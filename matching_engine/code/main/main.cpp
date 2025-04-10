@@ -4,11 +4,13 @@
 #include "engine.h"
 #include "order.h"
 
+#include "event.h"
+#include "event_bus.h"
+
 using json = nlohmann::json;
 using namespace std;
 
-
-int main(void){
+void TestEngine(){
     Engine engine;
 
     cout << "HI: " << endl;
@@ -39,6 +41,45 @@ int main(void){
     engine.Cyclic();
 
     engine.PrintOrderBook();
+}
+
+
+
+void handler(Event event){
+    cout << "handler1 " << event.GetJsonData() << endl;
+}
+
+void handler2(Event event){
+    cout << "handler2 " << event.GetJsonData() << endl;
+}
+
+void handler3(Event event){
+    cout << "handler3 " << event.GetJsonData() << endl;
+}
+
+void TestMessageBus(){
+    EventBus event_bus;
+
+    cout << "HI: " << endl;
+
+    event_bus.Subscribe(1, EVENT_ID_ADD_ORDER, handler);
+    event_bus.Subscribe(2, EVENT_ID_ADD_ORDER, handler2);
+    event_bus.Subscribe(3, EVENT_ID_ORDER_FILL, handler3);
+
+    json j_data = {{"p", 1}, {"q", 2}};
+    Event event(EVENT_ID_ADD_ORDER, j_data);
+
+    event_bus.Send(event);
+
+    event_bus.Cyclic();
+
+
+    cout << "BYE: " << endl;
+}
+
+
+int main(void){
+    TestMessageBus();
 
     return 0;
 }

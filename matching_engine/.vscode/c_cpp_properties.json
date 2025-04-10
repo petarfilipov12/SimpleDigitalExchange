@@ -4,7 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/code/engine/order_book"
+                "${workspaceFolder}/code/engine/order_book",
+                "${workspaceFolder}/code/message_bus/EventReceiver",
+                "${workspaceFolder}/code/Event",
+                "${workspaceFolder}/code/message_bus/EventBus",
+                "${workspaceFolder}/code/event_bus/EventReceiver",
+                "${workspaceFolder}/code/event_bus"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

@@ -15,6 +15,7 @@
         "span": "cpp",
         "sstream": "cpp",
         "ostream": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "functional": "cpp"
     }
 }

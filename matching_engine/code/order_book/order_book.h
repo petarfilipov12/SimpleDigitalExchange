@@ -1,6 +1,8 @@
 #ifndef ORDER_BOOK_H
 #define ORDER_BOOK_H
 
+#include <iostream>
+
 #include "book.h"
 #include "order.h"
 
@@ -8,16 +10,48 @@ using namespace std;
 
 class OrderBook{
     private:
-        Book<greater<float> > bid_book;
-        Book<less<float> > ask_book;
+        Book<greater<string> > bid_book;
+        Book<less<string> > ask_book;
     public:
         OrderBook(){}
+        
+        ~OrderBook(){
+            // this->bid_book.~Book();
+            // this->ask_book.~Book();
+        }
+
+        bool ExistsOrder(Order order) const{
+            bool ret = false;
+
+            if(order.order_side == ORDER_SIDE_BUY){
+                ret = this->bid_book.ExistsOrder(order);
+            }
+            else if(order.order_side == ORDER_SIDE_SELL){
+                ret = this->ask_book.ExistsOrder(order);
+            }
+            else{
+                
+            }
+
+            return ret;
+        }
+
+        bool ExistsOrderId(int id) const{
+            Order order(id);
+            bool ret = this->bid_book.ExistsOrder(order);
+
+            if(!ret){
+                ret = this->ask_book.ExistsOrder(order);
+            }
+
+            return ret;
+        }
 
         void AddOrder(Order order){
-            if(order.order_side == BUY){
+            if(order.order_side == ORDER_SIDE_BUY){
                 this->bid_book.AddOrder(order);
             }
-            else if(order.order_side == SELL){
+            else if(order.order_side == ORDER_SIDE_SELL){
                 this->ask_book.AddOrder(order);
             }
             else{
@@ -26,13 +60,8 @@ class OrderBook{
         }
 
         void CancelOrder(Order order){
-            if(this->bid_book.ExistsOrder(order)){
-                this->bid_book.CancelOrder(order);
-            }
-
-            if(this->ask_book.ExistsOrder(order)){
-                this->ask_book.CancelOrder(order);
-            }
+            this->bid_book.CancelOrder(order);
+            this->ask_book.CancelOrder(order);
         }
 
         void CancelOrderById(int id){

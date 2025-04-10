@@ -1,7 +1,7 @@
 #include <iostream>
 #include<nlohmann/json.hpp>
 
-#include "order_book.h"
+#include "engine.h"
 #include "order.h"
 
 using json = nlohmann::json;
@@ -9,26 +9,36 @@ using namespace std;
 
 
 int main(void){
-    OrderBook order_book;
+    Engine engine;
 
     cout << "HI: " << endl;
 
-    order_book.AddOrder(Order(1.1, 1, BUY));
-    order_book.AddOrder(Order(1.2, 2, BUY));
-    order_book.AddOrder(Order(1.1, 3, BUY));
+    engine.AddOrder(Order("1.1", 1, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
+    engine.AddOrder(Order("1.2", 2, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
+    engine.AddOrder(Order("1.1", 3, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
 
-    order_book.AddOrder(Order(1.4, 4, SELL));
-    order_book.AddOrder(Order(1.3, 5, SELL));
-    order_book.AddOrder(Order(1.4, 6, SELL));
+    engine.AddOrder(Order("1.4", 4, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
+    engine.AddOrder(Order("1.3", 5, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
+    engine.AddOrder(Order("1.4", 6, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
 
-    order_book.CancelOrderById(3);
-    order_book.CancelOrderById(6);
+    engine.GetOrderBook().PrintOrderBook();
 
-    order_book.PrintOrderBook();
+    cout << "##############" << endl;
 
-    cout << "---------" << endl;
-    order_book.GetBidFirst().PrintOrder();
-    order_book.GetAskFirst().PrintOrder();
+    engine.CancelOrderById(2);
+    engine.CancelOrderById(5);
+
+    engine.GetOrderBook().PrintOrderBook();
+
+    cout << "##############" << endl;
+    
+    engine.AddOrder(Order("0.0", 7, ORDER_SIDE_SELL, ORDER_TYPE_MARKET));
+    engine.AddOrder(Order("0.0", 8, ORDER_SIDE_BUY, ORDER_TYPE_MARKET));
+    
+    engine.Cyclic();
+    engine.Cyclic();
+
+    engine.GetOrderBook().PrintOrderBook();
 
     return 0;
 }

@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = 
+CFLAGS = -g
 
 PROGRAM_NAME = MatchingEngine_exec
 

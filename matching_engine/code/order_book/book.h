@@ -12,22 +12,22 @@ using namespace std;
 
 template <typename Comparator> class Book{
     private:
-        map<float, list<Order>, Comparator > book;
+        map<string, list<Order>, Comparator > book;
         unordered_set<Order, Order::HashFunc> orders;
     
     public:
         Book(){}
 
         ~Book(){
-            this->book.clear();
-            this->orders.clear();
+            // this->book.clear();
+            // this->orders.clear();
         }
 
-        bool ExistsOrder(Order order){
+        bool ExistsOrder(Order order) const{
             return this->orders.find(order) != this->orders.end();
         }
 
-        bool ExistsOrderId(int id){
+        bool ExistsOrderId(int id) const{
             return this->ExistsOrder(Order(id));
         }
 
@@ -46,6 +46,10 @@ template <typename Comparator> class Book{
 
                 if(pBookOrder != this->book[pOrder->price].end()){
                     this->book[pOrder->price].erase(pBookOrder);
+
+                    if(this->book[pOrder->price].empty()){
+                        this->book.erase(pOrder->price);
+                    }
                 }
 
                 this->orders.erase(pOrder);

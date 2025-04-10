@@ -21,14 +21,14 @@ int main(void){
     engine.AddOrder(Order("1.3", 5, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
     engine.AddOrder(Order("1.4", 6, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
 
-    engine.GetOrderBook().PrintOrderBook();
+    engine.PrintOrderBook();
 
     cout << "##############" << endl;
 
     engine.CancelOrderById(2);
     engine.CancelOrderById(5);
 
-    engine.GetOrderBook().PrintOrderBook();
+    engine.PrintOrderBook();
 
     cout << "##############" << endl;
     
@@ -38,7 +38,7 @@ int main(void){
     engine.Cyclic();
     engine.Cyclic();
 
-    engine.GetOrderBook().PrintOrderBook();
+    engine.PrintOrderBook();
 
     return 0;
 }

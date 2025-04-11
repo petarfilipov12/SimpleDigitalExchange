@@ -1,5 +1,8 @@
 #include <iostream>
-#include<nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
+#include <thread>
+
+#include "globals.h"
 
 #include "engine.h"
 #include "order.h"
@@ -7,79 +10,73 @@
 #include "event.h"
 #include "event_bus.h"
 
+#include "engine_event_handlers.h"
+#include "event_receiver_id.h"
+#include "event_logger.h"
+
+
 using json = nlohmann::json;
 using namespace std;
 
-void TestEngine(){
-    Engine engine;
+EventBus event_bus;
+Engine engine(&event_bus);
 
-    cout << "HI: " << endl;
-
-    engine.AddOrder(Order("1.1", 1, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
-    engine.AddOrder(Order("1.2", 2, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
-    engine.AddOrder(Order("1.1", 3, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT));
-
-    engine.AddOrder(Order("1.4", 4, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
-    engine.AddOrder(Order("1.3", 5, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
-    engine.AddOrder(Order("1.4", 6, ORDER_SIDE_SELL, ORDER_TYPE_LIMIT));
-
-    engine.PrintOrderBook();
-
-    cout << "##############" << endl;
-
-    engine.CancelOrderById(2);
-    engine.CancelOrderById(5);
-
-    engine.PrintOrderBook();
-
-    cout << "##############" << endl;
-    
-    engine.AddOrder(Order("0.0", 7, ORDER_SIDE_SELL, ORDER_TYPE_MARKET));
-    engine.AddOrder(Order("0.0", 8, ORDER_SIDE_BUY, ORDER_TYPE_MARKET));
-    
-    engine.Cyclic();
-    engine.Cyclic();
-
-    engine.PrintOrderBook();
+void StartEventBus()
+{
+    event_bus.run();
 }
 
-
-
-void handler(Event event){
-    cout << "handler1 " << event.GetJsonData() << endl;
+void StartEngine()
+{
+    engine.run();
 }
-
-void handler2(Event event){
-    cout << "handler2 " << event.GetJsonData() << endl;
-}
-
-void handler3(Event event){
-    cout << "handler3 " << event.GetJsonData() << endl;
-}
-
-void TestMessageBus(){
-    EventBus event_bus;
-
-    cout << "HI: " << endl;
-
-    event_bus.Subscribe(1, EVENT_ID_ADD_ORDER, handler);
-    event_bus.Subscribe(2, EVENT_ID_ADD_ORDER, handler2);
-    event_bus.Subscribe(3, EVENT_ID_ORDER_FILL, handler3);
-
-    json j_data = {{"p", 1}, {"q", 2}};
-    Event event(EVENT_ID_ADD_ORDER, j_data);
-
-    event_bus.Send(event);
-
-    event_bus.Cyclic();
-
-
-    cout << "BYE: " << endl;
-}
-
 
 int main(void){
-    TestMessageBus();
+    thread thread_event_bus(StartEventBus);
+    thread thread_engine(StartEngine);
+
+    event_bus.AddReceiver(RECEIVER_ID_ENGINE, EngineEventHandler_HandlerAddOrder);
+    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger_EventHandler);
+    EventLogger_Subscribe();
+
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+
+    while(true)
+    {
+        json j_data;
+        string price;
+        int order_id;
+        int order_side;
+        int order_type;
+
+
+        cout << "NEW ORDER:" << endl;
+
+        cout << "price: ";
+        cin >> price;
+
+        cout << "order_id: ";
+        cin >> order_id;
+
+        cout << "order_side: ";
+        cin >> order_side;
+
+        cout << "order_type: ";
+        cin >> order_type;
+
+
+        j_data["price"] = price;
+        j_data["order_id"] = order_id;
+        j_data["order_side"] = static_cast<enum OrderSide>(order_side);
+        j_data["order_type"] = static_cast<enum OrderType>(order_type);
+
+        Event event(EVENT_ID_ADD_ORDER, j_data);
+
+        event_bus.Send(event);
+    }
+    
+    thread_event_bus.join();
+    thread_engine.join();
 
     return 0;
 }

@@ -9,7 +9,8 @@
                 "${workspaceFolder}/code/Event",
                 "${workspaceFolder}/code/message_bus/EventBus",
                 "${workspaceFolder}/code/event_bus/EventReceiver",
-                "${workspaceFolder}/code/event_bus"
+                "${workspaceFolder}/code/event_bus",
+                "${workspaceFolder}/code/event"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

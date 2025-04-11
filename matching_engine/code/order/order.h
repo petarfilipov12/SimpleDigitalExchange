@@ -4,19 +4,9 @@
 #include <iostream>
 #include <functional>
 
+#include "order_enums.h"
+
 using namespace std;
-
-enum OrderSide{
-    ORDER_SIDE_BUY,
-    ORDER_SIDE_SELL,
-    ORDER_SIDE_INVALID
-};
-
-enum OrderType{
-    ORDER_TYPE_MARKET,
-    ORDER_TYPE_LIMIT,
-    ORDER_TYPE_INVALID
-};
 
 class Order{
     public:

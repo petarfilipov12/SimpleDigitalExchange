@@ -2,10 +2,13 @@
 #define ENGINE_H
 
 #include <iostream>
+#include <string>
 
 #include "order_book.h"
 #include "market_order_book.h"
 #include "order.h"
+#include "event.h"
+#include "event_bus.h"
 
 using namespace std;
 
@@ -13,9 +16,13 @@ class Engine{
     private:
         OrderBook order_book;
         MarketOrderBook market_book;
+        EventBus *event_bus;
     
     public:
-        Engine() {}
+        Engine(EventBus *event_bus)
+        {
+            this->event_bus = event_bus;
+        }
         
         ~Engine()
         {
@@ -110,15 +117,26 @@ class Engine{
         {
             Order bid_order = this->order_book.GetBidFirst();
             Order ask_order = this->order_book.GetAskFirst();
-        
-            if (stof(bid_order.price) >= stof(ask_order.price))
+
+            if ((bid_order.id != 0) && (ask_order.id != 0))
             {
-                cout << "BOOK Order FILL: " << endl;
-                bid_order.PrintOrder();
-                ask_order.PrintOrder();
-        
-                this->order_book.CancelOrderById(bid_order.id);
-                this->order_book.CancelOrderById(ask_order.id);
+                if (stof(bid_order.price) >= stof(ask_order.price))
+                {
+                    cout << "BOOK Order FILL: " << endl;
+                    bid_order.PrintOrder();
+                    ask_order.PrintOrder();
+
+                    json j_data;
+                    j_data["price"] = ask_order.price;
+                    j_data["bid_order_id"] = bid_order.id;
+                    j_data["ask_order_id"] = ask_order.id;
+
+                    Event event(EVENT_ID_ORDER_FILL, j_data);
+                    this->event_bus->Send(event);
+
+                    this->order_book.CancelOrderById(bid_order.id);
+                    this->order_book.CancelOrderById(ask_order.id);
+                }
             }
         }
         
@@ -126,14 +144,34 @@ class Engine{
         {
             Order market_order = this->market_book.GetFirst();
             Order book_order;
+            json j_data;
         
+            if(market_order.id == 0)
+            {
+                return;
+            }
+
             if (market_order.order_side == ORDER_SIDE_BUY)
             {
                 book_order = this->order_book.GetAskFirst();
+                if(book_order.id == 0)
+                {
+                    return;
+                }
+
+                j_data["ask_order_id"] = book_order.id;
+                j_data["bid_order_id"] = market_order.id;
             }
             else if (market_order.order_side == ORDER_SIDE_SELL)
             {
                 book_order = this->order_book.GetBidFirst();
+                if(book_order.id == 0)
+                {
+                    return;
+                }
+
+                j_data["ask_order_id"] = market_order.id;
+                j_data["bid_order_id"] = book_order.id;
             }
             else
             {
@@ -141,10 +179,14 @@ class Engine{
         
                 return;
             }
+            j_data["price"] = book_order.price;
         
             cout << "Market Order FILL: " << endl;
             market_order.PrintOrder();
             book_order.PrintOrder();
+
+            Event event(EVENT_ID_ORDER_FILL, j_data);
+            this->event_bus->Send(event);
         
             this->order_book.CancelOrderById(book_order.id);
             this->market_book.PopFirst();

@@ -16,7 +16,7 @@ HANDLER_FUNC(HandlerFunc){
 int main(void){
 
     // HTTP
-    Server svr;
+    SSLServer svr("../../server_certs/cert.pem", "../../server_certs/key.pem");
 
     svr.Get("/hi", HandlerFunc);
 

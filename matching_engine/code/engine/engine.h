@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "types.h"
 #include "order_book.h"
 #include "market_order_book.h"
 #include "order.h"
@@ -64,48 +65,60 @@ class Engine{
             return ret;
         }
         
-        void AddOrder(Order order)
+        Return_Type AddOrder(Order order)
         {
+            Return_Type ret = RET_NOT_OK;
+
             if (order.order_type == ORDER_TYPE_MARKET)
             {
-                this->market_book.AddMarketOrder(order);
+                ret = this->market_book.AddMarketOrder(order);
             }
             else if (order.order_type == ORDER_TYPE_LIMIT)
             {
-                this->order_book.AddOrder(order);
+                ret = this->order_book.AddOrder(order);
             }
             else
             {
                 // Error
             }
+
+            return ret;
         }
         
-        void CancelOrder(Order order)
+        Return_Type CancelOrder(Order order)
         {
+            Return_Type ret = RET_NOT_OK;
+
             if (order.order_type == ORDER_TYPE_MARKET)
             {
-                this->market_book.CancelMarketOrder(order);
+                ret = this->market_book.CancelMarketOrder(order);
             }
             else if (order.order_type == ORDER_TYPE_LIMIT)
             {
-                this->order_book.CancelOrder(order);
+                ret = this->order_book.CancelOrder(order);
             }
             else
             {
                 // Error
             }
+
+            return ret;
         }
         
-        void CancelOrderById(int id)
+        Return_Type CancelOrderById(int id)
         {
+            Return_Type ret = RET_NOT_OK;
+
             if (this->market_book.ExistsMarketOrderById(id))
             {
-                this->market_book.CancelMarketOrderById(id);
+                ret = this->market_book.CancelMarketOrderById(id);
             }
             else
             {
-                this->order_book.CancelOrderById(id);
+                ret = this->order_book.CancelOrderById(id);
             }
+
+            return ret;
         }
         
         void PrintOrderBook()
@@ -115,10 +128,13 @@ class Engine{
         
         void MatchOrderBook()
         {
-            Order bid_order = this->order_book.GetBidFirst();
-            Order ask_order = this->order_book.GetAskFirst();
+            Order bid_order;
+            Order ask_order;
 
-            if ((bid_order.id != 0) && (ask_order.id != 0))
+            if(
+                (RET_OK == this->order_book.GetBidFirst(&bid_order)) &&
+                (RET_OK == this->order_book.GetAskFirst(&ask_order))
+            )
             {
                 if (stof(bid_order.price) >= stof(ask_order.price))
                 {
@@ -142,19 +158,18 @@ class Engine{
         
         void MatchMarketOrder()
         {
-            Order market_order = this->market_book.GetFirst();
+            Order market_order;
             Order book_order;
             json j_data;
         
-            if(market_order.id == 0)
+            if(RET_OK != this->market_book.GetFirst(&market_order))
             {
                 return;
             }
 
             if (market_order.order_side == ORDER_SIDE_BUY)
             {
-                book_order = this->order_book.GetAskFirst();
-                if(book_order.id == 0)
+                if(RET_OK != this->order_book.GetAskFirst(&book_order))
                 {
                     return;
                 }
@@ -164,8 +179,7 @@ class Engine{
             }
             else if (market_order.order_side == ORDER_SIDE_SELL)
             {
-                book_order = this->order_book.GetBidFirst();
-                if(book_order.id == 0)
+                if(RET_OK != this->order_book.GetBidFirst(&book_order))
                 {
                     return;
                 }

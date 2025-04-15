@@ -40,6 +40,15 @@ class Order{
         //     return this->id < order2.id;
         // }
 
+        Order& operator=(const Order& order2){
+            this->price = order2.price;
+            this->id = order2.id;
+            this->order_side = order2.order_side;
+            this->order_type = order2.order_type;
+
+            return *this;
+        }
+
         bool operator==(const Order& order2) const{
             return this->id == order2.id;
         }

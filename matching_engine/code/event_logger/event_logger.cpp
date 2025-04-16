@@ -18,6 +18,6 @@ void EventLogger_Subscribe()
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {
-        event_bus.Subscribe(RECEIVER_ID_EVENT_LOGGER, static_cast<enum EventIds>(event_id));
+        event_bus.Subscribe(RECEIVER_ID_EVENT_LOGGER, event_id);
     }
 }

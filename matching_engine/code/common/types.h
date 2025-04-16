@@ -14,5 +14,6 @@ typedef unsigned int Return_Type;
 //Event Bus
 #define RET_RECEIVER_EXISTS     5u
 #define RET_RECEIVER_NOT_EXISTS 6u
+#define RET_EVENT_ID_INVALID    7u
 
 #endif

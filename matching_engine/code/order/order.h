@@ -2,33 +2,41 @@
 #define ORDER_H
 
 #include <string>
+#include<nlohmann/json.hpp>
+using json = nlohmann::json;
 
 using namespace std;
 
-enum OrderSide{
-    ORDER_SIDE_BUY,
-    ORDER_SIDE_SELL,
-    ORDER_SIDE_INVALID
-};
 
-enum OrderType{
-    ORDER_TYPE_MARKET,
-    ORDER_TYPE_LIMIT,
-    ORDER_TYPE_INVALID
-};
+#define ORDER_SIDE_BUY      0u
+#define ORDER_SIDE_SELL     1u
+#define ORDER_SIDE_INVALID  2u
+
+
+
+#define ORDER_TYPE_MARKET   0u
+#define ORDER_TYPE_LIMIT    1u
+#define ORDER_TYPE_INVALID  2u
+
 
 class Order{
     public:
         string price;
         int id;
-        enum OrderSide order_side;
-        enum OrderType order_type;
+        int order_side;
+        int order_type;
     
         Order();
 
         Order(int id);
 
-        Order(string price, int id, enum OrderSide order_side, enum OrderType order_type);
+        Order(string price, int id, int order_side, int order_type);
+
+        json ConvertToJson();
+
+        static string Convert_OrderSide_String(int order_side);
+
+        static string Convert_OrderType_String(int order_type);
 
         // bool operator<(Order order2) const{
         //     return this->id < order2.id;
@@ -47,6 +55,7 @@ class Order{
         };
 
         void PrintOrder();
+
 };
 
 #endif

@@ -60,45 +60,59 @@ Return_Type EventBus::RemoveReceiver(int receiver_id)
     return ret;
 }
 
-Return_Type EventBus::Subscribe(int receiver_id, enum EventIds event_id)
+Return_Type EventBus::Subscribe(int receiver_id, int event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 
-    this->receivers_lock.lock();
-    if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
+    if(event_id < EVENT_ID_INVALID)
     {
-        EventReceiver receiver = this->event_receivers[receiver_id];
+        this->receivers_lock.lock();
+        if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
+        {
+            EventReceiver receiver = this->event_receivers[receiver_id];
 
-        receiver.AddEvent(event_id);
-        this->events_to_receivers_map[event_id].insert(receiver_id);
+            receiver.AddEvent(event_id);
+            this->events_to_receivers_map[event_id].insert(receiver_id);
 
-        ret = RET_OK;
+            ret = RET_OK;
+        }
+        this->receivers_lock.unlock();
     }
-    this->receivers_lock.unlock();
+    else
+    {
+        ret = RET_EVENT_ID_INVALID;
+    }
 
     return ret;
 }
 
-Return_Type EventBus::Unsubscribe(int receiver_id, enum EventIds event_id)
+Return_Type EventBus::Unsubscribe(int receiver_id, int event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 
-    this->receivers_lock.lock();
-    if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
+    if(event_id < EVENT_ID_INVALID)
     {
-        this->event_receivers[receiver_id].RemoveEvent(event_id);
-
-        if (this->events_to_receivers_map[event_id].erase(receiver_id))
+        this->receivers_lock.lock();
+        if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
-            if (this->events_to_receivers_map[event_id].empty())
-            {
-                this->events_to_receivers_map.erase(event_id);
-            }
-        }
+            this->event_receivers[receiver_id].RemoveEvent(event_id);
 
-        ret = RET_OK;
+            if (this->events_to_receivers_map[event_id].erase(receiver_id))
+            {
+                if (this->events_to_receivers_map[event_id].empty())
+                {
+                    this->events_to_receivers_map.erase(event_id);
+                }
+            }
+
+            ret = RET_OK;
+        }
+        this->receivers_lock.unlock();
     }
-    this->receivers_lock.unlock();
+    else
+    {
+        ret = RET_EVENT_ID_INVALID;
+    }
 
     return ret;
 }

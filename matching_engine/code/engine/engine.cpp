@@ -48,6 +48,7 @@ bool Engine::ExistsOrderId(int id) const
 Return_Type Engine::AddOrder(Order order)
 {
     Return_Type ret = RET_NOT_OK;
+    json j_data;
 
     if (order.order_type == ORDER_TYPE_MARKET)
     {
@@ -62,12 +63,30 @@ Return_Type Engine::AddOrder(Order order)
         // Error
     }
 
+    if(RET_OK != ret)
+    {
+        j_data["error"] = "Add order failed";
+        j_data["data"] = order.ConvertToJson();
+
+        Event event(EVENT_ID_ADD_ORDER_FAILLED, j_data);
+        this->event_bus->Send(event);
+    }
+    else
+    {
+        j_data["msg"] = "Order Added";
+        j_data["data"] = order.ConvertToJson();
+
+        Event event(EVENT_ID_ORDER_ADDED, j_data);
+        this->event_bus->Send(event);
+    }
+
     return ret;
 }
 
 Return_Type Engine::CancelOrder(Order order)
 {
     Return_Type ret = RET_NOT_OK;
+    json j_data;
 
     if (order.order_type == ORDER_TYPE_MARKET)
     {
@@ -82,12 +101,30 @@ Return_Type Engine::CancelOrder(Order order)
         // Error
     }
 
+    if(RET_OK != ret)
+    {
+        j_data["error"] = "Cancel order failed";
+        j_data["data"] = order.ConvertToJson();
+
+        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data);
+        this->event_bus->Send(event);
+    }
+    else
+    {
+        j_data["msg"] = "Order canceled";
+        j_data["data"] = order.ConvertToJson();
+
+        Event event(EVENT_ID_ORDER_CANCELED, j_data);
+        this->event_bus->Send(event);
+    }
+
     return ret;
 }
 
 Return_Type Engine::CancelOrderById(int id)
 {
     Return_Type ret = RET_NOT_OK;
+    json j_data;
 
     if (this->market_book.ExistsMarketOrderById(id))
     {
@@ -96,6 +133,23 @@ Return_Type Engine::CancelOrderById(int id)
     else
     {
         ret = this->order_book.CancelOrderById(id);
+    }
+
+    if(RET_OK != ret)
+    {
+        j_data["error"] = "Cancel order failed";
+        j_data["data"] = {{"order_id", id}};
+
+        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data);
+        this->event_bus->Send(event);
+    }
+    else
+    {
+        j_data["msg"] = "Order canceled";
+        j_data["data"] = {{"order_id", id}};
+
+        Event event(EVENT_ID_ORDER_CANCELED, j_data);
+        this->event_bus->Send(event);
     }
 
     return ret;
@@ -122,7 +176,7 @@ void Engine::MatchOrderBook()
             j_data["bid_order_id"] = bid_order.id;
             j_data["ask_order_id"] = ask_order.id;
 
-            Event event(EVENT_ID_ORDER_FILL, j_data);
+            Event event(EVENT_ID_ORDER_FILLED, j_data);
             this->event_bus->Send(event);
 
             this->order_book.CancelOrderById(bid_order.id);
@@ -170,7 +224,7 @@ void Engine::MatchMarketOrder()
     }
     j_data["price"] = book_order.price;
 
-    Event event(EVENT_ID_ORDER_FILL, j_data);
+    Event event(EVENT_ID_ORDER_FILLED, j_data);
     this->event_bus->Send(event);
 
     this->order_book.CancelOrderById(book_order.id);

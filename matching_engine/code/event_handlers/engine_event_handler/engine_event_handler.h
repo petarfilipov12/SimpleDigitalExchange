@@ -3,6 +3,6 @@
 
 #include "event.h"
 
-void EngineEventHandler_HandlerAddOrder(Event event);
+void Engine_EventHandler(Event event);
 
 #endif

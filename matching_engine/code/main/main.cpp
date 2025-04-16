@@ -10,12 +10,12 @@
 #include "event.h"
 #include "event_bus.h"
 
-#include "engine_event_handlers.h"
+#include "engine_event_handler.h"
 #include "event_receiver_id.h"
 #include "event_logger.h"
 
 #include "rest_server.h"
-#include "rest_server_endpoit_handlers.h"
+#include "rest_server_handlers.h"
 
 
 using json = nlohmann::json;
@@ -36,8 +36,9 @@ void Init_Engine()
     thread thread_engine([]{engine.run();});
     thread_engine.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_ENGINE, EngineEventHandler_HandlerAddOrder);
+    event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine_EventHandler);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
 }
 
 void Init_EventLogger()
@@ -48,7 +49,8 @@ void Init_EventLogger()
 
 void Init_RestServer()
 {
-    rest_server.SetUrlPath("/add_order", RestServerHandler_HandlerAddOrder);
+    rest_server.SetUrlPath("/add_order", RestServerHandler_AddOrder);
+    rest_server.SetUrlPath("/cancel_order", RestServerHandler_CancelOrder);
 
     thread thread_rest_server([]{rest_server.run();});
     thread_rest_server.detach();
@@ -62,36 +64,7 @@ int main(void){
 
     while(true)
     {
-        json j_data;
-        string price;
-        int order_id;
-        int order_side;
-        int order_type;
-
-
-        cout << "NEW ORDER:" << endl;
-
-        cout << "price: ";
-        cin >> price;
-
-        cout << "order_id: ";
-        cin >> order_id;
-
-        cout << "order_side: ";
-        cin >> order_side;
-
-        cout << "order_type: ";
-        cin >> order_type;
-
-
-        j_data["price"] = price;
-        j_data["order_id"] = order_id;
-        j_data["order_side"] = static_cast<enum OrderSide>(order_side);
-        j_data["order_type"] = static_cast<enum OrderType>(order_type);
-
-        Event event(EVENT_ID_ADD_ORDER, j_data);
-
-        event_bus.Send(event);
+        sleep(1);
     }
 
     return 0;

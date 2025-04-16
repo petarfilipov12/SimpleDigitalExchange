@@ -17,7 +17,7 @@ class EventBus
 {
 private:
     map<int, EventReceiver> event_receivers;
-    map<enum EventIds, unordered_set<int> > events_to_receivers_map;
+    map<int, unordered_set<int> > events_to_receivers_map;
     queue<Event> event_queue;
 
     mutable mutex receivers_lock;
@@ -34,9 +34,9 @@ public:
 
     Return_Type RemoveReceiver(int receiver_id);
 
-    Return_Type Subscribe(int receiver_id, enum EventIds event_id);
+    Return_Type Subscribe(int receiver_id, int event_id);
 
-    Return_Type Unsubscribe(int receiver_id, enum EventIds event_id);
+    Return_Type Unsubscribe(int receiver_id, int event_id);
 
     void Send(Event event);
 

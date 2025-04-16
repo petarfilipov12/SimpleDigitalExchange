@@ -14,32 +14,51 @@
 #include "event_receiver_id.h"
 #include "event_logger.h"
 
+#include "rest_server.h"
+#include "rest_server_endpoit_handlers.h"
+
 
 using json = nlohmann::json;
 using namespace std;
 
 EventBus event_bus;
 Engine engine(&event_bus);
+RestServer rest_server("../../server_certs/cert.pem", "../../server_certs/key.pem");
 
-void StartEventBus()
+void Init_EventBus()
 {
-    event_bus.run();
+    thread thread_event_bus([]{event_bus.run();});
+    thread_event_bus.detach();
 }
 
-void StartEngine()
+void Init_Engine()
 {
-    engine.run();
+    thread thread_engine([]{engine.run();});
+    thread_engine.detach();
+
+    event_bus.AddReceiver(RECEIVER_ID_ENGINE, EngineEventHandler_HandlerAddOrder);
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+}
+
+void Init_EventLogger()
+{
+    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger_EventHandler);
+    EventLogger_Subscribe();
+}
+
+void Init_RestServer()
+{
+    rest_server.SetUrlPath("/add_order", RestServerHandler_HandlerAddOrder);
+
+    thread thread_rest_server([]{rest_server.run();});
+    thread_rest_server.detach();
 }
 
 int main(void){
-    thread thread_event_bus(StartEventBus);
-    thread thread_engine(StartEngine);
-
-    event_bus.AddReceiver(RECEIVER_ID_ENGINE, EngineEventHandler_HandlerAddOrder);
-    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger_EventHandler);
-    EventLogger_Subscribe();
-
-    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+    Init_EventBus();
+    Init_Engine();
+    Init_EventLogger();
+    Init_RestServer();
 
     while(true)
     {
@@ -74,9 +93,6 @@ int main(void){
 
         event_bus.Send(event);
     }
-    
-    thread_event_bus.join();
-    thread_engine.join();
 
     return 0;
 }

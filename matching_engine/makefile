@@ -1,5 +1,6 @@
 CC = g++
 CFLAGS = -g
+CFLAGS_END = -lssl -lcrypto
 
 PROGRAM_NAME = MatchingEngine_exec
 
@@ -15,7 +16,7 @@ DEPENDS = $(patsubst %.cpp, %.o, $(OBJS))
 
 
 $(PROGRAM_NAME): $(OBJS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(PROGRAM_NAME) $^
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(PROGRAM_NAME) $^ $(CFLAGS_END)
 
 $(BUILD_DIR):
 	mkdir -pv $(BUILD_DIR)

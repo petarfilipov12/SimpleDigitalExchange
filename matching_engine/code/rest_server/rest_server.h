@@ -24,7 +24,7 @@ public:
 
     ~RestServer();
 
-    void SetUrlPath(string url_path, function<void(const Request&, Response&)> handler_func);
+    void Post(string url_path, function<void(const Request&, Response&)> handler_func);
 
     void run();
 

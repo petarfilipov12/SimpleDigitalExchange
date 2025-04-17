@@ -23,7 +23,7 @@ using namespace std;
 
 EventBus event_bus;
 Engine engine(&event_bus);
-RestServer rest_server("../../server_certs/cert.pem", "../../server_certs/key.pem");
+RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem");
 
 void Init_EventBus()
 {
@@ -49,14 +49,16 @@ void Init_EventLogger()
 
 void Init_RestServer()
 {
-    rest_server.SetUrlPath("/add_order", RestServerHandler_AddOrder);
-    rest_server.SetUrlPath("/cancel_order", RestServerHandler_CancelOrder);
+    rest_server.Post("/add_order", RestServerHandler_AddOrder);
+    rest_server.Post("/cancel_order", RestServerHandler_CancelOrder);
 
     thread thread_rest_server([]{rest_server.run();});
     thread_rest_server.detach();
 }
 
 int main(void){
+    srand(time(0));
+    
     Init_EventBus();
     Init_Engine();
     Init_EventLogger();

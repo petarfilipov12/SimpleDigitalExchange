@@ -9,22 +9,14 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
 {
     cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
 
-    // json j_data;
-    // string price;
-    // int order_id;
-    // int order_side;
-    // int order_type;
+    json j_data = json::parse(req.body);
+    j_data["order_id"] = rand();
 
-    // j_data["price"] = price;
-    // j_data["order_id"] = order_id;
-    // j_data["order_side"] = order_side;
-    // j_data["order_type"] = order_type;
+    Event event(EVENT_ID_ADD_ORDER, j_data);
 
-    // Event event(EVENT_ID_ADD_ORDER, j_data);
+    event_bus.Send(event);
 
-    // event_bus.Send(event);
-
-    res.set_content("ADD_ORDER", "text/plain");
+    res.set_content(j_data.dump(), "application/json");
 }
 
 HANDLER_FUNC(RestServerHandler_CancelOrder)

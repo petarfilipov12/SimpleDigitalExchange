@@ -24,9 +24,9 @@ RestServer::~RestServer()
     delete this->svr;
 }
 
-void RestServer::SetUrlPath(string url_path, function<void(const Request &, Response &)> handler_func)
+void RestServer::Post(string url_path, function<void(const Request &, Response &)> handler_func)
 {
-    this->svr->Get(url_path, handler_func);
+    this->svr->Post(url_path, handler_func);
 }
 
 void RestServer::run()

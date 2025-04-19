@@ -16,4 +16,6 @@ typedef unsigned int Return_Type;
 #define RET_RECEIVER_NOT_EXISTS 6u
 #define RET_EVENT_ID_INVALID    7u
 
+#define RET_INVALID             255u
+
 #endif

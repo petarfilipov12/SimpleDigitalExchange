@@ -3,20 +3,36 @@
 #include "globals.h"
 
 using namespace std;
+using json = nlohmann::json;
 
 static void Engine_EventHandler_AddOrder(Event event)
 {
-    string price = event.GetJsonData()["price"];
-    int order_id = event.GetJsonData()["order_id"];
-    int order_side = event.GetJsonData()["order_side"];
-    int order_type = event.GetJsonData()["order_type"];
+    Return_Type ret;
 
-    engine.AddOrder(Order(price, order_id, order_side, order_type));
+    ret = engine.AddOrder(Order(
+        event.GetJsonData()["price"],
+        event.GetJsonData()["order_id"],
+        static_cast<enum eOrderSide_t>(event.GetJsonData()["order_side"]),
+        static_cast<enum eOrderType_t>(event.GetJsonData()["order_type"])
+    ));
+
+    if(nullptr != event.GetResponcePtr())
+    {
+        *(event.GetResponcePtr()) = ret;
+    }
+
 }
 
 static void Engine_EventHandler_CancelOrder(Event event)
 {
-    engine.CancelOrderById(event.GetJsonData()["order_id"]);
+    Return_Type ret;
+
+    ret = engine.CancelOrderById(event.GetJsonData()["order_id"]);
+
+    if(nullptr != event.GetResponcePtr())
+    {
+        *(event.GetResponcePtr()) = ret;
+    }
 }
 
 void Engine_EventHandler(Event event)

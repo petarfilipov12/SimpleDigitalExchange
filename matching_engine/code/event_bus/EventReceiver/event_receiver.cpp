@@ -18,12 +18,12 @@ EventReceiver::~EventReceiver()
     this->events.clear();
 }
 
-void EventReceiver::AddEvent(int event_id)
+void EventReceiver::AddEvent(enum eEventId_t event_id)
 {
     this->events.insert(event_id);
 }
 
-void EventReceiver::RemoveEvent(int event_id)
+void EventReceiver::RemoveEvent(enum eEventId_t event_id)
 {
     this->events.erase(event_id);
 }
@@ -33,12 +33,12 @@ bool EventReceiver::HaveEvents() const
     return (!this->events.empty());
 }
 
-bool EventReceiver::ContainsEvent(int event_id)
+bool EventReceiver::ContainsEvent(enum eEventId_t event_id)
 {
     return this->events.find(event_id) != this->events.end();
 }
 
-unordered_set<int> EventReceiver::GetEvents() const
+unordered_set<enum eEventId_t> EventReceiver::GetEvents() const
 {
     return this->events;
 }

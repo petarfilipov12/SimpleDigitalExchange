@@ -7,36 +7,38 @@ using json = nlohmann::json;
 
 using namespace std;
 
+enum eOrderSide_t
+{
+    ORDER_SIDE_BUY,
+    ORDER_SIDE_SELL,
+    ORDER_SIDE_INVALID
+};
 
-#define ORDER_SIDE_BUY      0u
-#define ORDER_SIDE_SELL     1u
-#define ORDER_SIDE_INVALID  2u
-
-
-
-#define ORDER_TYPE_MARKET   0u
-#define ORDER_TYPE_LIMIT    1u
-#define ORDER_TYPE_INVALID  2u
-
+enum eOrderType_t
+{
+    ORDER_TYPE_MARKET,
+    ORDER_TYPE_LIMIT,
+    ORDER_TYPE_INVALID
+};
 
 class Order{
     public:
         string price;
         int id;
-        int order_side;
-        int order_type;
+        enum eOrderSide_t order_side;
+        enum eOrderType_t order_type;
     
         Order();
 
         Order(int id);
 
-        Order(string price, int id, int order_side, int order_type);
+        Order(string price, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type);
 
         json ConvertToJson();
 
-        static string Convert_OrderSide_String(int order_side);
+        static string Convert_OrderSide_String(enum eOrderSide_t order_side);
 
-        static string Convert_OrderType_String(int order_type);
+        static string Convert_OrderType_String(enum eOrderType_t order_type);
 
         // bool operator<(Order order2) const{
         //     return this->id < order2.id;

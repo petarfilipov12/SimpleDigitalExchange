@@ -60,7 +60,7 @@ Return_Type EventBus::RemoveReceiver(int receiver_id)
     return ret;
 }
 
-Return_Type EventBus::Subscribe(int receiver_id, int event_id)
+Return_Type EventBus::Subscribe(int receiver_id, enum eEventId_t event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -86,7 +86,7 @@ Return_Type EventBus::Subscribe(int receiver_id, int event_id)
     return ret;
 }
 
-Return_Type EventBus::Unsubscribe(int receiver_id, int event_id)
+Return_Type EventBus::Unsubscribe(int receiver_id, enum eEventId_t event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 

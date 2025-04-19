@@ -68,7 +68,7 @@ Return_Type Engine::AddOrder(Order order)
         j_data["error"] = "Add order failed";
         j_data["data"] = order.ConvertToJson();
 
-        Event event(EVENT_ID_ADD_ORDER_FAILLED, j_data);
+        Event event(EVENT_ID_ADD_ORDER_FAILLED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
@@ -76,7 +76,7 @@ Return_Type Engine::AddOrder(Order order)
         j_data["msg"] = "Order Added";
         j_data["data"] = order.ConvertToJson();
 
-        Event event(EVENT_ID_ORDER_ADDED, j_data);
+        Event event(EVENT_ID_ORDER_ADDED, j_data, nullptr);
         this->event_bus->Send(event);
     }
 
@@ -106,7 +106,7 @@ Return_Type Engine::CancelOrder(Order order)
         j_data["error"] = "Cancel order failed";
         j_data["data"] = order.ConvertToJson();
 
-        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data);
+        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
@@ -114,7 +114,7 @@ Return_Type Engine::CancelOrder(Order order)
         j_data["msg"] = "Order canceled";
         j_data["data"] = order.ConvertToJson();
 
-        Event event(EVENT_ID_ORDER_CANCELED, j_data);
+        Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
         this->event_bus->Send(event);
     }
 
@@ -140,7 +140,7 @@ Return_Type Engine::CancelOrderById(int id)
         j_data["error"] = "Cancel order failed";
         j_data["data"] = {{"order_id", id}};
 
-        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data);
+        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
@@ -148,7 +148,7 @@ Return_Type Engine::CancelOrderById(int id)
         j_data["msg"] = "Order canceled";
         j_data["data"] = {{"order_id", id}};
 
-        Event event(EVENT_ID_ORDER_CANCELED, j_data);
+        Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
         this->event_bus->Send(event);
     }
 
@@ -176,7 +176,7 @@ void Engine::MatchOrderBook()
             j_data["bid_order_id"] = bid_order.id;
             j_data["ask_order_id"] = ask_order.id;
 
-            Event event(EVENT_ID_ORDER_FILLED, j_data);
+            Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
             this->event_bus->Send(event);
 
             this->order_book.CancelOrderById(bid_order.id);
@@ -224,7 +224,7 @@ void Engine::MatchMarketOrder()
     }
     j_data["price"] = book_order.price;
 
-    Event event(EVENT_ID_ORDER_FILLED, j_data);
+    Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
     this->event_bus->Send(event);
 
     this->order_book.CancelOrderById(book_order.id);

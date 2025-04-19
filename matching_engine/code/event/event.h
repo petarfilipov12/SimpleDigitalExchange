@@ -1,39 +1,46 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "types.h"
+
 #include<nlohmann/json.hpp>
 using json = nlohmann::json;
 
+enum eEventId_t
+{
+    EVENT_ID_ADD_ORDER,
+    EVENT_ID_CANCEL_ORDER,
 
-#define EVENT_ID_ADD_ORDER              0u
-#define EVENT_ID_CANCEL_ORDER           1u
+    EVENT_ID_ORDER_ADDED,
+    EVENT_ID_ADD_ORDER_FAILLED,
 
-#define EVENT_ID_ORDER_ADDED            2u
-#define EVENT_ID_ADD_ORDER_FAILLED      3u
+    EVENT_ID_ORDER_CANCELED,
+    EVENT_ID_CANCEL_ORDER_FAILED,
 
-#define EVENT_ID_ORDER_CANCELED         4u
-#define EVENT_ID_CANCEL_ORDER_FAILED    5u
+    EVENT_ID_ORDER_FILLED,
 
-#define EVENT_ID_ORDER_FILLED           6u
-
-#define EVENT_ID_INVALID                7u
+    EVENT_ID_INVALID
+};
 
 
 class Event{
     private:
-        int event_id;
+        enum eEventId_t event_id;
         json json_data;
+        Return_Type *responce;
 
     public:
         Event();
 
-        Event(int event_id, json json_data);
+        Event(enum eEventId_t event_id, json json_data, Return_Type *responce);
 
         Event(const Event& event2);
 
-        int GetEventId() const;
+        enum eEventId_t GetEventId() const;
 
         json GetJsonData() const;
+
+        Return_Type* GetResponcePtr() const;
 };
 
 #endif

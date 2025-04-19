@@ -20,7 +20,7 @@ Order::Order(int id)
     this->order_type = ORDER_TYPE_INVALID;
 }
 
-Order::Order(string price, int id, int order_side, int order_type)
+Order::Order(string price, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type)
 {
     this->price = price;
     this->id = id;
@@ -40,7 +40,7 @@ json Order::ConvertToJson()
     return j_data;
 }
 
-string Order::Convert_OrderSide_String(int order_side)
+string Order::Convert_OrderSide_String(enum eOrderSide_t order_side)
 {
     string s_order_side;
 
@@ -60,7 +60,7 @@ string Order::Convert_OrderSide_String(int order_side)
     return s_order_side;
 }
 
-string Order::Convert_OrderType_String(int order_type)
+string Order::Convert_OrderType_String(enum eOrderType_t order_type)
 {
     string s_order_type;
 

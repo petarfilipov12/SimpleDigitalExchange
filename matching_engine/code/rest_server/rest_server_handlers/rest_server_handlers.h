@@ -1,3 +1,7 @@
+#ifndef REST_SERVER_HANDLER_H
+#define REST_SERVER_HANDLER_H
+
+#include "types.h"
 #include "globals.h"
 #include <iostream>
 
@@ -9,34 +13,47 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
 {
     cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
 
+    Return_Type responce = RET_INVALID;
+    json responce_data;
     json j_data = json::parse(req.body);
     j_data["order_id"] = rand();
 
-    Event event(EVENT_ID_ADD_ORDER, j_data);
+    Event event(EVENT_ID_ADD_ORDER, j_data, &responce);
 
     event_bus.Send(event);
 
-    res.set_content(j_data.dump(), "application/json");
+    while(RET_INVALID == responce)
+    {
+        //Timer
+    }
+
+    responce_data["error"] = responce;
+    responce_data["data"] = j_data;
+
+    res.set_content(responce_data.dump(), "application/json");
 }
 
 HANDLER_FUNC(RestServerHandler_CancelOrder)
 {
     cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
 
-    // json j_data;
-    // string price;
-    // int order_id;
-    // int order_side;
-    // int order_type;
+    Return_Type responce = RET_INVALID;
+    json responce_data;
+    json j_data = json::parse(req.body);
 
-    // j_data["price"] = price;
-    // j_data["order_id"] = order_id;
-    // j_data["order_side"] = order_side;
-    // j_data["order_type"] = order_type;
+    Event event(EVENT_ID_CANCEL_ORDER, j_data, &responce);
 
-    // Event event(EVENT_ID_ADD_ORDER, j_data);
+    event_bus.Send(event);
 
-    // event_bus.Send(event);
+    while(RET_INVALID == responce)
+    {
+        //Timer
+    }
 
-    res.set_content("CANCEL_ORDER", "text/plain");
+    responce_data["error"] = responce;
+    responce_data["data"] = j_data;
+
+    res.set_content(responce_data.dump(), "application/json");
 }
+
+#endif

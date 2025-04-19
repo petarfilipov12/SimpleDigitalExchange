@@ -34,9 +34,9 @@ public:
 
     Return_Type RemoveReceiver(int receiver_id);
 
-    Return_Type Subscribe(int receiver_id, int event_id);
+    Return_Type Subscribe(int receiver_id, enum eEventId_t event_id);
 
-    Return_Type Unsubscribe(int receiver_id, int event_id);
+    Return_Type Unsubscribe(int receiver_id, enum eEventId_t event_id);
 
     void Send(Event event);
 

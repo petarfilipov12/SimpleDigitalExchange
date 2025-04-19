@@ -12,7 +12,7 @@ class EventReceiver
 {
 private:
     int id;
-    unordered_set<int> events;
+    unordered_set<enum eEventId_t> events;
     function<void(Event)> callback;
 public:
     EventReceiver();
@@ -21,15 +21,15 @@ public:
 
     ~EventReceiver();
 
-    void AddEvent(int event_id);
+    void AddEvent(enum eEventId_t event_id);
 
-    void RemoveEvent(int event_id);
+    void RemoveEvent(enum eEventId_t event_id);
 
     bool HaveEvents() const;
 
-    bool ContainsEvent(int event_id);
+    bool ContainsEvent(enum eEventId_t event_id);
 
-    unordered_set<int> GetEvents() const;
+    unordered_set<enum eEventId_t> GetEvents() const;
 
     int GetId() const;
 

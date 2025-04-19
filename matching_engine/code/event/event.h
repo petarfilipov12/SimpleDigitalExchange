@@ -27,12 +27,12 @@ class Event{
     private:
         enum eEventId_t event_id;
         json json_data;
-        Return_Type *responce;
+        json *responce_data;
 
     public:
         Event();
 
-        Event(enum eEventId_t event_id, json json_data, Return_Type *responce);
+        Event(enum eEventId_t event_id, json json_data, json *responce_data);
 
         Event(const Event& event2);
 
@@ -40,7 +40,7 @@ class Event{
 
         json GetJsonData() const;
 
-        Return_Type* GetResponcePtr() const;
+        json* GetResponceDataPtr() const;
 };
 
 #endif

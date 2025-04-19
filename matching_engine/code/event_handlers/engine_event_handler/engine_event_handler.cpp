@@ -16,9 +16,11 @@ static void Engine_EventHandler_AddOrder(Event event)
         static_cast<enum eOrderType_t>(event.GetJsonData()["order_type"])
     ));
 
-    if(nullptr != event.GetResponcePtr())
+    if(nullptr != event.GetResponceDataPtr())
     {
-        *(event.GetResponcePtr()) = ret;
+
+        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
     }
 
 }
@@ -29,9 +31,10 @@ static void Engine_EventHandler_CancelOrder(Event event)
 
     ret = engine.CancelOrderById(event.GetJsonData()["order_id"]);
 
-    if(nullptr != event.GetResponcePtr())
+    if(nullptr != event.GetResponceDataPtr())
     {
-        *(event.GetResponcePtr()) = ret;
+        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
     }
 }
 

@@ -3,21 +3,21 @@
 Event::Event()
 {
     this->event_id = EVENT_ID_INVALID;
-    this->responce = nullptr;
+    this->responce_data = nullptr;
 }
 
-Event::Event(enum eEventId_t event_id, json json_data, Return_Type *responce)
+Event::Event(enum eEventId_t event_id, json json_data, json *responce_data)
 {
     this->event_id = event_id;
     this->json_data = json_data;
-    this->responce = responce;
+    this->responce_data = responce_data;
 }
 
 Event::Event(const Event &event2)
 {
     this->event_id = event2.event_id;
     this->json_data = event2.json_data;
-    this->responce = event2.responce;
+    this->responce_data = event2.responce_data;
 }
 
 enum eEventId_t Event::GetEventId() const
@@ -30,7 +30,7 @@ json Event::GetJsonData() const
     return this->json_data;
 }
 
-Return_Type* Event::GetResponcePtr() const
+json* Event::GetResponceDataPtr() const
 {
-    return this->responce;
+    return this->responce_data;
 }

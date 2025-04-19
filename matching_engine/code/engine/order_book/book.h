@@ -15,6 +15,7 @@ using namespace std;
 template <typename Comparator> class Book{
     private:
         map<string, list<Order>, Comparator > book;
+        map<string, float, Comparator > book_l2;
         unordered_set<Order, Order::HashFunc> orders;
 
         mutable mutex book_lock;
@@ -47,6 +48,8 @@ template <typename Comparator> class Book{
                 this->book[order.price].push_back(order);
                 this->orders.insert(order);
 
+                this->book_l2[order.price] += 1.0; //TODO order amount
+
                 ret = RET_OK;
             }
             this->book_lock.unlock();
@@ -68,6 +71,11 @@ template <typename Comparator> class Book{
 
                     if(this->book[pOrder->price].empty()){
                         this->book.erase(pOrder->price);
+                        this->book_l2.erase(pOrder->price);
+                    }
+                    else
+                    {
+                        this->book_l2[pOrder->price] -= 1.0; //TODO order amount
                     }
                 }
 
@@ -99,6 +107,21 @@ template <typename Comparator> class Book{
             return ret;
         }
 
+        Return_Type GetL2Book(map<string, float, Comparator > *book_l2)
+        {
+            Return_Type ret = RET_BOOK_EMPTY;
+
+            this->book_lock.lock();
+            if(!this->book_l2.empty())
+            {
+                *book_l2 = this->book_l2;
+
+                ret = RET_OK;
+            }
+            this->book_lock.unlock();
+
+            return ret;
+        }
 
         void PrintBook(){
             this->book_lock.lock();

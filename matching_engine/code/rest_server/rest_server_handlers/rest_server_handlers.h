@@ -48,4 +48,22 @@ HANDLER_FUNC(RestServerHandler_CancelOrder)
     res.set_content(responce_data.dump(), "application/json");
 }
 
+HANDLER_FUNC(RestServerHandler_GetOrderBook)
+{
+    cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
+
+    json responce_data;
+
+    Event event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data);
+
+    event_bus.Send(event);
+
+    while(responce_data.empty())
+    {
+        //Timer
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
 #endif

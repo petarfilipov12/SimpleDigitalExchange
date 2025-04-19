@@ -5,6 +5,9 @@
 #include "book.h"
 #include "order.h"
 
+#include<nlohmann/json.hpp>
+using json = nlohmann::json;
+
 class OrderBook{
     private:
         Book<greater<string> > bid_book;
@@ -27,6 +30,8 @@ class OrderBook{
         Return_Type GetBidFirst(Order *pOrder);
 
         Return_Type GetAskFirst(Order *pOrder);
+
+        Return_Type GetL2Book(json *l2_book);
 
         void PrintOrderBook();
 

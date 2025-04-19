@@ -155,6 +155,11 @@ Return_Type Engine::CancelOrderById(int id)
     return ret;
 }
 
+Return_Type Engine::GetOrderBook(json *l2_book)
+{
+    return this->order_book.GetL2Book(l2_book);
+}
+
 void Engine::PrintOrderBook()
 {
     this->order_book.PrintOrderBook();

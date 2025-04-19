@@ -19,6 +19,8 @@ enum eEventId_t
 
     EVENT_ID_ORDER_FILLED,
 
+    EVENT_ID_GET_ORDER_BOOK,
+
     EVENT_ID_INVALID
 };
 

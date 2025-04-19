@@ -92,6 +92,30 @@ Return_Type OrderBook::GetAskFirst(Order *pOrder)
     return this->ask_book.GetFirst(pOrder);
 }
 
+Return_Type OrderBook::GetL2Book(json *l2_order_book)
+{
+    Return_Type ret;
+    map<string, float, greater<string> > bid_l2_book;
+    map<string, float, less<string> > ask_l2_book;
+
+    (*l2_order_book)["ask"] = {};
+    (*l2_order_book)["bid"] = {};
+
+    ret = this->ask_book.GetL2Book(&ask_l2_book);
+    if(RET_OK == ret)
+    {
+        (*l2_order_book)["ask"] = ask_l2_book;
+    }
+
+    ret = this->bid_book.GetL2Book(&bid_l2_book);
+    if(RET_OK == ret)
+    {
+        (*l2_order_book)["bid"] = bid_l2_book;
+    }
+
+    return RET_OK;
+}
+
 void OrderBook::PrintOrderBook()
 {
     cout << "bid_book:" << endl;

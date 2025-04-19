@@ -5,6 +5,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+#include <iostream>
+
 static void Engine_EventHandler_AddOrder(Event event)
 {
     Return_Type ret;
@@ -38,6 +40,17 @@ static void Engine_EventHandler_CancelOrder(Event event)
     }
 }
 
+static void Engine_EventHandler_GetOrderBook(Event event)
+{
+    if(nullptr != event.GetResponceDataPtr())
+    {
+        (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
+        (*event.GetResponceDataPtr())["data"] = {};
+
+        (*event.GetResponceDataPtr())["error"] = engine.GetOrderBook(&((*event.GetResponceDataPtr())["data"]));
+    }
+}
+
 void Engine_EventHandler(Event event)
 {
     switch(event.GetEventId())
@@ -47,6 +60,9 @@ void Engine_EventHandler(Event event)
             break;
         case EVENT_ID_CANCEL_ORDER:
             Engine_EventHandler_CancelOrder(event);
+            break;
+        case EVENT_ID_GET_ORDER_BOOK:
+            Engine_EventHandler_GetOrderBook(event);
             break;
         default:
             break;

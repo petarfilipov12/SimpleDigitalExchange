@@ -39,6 +39,7 @@ void Init_Engine()
     event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine_EventHandler);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_GET_ORDER_BOOK);
 }
 
 void Init_EventLogger()
@@ -51,6 +52,7 @@ void Init_RestServer()
 {
     rest_server.Post("/add_order", RestServerHandler_AddOrder);
     rest_server.Post("/cancel_order", RestServerHandler_CancelOrder);
+    rest_server.Post("/get_order_book", RestServerHandler_GetOrderBook);
 
     thread thread_rest_server([]{rest_server.run();});
     thread_rest_server.detach();

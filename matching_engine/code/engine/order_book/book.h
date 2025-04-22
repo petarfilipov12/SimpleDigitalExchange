@@ -75,7 +75,7 @@ template <typename Comparator> class Book{
                     }
                     else
                     {
-                        this->book_l2[pOrder->price] -= (order.quantity - order.filled);
+                        this->book_l2[pOrder->price] -= (pOrder->quantity - pOrder->filled);
                     }
                 }
 

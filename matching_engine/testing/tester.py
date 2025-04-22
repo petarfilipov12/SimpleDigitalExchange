@@ -65,16 +65,19 @@ def GetOrderBook():
 
 def main():
     
-    AddOrder("1.0", 100.0, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    # AddOrder("1.0", 100.0, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
+    # time.sleep(0.1)
 
-    AddOrder("1.1", 100.0,  ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    # AddOrder("1.1", 100.0,  ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
+    # time.sleep(0.1)
 
-    AddOrder("1.3", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    # AddOrder("1.3", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
+    # time.sleep(0.1)
 
-    AddOrder("1.2", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
+    # AddOrder("1.2", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
+    # time.sleep(0.1)
+
+    AddOrder("0.0", 390.0,  ORDER_SIDE_SELL, ORDER_TYPE_MARKET)
     time.sleep(0.1)
 
     

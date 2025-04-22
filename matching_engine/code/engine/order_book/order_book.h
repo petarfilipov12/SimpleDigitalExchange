@@ -27,9 +27,11 @@ class OrderBook{
 
         Return_Type CancelOrderById(int id);
 
-        Return_Type GetBidFirst(Order *pOrder);
+        Return_Type GetBidFirst(Order **pOrder);
 
-        Return_Type GetAskFirst(Order *pOrder);
+        Return_Type GetAskFirst(Order **pOrder);
+
+        Return_Type L2Book_OrderPatialyFilled(Order *pOrder, float quantity);
 
         Return_Type GetL2Book(json *l2_book);
 

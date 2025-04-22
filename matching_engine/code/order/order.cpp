@@ -7,6 +7,8 @@ using namespace std;
 Order::Order()
 {
     this->price = "0.0";
+    this->quantity = 0.0;
+    this->filled = 0.0;
     this->id = 0;
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
@@ -15,14 +17,18 @@ Order::Order()
 Order::Order(int id)
 {
     this->price = "0.0";
+    this->quantity = 0.0;
+    this->filled = 0.0;
     this->id = id;
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
 }
 
-Order::Order(string price, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type)
+Order::Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type)
 {
     this->price = price;
+    this->quantity = quantity;
+    this->filled = 0.0;
     this->id = id;
     this->order_side = order_side;
     this->order_type = order_type;
@@ -34,6 +40,8 @@ json Order::ConvertToJson()
 
     j_data["order_id"] = this->id;
     j_data["price"] = this->price;
+    j_data["quantity"] = this->quantity;
+    j_data["filled"] = this->filled;
     j_data["order_side"] = this->Convert_OrderSide_String(this->order_side);
     j_data["order_type"] = this->Convert_OrderType_String(this->order_type);
 
@@ -87,6 +95,8 @@ string Order::Convert_OrderType_String(enum eOrderType_t order_type)
 Order &Order::operator=(const Order &order2)
 {
     this->price = order2.price;
+    this->quantity = order2.quantity;
+    this->filled = order2.filled;
     this->id = order2.id;
     this->order_side = order2.order_side;
     this->order_type = order2.order_type;

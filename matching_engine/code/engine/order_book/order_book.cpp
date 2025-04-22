@@ -82,21 +82,41 @@ Return_Type OrderBook::CancelOrderById(int id)
     return this->CancelOrder(Order(id));
 }
 
-Return_Type OrderBook::GetBidFirst(Order *pOrder)
+Return_Type OrderBook::GetBidFirst(Order **pOrder)
 {
     return this->bid_book.GetFirst(pOrder);
 }
 
-Return_Type OrderBook::GetAskFirst(Order *pOrder)
+Return_Type OrderBook::GetAskFirst(Order **pOrder)
 {
     return this->ask_book.GetFirst(pOrder);
+}
+
+Return_Type OrderBook::L2Book_OrderPatialyFilled(Order *pOrder, float quantity)
+{
+    Return_Type ret = RET_NOT_OK;
+
+    if (pOrder->order_side == ORDER_SIDE_BUY)
+    {
+        ret = this->bid_book.L2Book_OrderPatialyFilled(pOrder, quantity);
+    }
+    else if (pOrder->order_side == ORDER_SIDE_SELL)
+    {
+        ret = this->ask_book.L2Book_OrderPatialyFilled(pOrder, quantity);
+    }
+    else
+    {
+        // Nothing to do
+    }
+
+    return ret;
 }
 
 Return_Type OrderBook::GetL2Book(json *l2_order_book)
 {
     Return_Type ret;
-    map<string, float, greater<string> > bid_l2_book;
-    map<string, float, less<string> > ask_l2_book;
+    map<string, float, greater<string> > *bid_l2_book;
+    map<string, float, less<string> > *ask_l2_book;
 
     (*l2_order_book)["ask"] = {};
     (*l2_order_book)["bid"] = {};
@@ -104,13 +124,13 @@ Return_Type OrderBook::GetL2Book(json *l2_order_book)
     ret = this->ask_book.GetL2Book(&ask_l2_book);
     if(RET_OK == ret)
     {
-        (*l2_order_book)["ask"] = ask_l2_book;
+        (*l2_order_book)["ask"] = *ask_l2_book;
     }
 
     ret = this->bid_book.GetL2Book(&bid_l2_book);
     if(RET_OK == ret)
     {
-        (*l2_order_book)["bid"] = bid_l2_book;
+        (*l2_order_book)["bid"] = *bid_l2_book;
     }
 
     return RET_OK;

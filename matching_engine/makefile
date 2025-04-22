@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g
+CFLAGS = -ggdb -g3 -O3
 CFLAGS_END = -lssl -lcrypto
 
 PROGRAM_NAME = MatchingEngine_exec

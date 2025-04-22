@@ -29,7 +29,7 @@ class MarketOrderBook{
 
         Return_Type CancelMarketOrderById(int id);
 
-        Return_Type GetFirst(Order *pOrder) const;
+        Return_Type GetFirst(Order **pOrder);
 
         Return_Type PopFirst();
 };

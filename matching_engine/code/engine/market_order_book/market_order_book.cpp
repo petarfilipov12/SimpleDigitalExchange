@@ -66,14 +66,14 @@ Return_Type MarketOrderBook::CancelMarketOrderById(int id)
     return this->CancelMarketOrder(Order(id));
 }
 
-Return_Type MarketOrderBook::GetFirst(Order *pOrder) const
+Return_Type MarketOrderBook::GetFirst(Order **pOrder)
 {
     Return_Type ret = RET_BOOK_EMPTY;
 
     this->market_book_lock.lock();
     if (!this->market_orders_queue.empty())
     {
-        *pOrder = this->market_orders_queue.front();
+        *pOrder = &(this->market_orders_queue.front());
 
         ret = RET_OK;
     }

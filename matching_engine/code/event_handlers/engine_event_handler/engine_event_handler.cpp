@@ -13,6 +13,7 @@ static void Engine_EventHandler_AddOrder(Event event)
 
     ret = engine.AddOrder(Order(
         event.GetJsonData()["price"],
+        event.GetJsonData()["quantity"],
         event.GetJsonData()["order_id"],
         static_cast<enum eOrderSide_t>(event.GetJsonData()["order_side"]),
         static_cast<enum eOrderType_t>(event.GetJsonData()["order_type"])
@@ -20,7 +21,6 @@ static void Engine_EventHandler_AddOrder(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-
         (*event.GetResponceDataPtr())["error"] = ret;
         (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
     }
@@ -42,12 +42,17 @@ static void Engine_EventHandler_CancelOrder(Event event)
 
 static void Engine_EventHandler_GetOrderBook(Event event)
 {
+    json temp_data;
+    Return_Type ret = RET_NOT_OK;
+
     if(nullptr != event.GetResponceDataPtr())
     {
-        (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
-        (*event.GetResponceDataPtr())["data"] = {};
+        // (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
+        // (*event.GetResponceDataPtr())["data"] = {};
 
-        (*event.GetResponceDataPtr())["error"] = engine.GetOrderBook(&((*event.GetResponceDataPtr())["data"]));
+        ret = engine.GetOrderBook(&temp_data);
+        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetResponceDataPtr())["data"] = temp_data;
     }
 }
 

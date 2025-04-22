@@ -24,6 +24,8 @@ enum eOrderType_t
 class Order{
     public:
         string price;
+        float quantity;
+        float filled;
         int id;
         enum eOrderSide_t order_side;
         enum eOrderType_t order_type;
@@ -32,7 +34,7 @@ class Order{
 
         Order(int id);
 
-        Order(string price, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type);
+        Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type);
 
         json ConvertToJson();
 

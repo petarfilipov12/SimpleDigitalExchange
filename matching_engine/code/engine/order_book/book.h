@@ -48,7 +48,7 @@ template <typename Comparator> class Book{
                 this->book[order.price].push_back(order);
                 this->orders.insert(order);
 
-                this->book_l2[order.price] += 1.0; //TODO order amount
+                this->book_l2[order.price] += order.quantity;
 
                 ret = RET_OK;
             }
@@ -75,7 +75,7 @@ template <typename Comparator> class Book{
                     }
                     else
                     {
-                        this->book_l2[pOrder->price] -= 1.0; //TODO order amount
+                        this->book_l2[pOrder->price] -= (order.quantity - order.filled);
                     }
                 }
 
@@ -92,13 +92,13 @@ template <typename Comparator> class Book{
             return this->CancelOrder(Order(id));
         }
 
-        Return_Type GetFirst(Order *pOrder){
+        Return_Type GetFirst(Order **pOrder){
             Return_Type ret = RET_BOOK_EMPTY;
 
             this->book_lock.lock();
             if(!this->book.empty())
             {
-                *pOrder = this->book.begin()->second.front();
+                *pOrder = &(this->book.begin()->second.front());
 
                 ret = RET_OK;
             }
@@ -107,14 +107,27 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        Return_Type GetL2Book(map<string, float, Comparator > *book_l2)
+        Return_Type L2Book_OrderPatialyFilled(Order *pOrder, float quantity)
+        {
+            Return_Type ret = RET_NOT_OK;
+
+            if( (!this->book[pOrder->price].empty()) && (this->book_l2[pOrder->price] >= quantity) )
+            {
+                this->book_l2[pOrder->price] -= quantity;
+                ret = RET_OK;
+            }
+            
+            return ret;
+        }
+
+        Return_Type GetL2Book(map<string, float, Comparator > **book_l2)
         {
             Return_Type ret = RET_BOOK_EMPTY;
 
             this->book_lock.lock();
             if(!this->book_l2.empty())
             {
-                *book_l2 = this->book_l2;
+                *book_l2 = &(this->book_l2);
 
                 ret = RET_OK;
             }

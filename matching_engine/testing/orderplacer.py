@@ -1,6 +1,7 @@
 import requests
 import time
 import json
+import random
 
 ORDER_SIDE_BUY = 0
 ORDER_SIDE_SELL = 1
@@ -11,14 +12,31 @@ ORDER_TYPE_LIMIT = 1
 ORDER_TYPE_INVALID = 2
 
 def AddOrder(priceP, sideP, typeP):
-    print("ADD ORDER")
+
+    side_s = ""
+    if(sideP == ORDER_SIDE_BUY):
+        side_s = "ORDER_SIDE_BUY"
+    elif(sideP == ORDER_SIDE_SELL):
+        side_s = "ORDER_SIDE_SELL"
+    else:
+        side_s = "ORDER_SIDE_INVALID"
+
+    type_s = ""
+    if(typeP == ORDER_TYPE_MARKET):
+        type_s = "ORDER_TYPE_MARKET"
+    elif(typeP == ORDER_TYPE_LIMIT):
+        type_s = "ORDER_TYPE_LIMIT"
+    else:
+        type_s = "ORDER_TYPE_INVALID"
+
+    print("ADD ORDER", priceP, side_s, type_s)
     url = "https://127.0.0.1:8080/add_order"
     data = {}
     data["price"] = priceP
     data["order_side"] = sideP
     data["order_type"] = typeP
 
-    path_to_pub_key = "../../server_certs/cert2.pem"
+    path_to_pub_key = "../../../server_certs/cert2.pem"
     resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
     return resp
@@ -29,7 +47,7 @@ def CancelOrder(order_idP):
     data = {}
     data["order_id"] = order_idP
 
-    path_to_pub_key = "../../server_certs/cert2.pem"
+    path_to_pub_key = "../../../server_certs/cert2.pem"
     resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
     return resp
@@ -39,27 +57,19 @@ def GetOrderBook():
     url = "https://127.0.0.1:8080/get_order_book"
     data = {}
 
-    path_to_pub_key = "../../server_certs/cert2.pem"
+    path_to_pub_key = "../../../server_certs/cert2.pem"
     resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
     return resp
 
 def main():
     
-    AddOrder("1.1", ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    while(True):
+        price = str(round(random.uniform(1, 2), 2))
+        side = random.choice([ORDER_SIDE_BUY, ORDER_SIDE_SELL])
+        AddOrder(price, side, ORDER_TYPE_LIMIT)
 
-    AddOrder("1.0", ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
-
-    AddOrder("1.5", ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
-
-    AddOrder("1.2", ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
-
-
-    print(GetOrderBook())
+        time.sleep(1)
 
     
 

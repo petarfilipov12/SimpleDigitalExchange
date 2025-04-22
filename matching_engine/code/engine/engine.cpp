@@ -167,59 +167,88 @@ void Engine::PrintOrderBook()
 
 void Engine::MatchOrderBook()
 {
-    Order bid_order;
-    Order ask_order;
+    json j_data;
+    Order *bid_order;
+    Order *ask_order;
+    float quantity;
+    float bid_quantity;
 
     if (
         (RET_OK == this->order_book.GetBidFirst(&bid_order)) &&
         (RET_OK == this->order_book.GetAskFirst(&ask_order)))
     {
-        if (stof(bid_order.price) >= stof(ask_order.price))
+        if (stof(bid_order->price) >= stof(ask_order->price))
         {
-            json j_data;
-            j_data["price"] = ask_order.price;
-            j_data["bid_order_id"] = bid_order.id;
-            j_data["ask_order_id"] = ask_order.id;
+            quantity = (ask_order->quantity - ask_order->filled);
+            bid_quantity = (bid_order->quantity - bid_order->filled);
+            if(bid_quantity < quantity)
+            {
+                quantity = bid_quantity;
+            }
+
+            j_data["price"] = ask_order->price;
+            j_data["quantity"] = quantity;
+            j_data["bid_order_id"] = bid_order->id;
+            j_data["ask_order_id"] = ask_order->id;
+
+            ask_order->filled += quantity;
+            if(ask_order->filled >= ask_order->quantity)
+            {
+                this->order_book.CancelOrderById(ask_order->id);
+            }
+            else
+            {
+                this->order_book.L2Book_OrderPatialyFilled(ask_order, quantity);
+            }
+
+            bid_order->filled += quantity;
+            if(bid_order->filled >= bid_order->quantity)
+            {
+                this->order_book.CancelOrderById(bid_order->id);
+            }
+            else
+            {
+                this->order_book.L2Book_OrderPatialyFilled(bid_order, quantity);
+            }
 
             Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
             this->event_bus->Send(event);
-
-            this->order_book.CancelOrderById(bid_order.id);
-            this->order_book.CancelOrderById(ask_order.id);
         }
     }
 }
 
 void Engine::MatchMarketOrder()
 {
-    Order market_order;
-    Order book_order;
+    Order *market_order;
+    Order *book_order;
     json j_data;
+    float quantity;
+    float book_order_quantity;
 
     if (RET_OK != this->market_book.GetFirst(&market_order))
     {
         return;
     }
 
-    if (market_order.order_side == ORDER_SIDE_BUY)
+    if (market_order->order_side == ORDER_SIDE_BUY)
     {
         if (RET_OK != this->order_book.GetAskFirst(&book_order))
         {
             return;
         }
 
-        j_data["ask_order_id"] = book_order.id;
-        j_data["bid_order_id"] = market_order.id;
+        j_data["ask_order_id"] = book_order->id;
+        j_data["bid_order_id"] = market_order->id;
     }
-    else if (market_order.order_side == ORDER_SIDE_SELL)
+    else if (market_order->order_side == ORDER_SIDE_SELL)
     {
         if (RET_OK != this->order_book.GetBidFirst(&book_order))
         {
             return;
         }
 
-        j_data["ask_order_id"] = market_order.id;
-        j_data["bid_order_id"] = book_order.id;
+        j_data["ask_order_id"] = market_order->id;
+        j_data["bid_order_id"] = book_order->id;
     }
     else
     {
@@ -227,13 +256,34 @@ void Engine::MatchMarketOrder()
 
         return;
     }
-    j_data["price"] = book_order.price;
+    quantity = (market_order->quantity - market_order->filled);
+    book_order_quantity = (book_order->quantity - book_order->filled);
+    if (book_order_quantity < quantity)
+    {
+        quantity = book_order_quantity;
+    }
 
+    j_data["price"] = book_order->price;
+    j_data["quantity"] = quantity;
+
+    book_order->filled += quantity;
+    if (book_order->filled >= book_order->quantity)
+    {
+        this->order_book.CancelOrderById(book_order->id);
+    }
+    else
+    {
+        this->order_book.L2Book_OrderPatialyFilled(book_order, quantity);
+    }
+
+    market_order->filled += quantity;
+    if (market_order->filled >= market_order->quantity)
+    {
+        this->market_book.PopFirst();
+    }
+    
     Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
     this->event_bus->Send(event);
-
-    this->order_book.CancelOrderById(book_order.id);
-    this->market_book.PopFirst();
 }
 
 void Engine::Cyclic()

@@ -27,7 +27,7 @@
                     "ignoreFailures": true
                 }
             ],
-            //"preLaunchTask": "pre Launch Task"
+            "preLaunchTask": "pre Launch Task"
         }
 
     ]

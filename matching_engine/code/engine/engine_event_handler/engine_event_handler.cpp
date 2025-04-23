@@ -11,13 +11,7 @@ static void Engine_EventHandler_AddOrder(Event event)
 {
     Return_Type ret;
 
-    ret = engine.AddOrder(Order(
-        event.GetJsonData()["price"],
-        event.GetJsonData()["quantity"],
-        event.GetJsonData()["order_id"],
-        static_cast<enum eOrderSide_t>(event.GetJsonData()["order_side"]),
-        static_cast<enum eOrderType_t>(event.GetJsonData()["order_type"])
-    ));
+    ret = engine.AddOrder(Order::ConvertJsonToOrder(event.GetJsonData()));
 
     if(nullptr != event.GetResponceDataPtr())
     {

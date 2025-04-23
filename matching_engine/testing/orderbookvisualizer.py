@@ -50,7 +50,7 @@ def main():
             print(status, "ERROR")
             logger.log(str(datetime.datetime.now()) + ": " + str(status) + ":" + str(body_json))
 
-        time.sleep(0.5)
+        time.sleep(0.2)
 
 
     

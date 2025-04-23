@@ -12,6 +12,7 @@ Order::Order()
     this->id = 0;
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
+    this->status = false;
 }
 
 Order::Order(int id)
@@ -22,9 +23,10 @@ Order::Order(int id)
     this->id = id;
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
+    this->status = false;
 }
 
-Order::Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type)
+Order::Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status)
 {
     this->price = price;
     this->quantity = quantity;
@@ -32,9 +34,10 @@ Order::Order(string price, float quantity, int id, enum eOrderSide_t order_side,
     this->id = id;
     this->order_side = order_side;
     this->order_type = order_type;
+    this->status = status;
 }
 
-json Order::ConvertToJson()
+json Order::ConvertOrderToJson()
 {
     json j_data;
 
@@ -42,10 +45,23 @@ json Order::ConvertToJson()
     j_data["price"] = this->price;
     j_data["quantity"] = this->quantity;
     j_data["filled"] = this->filled;
-    j_data["order_side"] = this->Convert_OrderSide_String(this->order_side);
-    j_data["order_type"] = this->Convert_OrderType_String(this->order_type);
-
+    j_data["order_side"] = this->order_side;
+    j_data["order_type"] = this->order_type;
+    j_data["status"] = this->status;
+    
     return j_data;
+}
+
+Order Order::ConvertJsonToOrder(json j_data)
+{
+    return Order(
+        j_data["price"],
+        j_data["quantity"],
+        j_data["order_id"],
+        static_cast<enum eOrderSide_t>(j_data["order_side"]),
+        static_cast<enum eOrderType_t>(j_data["order_type"]),
+        j_data["status"]
+    );
 }
 
 string Order::Convert_OrderSide_String(enum eOrderSide_t order_side)

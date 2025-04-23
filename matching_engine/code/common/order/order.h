@@ -29,14 +29,17 @@ class Order{
         int id;
         enum eOrderSide_t order_side;
         enum eOrderType_t order_type;
+        bool status;
     
         Order();
 
         Order(int id);
 
-        Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type);
+        Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status);
 
-        json ConvertToJson();
+        json ConvertOrderToJson();
+
+        static Order ConvertJsonToOrder(json j_data);
 
         static string Convert_OrderSide_String(enum eOrderSide_t order_side);
 

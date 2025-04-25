@@ -1,7 +1,6 @@
-#ifndef CACHE_ORDERS_EVENT_HANDLER_H
-#define CACHE_ORDERS_EVENT_HANDLER_H
+#include "cache_orders_event_handler.h"
 
-#include "event.h"
+#include "types.h"
 
 #include "globals.h"
 #include "order.h"
@@ -64,5 +63,3 @@ void CacheOrders_EventHandler(Event event)
     }
 
 }
-
-#endif

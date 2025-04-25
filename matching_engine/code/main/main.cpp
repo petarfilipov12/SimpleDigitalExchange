@@ -17,6 +17,9 @@
 #include "rest_server.h"
 #include "rest_server_handlers.h"
 
+//#include "cache_orders.h"
+#include "cache_orders_event_handler.h"
+
 
 using json = nlohmann::json;
 using namespace std;
@@ -38,6 +41,7 @@ void Init_Engine()
     thread_engine.detach();
 
     event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine_EventHandler);
+
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_GET_ORDER_BOOK);
@@ -59,12 +63,23 @@ void Init_RestServer()
     thread_rest_server.detach();
 }
 
+void Init_CacheOrders()
+{
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, CacheOrders_EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_ADDED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_GET_ORDER);
+}
+
 int main(void){
     srand(time(0));
     
     Init_EventBus();
-    Init_Engine();
     Init_EventLogger();
+    Init_CacheOrders();
+    Init_Engine();
     Init_RestServer();
 
     while(true)

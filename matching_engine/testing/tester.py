@@ -42,6 +42,17 @@ def AddOrder(priceP, qtyP, sideP, typeP):
 
     return resp
 
+def GetOrder(order_idP):
+    print("GET ORDER")
+    url = "https://127.0.0.1:8080/get_order"
+    data = {}
+    data["order_id"] = order_idP
+
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+
+    return resp
+
 def CancelOrder(order_idP):
     print("CANCEL ORDER")
     url = "https://127.0.0.1:8080/cancel_order"
@@ -74,11 +85,14 @@ def main():
     # AddOrder("1.3", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
     # time.sleep(0.1)
 
-    # AddOrder("1.2", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
+    order = AddOrder("1.2", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
+    time.sleep(0.1)
+
+    # AddOrder("0.0", 390.0,  ORDER_SIDE_SELL, ORDER_TYPE_MARKET)
     # time.sleep(0.1)
 
-    AddOrder("0.0", 390.0,  ORDER_SIDE_SELL, ORDER_TYPE_MARKET)
-    time.sleep(0.1)
+    print(order)
+    print(GetOrder(order["data"]["order_id"]))
 
     
 

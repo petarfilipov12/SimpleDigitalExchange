@@ -63,19 +63,15 @@ Return_Type Engine::AddOrder(Order order)
         // Error
     }
 
+    j_data = order.ConvertOrderToJson();
+
     if(RET_OK != ret)
     {
-        j_data["error"] = "Add order failed";
-        j_data["data"] = order.ConvertOrderToJson();
-
         Event event(EVENT_ID_ADD_ORDER_FAILLED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
     {
-        j_data["msg"] = "Order Added";
-        j_data["data"] = order.ConvertOrderToJson();
-
         Event event(EVENT_ID_ORDER_ADDED, j_data, nullptr);
         this->event_bus->Send(event);
     }
@@ -101,19 +97,14 @@ Return_Type Engine::CancelOrder(Order order)
         // Error
     }
 
+    j_data = order.ConvertOrderToJson();
     if(RET_OK != ret)
     {
-        j_data["error"] = "Cancel order failed";
-        j_data["data"] = order.ConvertOrderToJson();
-
         Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
     {
-        j_data["msg"] = "Order canceled";
-        j_data["data"] = order.ConvertOrderToJson();
-
         Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
         this->event_bus->Send(event);
     }
@@ -135,19 +126,14 @@ Return_Type Engine::CancelOrderById(int id)
         ret = this->order_book.CancelOrderById(id);
     }
 
+    j_data = {{"order_id", id}};
     if(RET_OK != ret)
     {
-        j_data["error"] = "Cancel order failed";
-        j_data["data"] = {{"order_id", id}};
-
         Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
         this->event_bus->Send(event);
     }
     else
     {
-        j_data["msg"] = "Order canceled";
-        j_data["data"] = {{"order_id", id}};
-
         Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
         this->event_bus->Send(event);
     }

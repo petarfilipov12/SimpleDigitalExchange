@@ -6,6 +6,7 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "unordered_set": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "string": "cpp"
     }
 }

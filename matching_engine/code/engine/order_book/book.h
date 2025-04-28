@@ -15,7 +15,6 @@ using namespace std;
 template <typename Comparator> class Book{
     private:
         map<string, list<Order>, Comparator > book;
-        map<string, float, Comparator > book_l2;
         unordered_set<Order, Order::HashFunc> orders;
 
         mutable mutex book_lock;
@@ -48,8 +47,6 @@ template <typename Comparator> class Book{
                 this->book[order.price].push_back(order);
                 this->orders.insert(order);
 
-                this->book_l2[order.price] += order.quantity;
-
                 ret = RET_OK;
             }
             this->book_lock.unlock();
@@ -71,11 +68,6 @@ template <typename Comparator> class Book{
 
                     if(this->book[pOrder->price].empty()){
                         this->book.erase(pOrder->price);
-                        this->book_l2.erase(pOrder->price);
-                    }
-                    else
-                    {
-                        this->book_l2[pOrder->price] -= (pOrder->quantity - pOrder->filled);
                     }
                 }
 
@@ -105,45 +97,6 @@ template <typename Comparator> class Book{
             this->book_lock.unlock();
 
             return ret;
-        }
-
-        Return_Type L2Book_OrderPatialyFilled(Order *pOrder, float quantity)
-        {
-            Return_Type ret = RET_NOT_OK;
-
-            if( (!this->book[pOrder->price].empty()) && (this->book_l2[pOrder->price] >= quantity) )
-            {
-                this->book_l2[pOrder->price] -= quantity;
-                ret = RET_OK;
-            }
-            
-            return ret;
-        }
-
-        Return_Type GetL2Book(map<string, float, Comparator > **book_l2)
-        {
-            Return_Type ret = RET_BOOK_EMPTY;
-
-            this->book_lock.lock();
-            if(!this->book_l2.empty())
-            {
-                *book_l2 = &(this->book_l2);
-
-                ret = RET_OK;
-            }
-            this->book_lock.unlock();
-
-            return ret;
-        }
-
-        void PrintBook(){
-            this->book_lock.lock();
-            for(auto price_level : this->book){
-                for(auto order : price_level.second){
-                    order.PrintOrder();
-                }
-            }
-            this->book_lock.unlock();
         }
 };
 

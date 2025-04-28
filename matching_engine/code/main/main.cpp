@@ -44,7 +44,7 @@ void Init_Engine()
 
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
-    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_GET_ORDER_BOOK);
+    //event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_GET_ORDER_BOOK);
 }
 
 void Init_EventLogger()

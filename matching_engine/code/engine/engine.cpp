@@ -141,16 +141,6 @@ Return_Type Engine::CancelOrderById(int id)
     return ret;
 }
 
-Return_Type Engine::GetOrderBook(json *l2_book)
-{
-    return this->order_book.GetL2Book(l2_book);
-}
-
-void Engine::PrintOrderBook()
-{
-    this->order_book.PrintOrderBook();
-}
-
 void Engine::MatchOrderBook()
 {
     json j_data;
@@ -182,19 +172,11 @@ void Engine::MatchOrderBook()
             {
                 this->order_book.CancelOrderById(ask_order->id);
             }
-            else
-            {
-                this->order_book.L2Book_OrderPatialyFilled(ask_order, quantity);
-            }
 
             bid_order->filled += quantity;
             if(bid_order->filled >= bid_order->quantity)
             {
                 this->order_book.CancelOrderById(bid_order->id);
-            }
-            else
-            {
-                this->order_book.L2Book_OrderPatialyFilled(bid_order, quantity);
             }
 
             Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
@@ -256,10 +238,6 @@ void Engine::MatchMarketOrder()
     if (book_order->filled >= book_order->quantity)
     {
         this->order_book.CancelOrderById(book_order->id);
-    }
-    else
-    {
-        this->order_book.L2Book_OrderPatialyFilled(book_order, quantity);
     }
 
     market_order->filled += quantity;

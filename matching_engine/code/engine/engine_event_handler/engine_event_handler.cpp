@@ -34,22 +34,6 @@ static void Engine_EventHandler_CancelOrder(Event event)
     }
 }
 
-static void Engine_EventHandler_GetOrderBook(Event event)
-{
-    json temp_data;
-    Return_Type ret = RET_NOT_OK;
-
-    if(nullptr != event.GetResponceDataPtr())
-    {
-        // (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
-        // (*event.GetResponceDataPtr())["data"] = {};
-
-        ret = engine.GetOrderBook(&temp_data);
-        (*event.GetResponceDataPtr())["error"] = ret;
-        (*event.GetResponceDataPtr())["data"] = temp_data;
-    }
-}
-
 void Engine_EventHandler(Event event)
 {
     switch(event.GetEventId())
@@ -59,9 +43,6 @@ void Engine_EventHandler(Event event)
             break;
         case EVENT_ID_CANCEL_ORDER:
             Engine_EventHandler_CancelOrder(event);
-            break;
-        case EVENT_ID_GET_ORDER_BOOK:
-            Engine_EventHandler_GetOrderBook(event);
             break;
         default:
             break;

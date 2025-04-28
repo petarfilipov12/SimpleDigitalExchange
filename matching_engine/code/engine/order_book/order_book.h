@@ -31,12 +31,6 @@ class OrderBook{
 
         Return_Type GetAskFirst(Order **pOrder);
 
-        Return_Type L2Book_OrderPatialyFilled(Order *pOrder, float quantity);
-
-        Return_Type GetL2Book(json *l2_book);
-
-        void PrintOrderBook();
-
 };
 
 #endif

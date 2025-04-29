@@ -19,6 +19,7 @@
 
 //#include "cache_orders.h"
 #include "cache_orders_event_handler.h"
+#include "cache_order_book_l2_event_handler.h"
 
 
 using json = nlohmann::json;
@@ -28,6 +29,7 @@ EventBus event_bus;
 Engine engine(&event_bus);
 RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem");
 CacheOrders cache_orders;
+Cache_OrderBookL2 cache_order_book_l2;
 
 void Init_EventBus()
 {
@@ -44,7 +46,6 @@ void Init_Engine()
 
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
-    //event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_GET_ORDER_BOOK);
 }
 
 void Init_EventLogger()
@@ -74,12 +75,23 @@ void Init_CacheOrders()
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_GET_ORDER);
 }
 
+void Init_CacheOrderBookL2()
+{
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, CacheOrderBookL2_EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_ADDED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_GET_ORDER_BOOK);
+}
+
 int main(void){
     srand(time(0));
     
     Init_EventBus();
     Init_EventLogger();
     Init_CacheOrders();
+    Init_CacheOrderBookL2();
     Init_Engine();
     Init_RestServer();
 

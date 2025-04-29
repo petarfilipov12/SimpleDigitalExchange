@@ -7,6 +7,7 @@
         "utility": "cpp",
         "unordered_set": "cpp",
         "algorithm": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "map": "cpp"
     }
 }

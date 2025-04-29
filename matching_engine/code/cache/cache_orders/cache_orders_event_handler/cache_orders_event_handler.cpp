@@ -5,8 +5,6 @@
 #include "globals.h"
 #include "order.h"
 
-void CacheOrders_EventHandler(Event event);
-
 static void CacheOrders_EventHandler_OrderAdded(Event event)
 {
     cache_orders.OrderAdded(Order::ConvertJsonToOrder(event.GetJsonData()));

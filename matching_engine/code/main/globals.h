@@ -5,10 +5,12 @@
 #include "engine.h"
 #include "rest_server.h"
 #include "cache_orders.h"
+#include "cache_order_book_l2.h"
 
 extern EventBus event_bus;
 extern Engine engine;
 extern RestServer rest_server;
 extern CacheOrders cache_orders;
+extern Cache_OrderBookL2 cache_order_book_l2;
 
 #endif

@@ -55,7 +55,7 @@ Return_Type Cache_OrderBookL2::OrderCanceled(int order_id)
 
     if (RET_OK == responce_data["error"])
     {
-        Order order = Order::ConvertJsonToOrder(responce_data["error"]["data"]);
+        Order order = Order::ConvertJsonToOrder(responce_data["data"]);
 
         if (ORDER_TYPE_LIMIT == order.order_type)
         {
@@ -111,7 +111,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(int bid_order_id, int ask_order_id, f
     ret = bid_order_responce_data["error"];
     if (RET_OK == ret)
     {
-        order = Order::ConvertJsonToOrder(bid_order_responce_data["error"]["data"]);
+        order = Order::ConvertJsonToOrder(bid_order_responce_data["data"]);
         if (ORDER_TYPE_LIMIT == order.order_type)
         {
             this->bid_book_l2_look.lock();
@@ -136,7 +136,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(int bid_order_id, int ask_order_id, f
     ret = ask_order_responce_data["error"];
     if (RET_OK == ret)
     {
-        order = Order::ConvertJsonToOrder(ask_order_responce_data["error"]["data"]);
+        order = Order::ConvertJsonToOrder(ask_order_responce_data["data"]);
         if (ORDER_TYPE_LIMIT == order.order_type)
         {
             this->ask_book_l2_look.lock();

@@ -42,7 +42,7 @@ void CacheOrderBookL2_EventHandler(Event event)
         case EVENT_ID_ORDER_FILLED:
             CacheOrderBookL2_EventHandler_OrderFilled(event);
             break;
-        case EVENT_ID_GET_ORDER:
+        case EVENT_ID_GET_ORDER_BOOK:
         CacheOrderBookL2_EventHandler_GetOrderBookL2(event);
             break;
         default:

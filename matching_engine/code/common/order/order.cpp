@@ -116,6 +116,7 @@ Order &Order::operator=(const Order &order2)
     this->id = order2.id;
     this->order_side = order2.order_side;
     this->order_type = order2.order_type;
+    this->status = order2.status;
 
     return *this;
 }
@@ -123,45 +124,4 @@ Order &Order::operator=(const Order &order2)
 bool Order::operator==(const Order &order2) const
 {
     return this->id == order2.id;
-}
-
-void Order::PrintOrder()
-{
-    string s_order_side, s_order_type;
-
-    if (this->order_side == ORDER_SIDE_BUY)
-    {
-        s_order_side = "ORDER_SIDE_BUY";
-    }
-    else if (this->order_side == ORDER_SIDE_SELL)
-    {
-        s_order_side = "ORDER_SIDE_SELL";
-    }
-    else if (this->order_side == ORDER_SIDE_INVALID)
-    {
-        s_order_side = "ORDER_SIDE_INVALID";
-    }
-    else
-    {
-        s_order_side = "NA";
-    }
-
-    if (this->order_type == ORDER_TYPE_MARKET)
-    {
-        s_order_type = "ORDER_TYPE_MARKET";
-    }
-    else if (this->order_type == ORDER_TYPE_LIMIT)
-    {
-        s_order_type = "ORDER_TYPE_LIMIT";
-    }
-    else if (this->order_type == ORDER_TYPE_INVALID)
-    {
-        s_order_type = "ORDER_TYPE_INVALID";
-    }
-    else
-    {
-        s_order_type = "NA";
-    }
-
-    cout << "id=" << this->id << ", price=" << this->price << ", side=" << s_order_side << ", type=" << s_order_type << endl;
 }

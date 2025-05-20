@@ -10,8 +10,8 @@ using json = nlohmann::json;
 static void Engine_EventHandler_AddOrder(Event event)
 {
     Return_Type ret;
-
-    ret = engine.AddOrder(Order::ConvertJsonToOrder(event.GetJsonData()));
+    json j_data = event.GetJsonData();
+    ret = engine.AddOrder(ConvertJsonToOrder(&j_data));
 
     if(nullptr != event.GetResponceDataPtr())
     {

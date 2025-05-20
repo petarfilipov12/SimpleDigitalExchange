@@ -89,6 +89,7 @@ Return_Type MarketOrderBook::PopFirst()
     this->market_book_lock.lock();
     if (!this->market_orders_queue.empty())
     {
+        this->market_orders.erase(this->market_orders_queue.front());
         this->market_orders_queue.pop_front();
 
         ret = RET_OK;

@@ -39,8 +39,6 @@ class Order{
 
         json ConvertOrderToJson();
 
-        static Order ConvertJsonToOrder(json j_data);
-
         static string Convert_OrderSide_String(enum eOrderSide_t order_side);
 
         static string Convert_OrderType_String(enum eOrderType_t order_type);
@@ -60,9 +58,8 @@ class Order{
                     return hash<int>{}(order.id);
                 }
         };
-
-        void PrintOrder();
-
 };
+
+Order ConvertJsonToOrder(json *j_data);
 
 #endif

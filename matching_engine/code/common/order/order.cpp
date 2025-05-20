@@ -52,18 +52,6 @@ json Order::ConvertOrderToJson()
     return j_data;
 }
 
-Order Order::ConvertJsonToOrder(json j_data)
-{
-    return Order(
-        j_data["price"],
-        j_data["quantity"],
-        j_data["order_id"],
-        static_cast<enum eOrderSide_t>(j_data["order_side"]),
-        static_cast<enum eOrderType_t>(j_data["order_type"]),
-        j_data["status"]
-    );
-}
-
 string Order::Convert_OrderSide_String(enum eOrderSide_t order_side)
 {
     string s_order_side;
@@ -124,4 +112,16 @@ Order &Order::operator=(const Order &order2)
 bool Order::operator==(const Order &order2) const
 {
     return this->id == order2.id;
+}
+
+Order ConvertJsonToOrder(json *j_data)
+{
+    return Order(
+        (*j_data)["price"],
+        (*j_data)["quantity"],
+        (*j_data)["order_id"],
+        static_cast<enum eOrderSide_t>((*j_data)["order_side"]),
+        static_cast<enum eOrderType_t>((*j_data)["order_type"]),
+        (*j_data)["status"]
+    );
 }

@@ -7,7 +7,8 @@
 
 static void CacheOrderBookL2_EventHandler_OrderAdded(Event event)
 {
-    cache_order_book_l2.OrderAdded(Order::ConvertJsonToOrder(event.GetJsonData()));
+    json j_data = event.GetJsonData();
+    cache_order_book_l2.OrderAdded(ConvertJsonToOrder(&j_data));
 }
 
 static void CacheOrderBookL2_EventHandler_OrderCanceled(Event event)

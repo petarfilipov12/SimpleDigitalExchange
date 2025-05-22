@@ -1,20 +1,7 @@
-import pandas as pd 
-import datetime as dt 
-
-# plotting packages 
-import plotly.graph_objects as go
-import plotly.express as px
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import seaborn as sns
-
-# hide warnings 
-import warnings
-warnings.filterwarnings('ignore')
-
-import random
+import dearpygui.dearpygui as dpg
+import threading
+import time
 import requests
-
 
 def GetOrderBook():
     #print("GET ORDER BOOK")
@@ -26,34 +13,63 @@ def GetOrderBook():
 
     return (resp.status_code, resp.json())
 
+def ShowBookDepth(parent):        
+        with dpg.plot(parent=parent, label="Order Book Depth", height=400, width=-1):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="price", auto_fit=True)
+            with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
+                dpg.add_stair_series([1.0, 1.1], [2, 1], tag="stair_series_ask", label="ask", shaded=True)
+                dpg.add_stair_series([1.3, 1.4], [1, 2], tag="stair_series_bid", label="bid", shaded=True)
 
+def ShowMainWindow():
+    dpg.add_input_int(default_value=0, tag="VAL", parent="PRIMARY_WINDOW")
+
+    ShowBookDepth(parent="PRIMARY_WINDOW")
     
 
-def main():
-    #book_json = {'ask': {'1.99': 76.20999908447266}, 'bid': {'1.09': 334.6000061035156, '1.13': 275.67999267578125, '1.18': 185.1499786376953, '1.81': 164.70005798339844}}
+def TimerUpdate():
+    i = 0
 
-    fig, ax = plt.subplots()
-    ax.set_xlabel("Price")
-    ax.set_ylabel("Amount")
+    while(True):
+        time.sleep(1)
 
-    def update(frame):
+        i += 1
+        dpg.set_value("VAL", i)
+
+        #Get Order Book Data
         (status, body_json) = GetOrderBook()
         if(body_json):
-            book_ask_df = pd.DataFrame(body_json["ask"].items(), columns=["price", "amount"])
-            book_ask_df["price"] = book_ask_df["price"].astype(float)
+            order_book = body_json
 
-            book_bid_df = pd.DataFrame(body_json["bid"].items(), columns=["price", "amount"])
-            book_bid_df["price"] = book_bid_df["price"].astype(float)
+            if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):
+                prices = [float(price) for price in list(order_book["ask"].keys())]
+                amounts = list(order_book["ask"].values())
 
-            ax.clear()
+                dpg.configure_item("stair_series_ask", x=prices, y=amounts)
+            
+            if( ("bid" in order_book.keys()) and isinstance(order_book["bid"], dict) ):
+                prices = [float(price) for price in list(order_book["bid"].keys())]
+                amounts = list(order_book["bid"].values())
 
-            sns.ecdfplot(x="price", weights="amount", stat="count", complementary=True, data=book_bid_df, ax=ax, color='g')
-            sns.ecdfplot(x="price", weights="amount", stat="count", data=book_ask_df, ax=ax, color='r')
+                dpg.configure_item("stair_series_bid", x=prices, y=amounts)
 
-            fig.canvas.draw()
+def main():
+    t1 = threading.Thread(target=TimerUpdate)
 
-    anim = FuncAnimation(fig, update)
-    plt.show()
+    dpg.create_context()
+    dpg.create_viewport(title='Custom Title', width=900, height=700)
+
+    dpg.add_window(tag="PRIMARY_WINDOW")
+    ShowMainWindow()
+
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.set_primary_window("PRIMARY_WINDOW", True)
+    
+    t1.start()
+    dpg.start_dearpygui()
+
+    dpg.destroy_context()
 
 if(__name__ == "__main__"):
     main()

@@ -116,7 +116,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(int bid_order_id, int ask_order_id, f
         {
             this->bid_book_l2_look.lock();
             this->bid_book_l2[order.price] -= quantity;
-            if (this->bid_book_l2[order.price] <= 0.0)
+            if (this->bid_book_l2[order.price] <= 0.1)
             {
                 this->bid_book_l2.erase(order.price);
             }
@@ -141,7 +141,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(int bid_order_id, int ask_order_id, f
         {
             this->ask_book_l2_look.lock();
             this->ask_book_l2[order.price] -= quantity;
-            if (this->ask_book_l2[order.price] <= 0.0)
+            if (this->ask_book_l2[order.price] <= 0.1)
             {
                 this->ask_book_l2.erase(order.price);
             }

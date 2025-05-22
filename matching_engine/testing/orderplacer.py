@@ -69,12 +69,14 @@ def main():
         price = str(round(random.uniform(1, 2), 2))
         qty = round(random.uniform(0, 500), 2)
         side = random.choice([ORDER_SIDE_BUY, ORDER_SIDE_SELL])
-        order_type = random.choices([ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT], weights = [30, 70])[0]
+        #order_type = random.choices([ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT], weights = [30, 70])[0]
+        order_type = ORDER_TYPE_LIMIT
         order = AddOrder(price, qty, side, order_type)
         print(order)
         print()
 
         time.sleep(0.2)
+        #input("Press Enter")
 
     
 

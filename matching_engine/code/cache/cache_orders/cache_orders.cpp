@@ -47,6 +47,7 @@ Return_Type CacheOrders::OrderChange(int order_id, float quantity)
     if (order_itter != this->orders.end())
     {
         order_itter->second.filled += quantity;
+        order_itter->second.status = (bool)(order_itter->second.filled < order_itter->second.quantity);
 
         ret = RET_OK;
     }

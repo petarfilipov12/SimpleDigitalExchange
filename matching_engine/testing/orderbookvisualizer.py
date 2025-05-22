@@ -1,3 +1,17 @@
+import pandas as pd 
+import datetime as dt 
+
+# plotting packages 
+import plotly.graph_objects as go
+import plotly.express as px
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import seaborn as sns
+
+# hide warnings 
+import warnings
+warnings.filterwarnings('ignore')
+
 import requests
 import time
 import json
@@ -27,30 +41,54 @@ def GetOrderBook():
 def main():
 
     logger = Logger()
+    
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Price")
+    ax.set_ylabel("Amount")
 
-    while(True):
+    def update(frame):
         (status, body_json) = GetOrderBook()
-
         if(body_json):
-            os.system("clear")
-
-            print(status)
             order_book = body_json
 
+            ax.clear()
+            ax.cla()
+            os.system("clear")
+
             if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):
+                # book_ask_df = pd.DataFrame(body_json["ask"].items(), columns=["price", "amount"])
+                # book_ask_df["price"] = book_ask_df["price"].astype(float)
+
+                # sns.ecdfplot(x="price", weights="amount", stat="count", data=book_ask_df, ax=ax, color='r')
+
+                ax.bar([float(price) for price in list(order_book["ask"].keys())], list(order_book["ask"].values()), color='red')
+
+                #print
                 for price, amount in reversed(order_book["ask"].items()):
                     print(colored(price + ":" + str(amount), "red"))
-            
+
             print("------------------------------------")
 
             if( ("bid" in order_book.keys()) and isinstance(order_book["bid"], dict) ):
+                # book_bid_df = pd.DataFrame(body_json["bid"].items(), columns=["price", "amount"])
+                # book_bid_df["price"] = book_bid_df["price"].astype(float)
+
+                # sns.ecdfplot(x="price", weights="amount", stat="count", complementary=True, data=book_bid_df, ax=ax, color='g')
+            
+                ax.bar([float(price) for price in list(order_book["bid"].keys())], list(order_book["bid"].values()), color='green')
+
+
+                #print
                 for price, amount in reversed(order_book["bid"].items()):
                     print(colored(price + ":" + str(amount), "green"))
+
+            fig.canvas.draw()
         else:
             print(status, "ERROR")
             logger.log(str(datetime.datetime.now()) + ": " + str(status) + ":" + str(body_json))
 
-        time.sleep(0.2)
+    anim = FuncAnimation(fig, update)
+    plt.show()
 
 
     

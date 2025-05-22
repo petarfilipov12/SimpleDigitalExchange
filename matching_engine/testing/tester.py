@@ -1,101 +1,59 @@
-import requests
-import time
-import json
+import pandas as pd 
+import datetime as dt 
+
+# plotting packages 
+import plotly.graph_objects as go
+import plotly.express as px
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import seaborn as sns
+
+# hide warnings 
+import warnings
+warnings.filterwarnings('ignore')
+
 import random
+import requests
 
-ORDER_SIDE_BUY = 0
-ORDER_SIDE_SELL = 1
-ORDER_SIDE_INVALID = 2
-
-ORDER_TYPE_MARKET = 0
-ORDER_TYPE_LIMIT = 1
-ORDER_TYPE_INVALID = 2
-
-def AddOrder(priceP, qtyP, sideP, typeP):
-
-    side_s = ""
-    if(sideP == ORDER_SIDE_BUY):
-        side_s = "ORDER_SIDE_BUY"
-    elif(sideP == ORDER_SIDE_SELL):
-        side_s = "ORDER_SIDE_SELL"
-    else:
-        side_s = "ORDER_SIDE_INVALID"
-
-    type_s = ""
-    if(typeP == ORDER_TYPE_MARKET):
-        type_s = "ORDER_TYPE_MARKET"
-    elif(typeP == ORDER_TYPE_LIMIT):
-        type_s = "ORDER_TYPE_LIMIT"
-    else:
-        type_s = "ORDER_TYPE_INVALID"
-
-    print("ADD ORDER", priceP, qtyP, side_s, type_s)
-    url = "https://127.0.0.1:8080/add_order"
-    data = {}
-    data["price"] = priceP
-    data["quantity"] = qtyP
-    data["order_side"] = sideP
-    data["order_type"] = typeP
-
-    path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
-
-    return resp
-
-def GetOrder(order_idP):
-    print("GET ORDER")
-    url = "https://127.0.0.1:8080/get_order"
-    data = {}
-    data["order_id"] = order_idP
-
-    path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
-
-    return resp
-
-def CancelOrder(order_idP):
-    print("CANCEL ORDER")
-    url = "https://127.0.0.1:8080/cancel_order"
-    data = {}
-    data["order_id"] = order_idP
-
-    path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
-
-    return resp
 
 def GetOrderBook():
-    print("GET ORDER BOOK")
+    #print("GET ORDER BOOK")
     url = "https://127.0.0.1:8080/get_order_book"
     data = {}
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+    resp = requests.post(url, json=data, verify=path_to_pub_key)
 
-    return resp
+    return (resp.status_code, resp.json())
+
+
+    
 
 def main():
-    
-    AddOrder("1.0", 100.0, ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    #book_json = {'ask': {'1.99': 76.20999908447266}, 'bid': {'1.09': 334.6000061035156, '1.13': 275.67999267578125, '1.18': 185.1499786376953, '1.81': 164.70005798339844}}
 
-    AddOrder("1.1", 100.0,  ORDER_SIDE_BUY, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    fig, ax = plt.subplots()
+    ax.set_xlabel("Price")
+    ax.set_ylabel("Amount")
 
-    AddOrder("1.3", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+    def update(frame):
+        (status, body_json) = GetOrderBook()
+        if(body_json):
+            book_ask_df = pd.DataFrame(body_json["ask"].items(), columns=["price", "amount"])
+            book_ask_df["price"] = book_ask_df["price"].astype(float)
 
-    AddOrder("1.2", 100.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+            book_bid_df = pd.DataFrame(body_json["bid"].items(), columns=["price", "amount"])
+            book_bid_df["price"] = book_bid_df["price"].astype(float)
 
-    time.sleep(5)
-    
-    AddOrder("1.0", 150.0,  ORDER_SIDE_SELL, ORDER_TYPE_LIMIT)
-    time.sleep(0.1)
+            ax.clear()
 
-    
+            sns.ecdfplot(x="price", weights="amount", stat="count", complementary=True, data=book_bid_df, ax=ax, color='g')
+            sns.ecdfplot(x="price", weights="amount", stat="count", data=book_ask_df, ax=ax, color='r')
 
-    
+            fig.canvas.draw()
+
+    anim = FuncAnimation(fig, update)
+    plt.show()
 
 if(__name__ == "__main__"):
     main()

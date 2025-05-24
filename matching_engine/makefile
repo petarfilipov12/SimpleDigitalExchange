@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -g#gdb -g3 -O0
+CFLAGS = -std=c++11 -g -D JSON_DIAGNOSTICS=1 #gdb -g3 -O0
 CFLAGS_END = -lssl -lcrypto
 
 PROGRAM_NAME = MatchingEngine_exec

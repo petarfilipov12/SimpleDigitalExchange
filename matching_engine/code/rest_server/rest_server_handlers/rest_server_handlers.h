@@ -24,7 +24,7 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
 
     while(responce_data.empty())
     {
-        //Timer
+        usleep(10);
     }
 
     res.set_content(responce_data.dump(), "application/json");

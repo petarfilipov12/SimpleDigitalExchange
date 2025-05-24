@@ -16,6 +16,8 @@ static void Engine_EventHandler_AddOrder(Event event)
     if(nullptr != event.GetResponceDataPtr())
     {
         (*event.GetResponceDataPtr())["error"] = ret;
+        
+        (*event.GetResponceDataPtr())["data"] = {};
         (*event.GetResponceDataPtr())["data"] = j_data;
     }
 

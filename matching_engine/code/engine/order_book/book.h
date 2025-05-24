@@ -65,6 +65,7 @@ template <typename Comparator> class Book{
                 {
                     *pOrder_o = *pOrder;
                 }
+                
                 list<Order>::iterator pBookOrder = find(this->book[pOrder->price].begin(), this->book[pOrder->price].end(), *pOrder);
 
                 if(pBookOrder != this->book[pOrder->price].end()){

@@ -84,27 +84,56 @@ Return_Type Cache_OrderBookL2::OrderFilled(
     float quantity)
 {
     Return_Type ret = RET_NOT_OK;
+    bool flag = false;
 
     if (ORDER_TYPE_LIMIT == bid_order_type)
     {
-        this->bid_book_l2_look.lock();
-        this->bid_book_l2[bid_order_price] -= quantity;
-        if (this->bid_book_l2[bid_order_price] <= 0.1)
+        while(false == flag)
         {
-            this->bid_book_l2.erase(bid_order_price);
+            this->bid_book_l2_look.lock();
+            if(this->bid_book_l2[bid_order_price] >= (quantity - 0.1))
+            {
+                this->bid_book_l2[bid_order_price] -= quantity;
+                if (this->bid_book_l2[bid_order_price] <= 0.1)
+                {
+                    this->bid_book_l2.erase(bid_order_price);
+                }
+
+                flag = true;
+            }
+            this->bid_book_l2_look.unlock();
+
+            if(false == flag)
+            {
+                usleep(10);
+            }
         }
-        this->bid_book_l2_look.unlock();
     }
 
     if (ORDER_TYPE_LIMIT == ask_order_type)
     {
-        this->ask_book_l2_look.lock();
-        this->ask_book_l2[ask_order_price] -= quantity;
-        if (this->ask_book_l2[ask_order_price] <= 0.1)
+        flag = false;
+
+        while(false == flag)
         {
-            this->ask_book_l2.erase(ask_order_price);
+            this->ask_book_l2_look.lock();
+            if(this->ask_book_l2[ask_order_price] >= (quantity - 0.1))
+            {
+                this->ask_book_l2[ask_order_price] -= quantity;
+                if (this->ask_book_l2[ask_order_price] <= 0.1)
+                {
+                    this->ask_book_l2.erase(ask_order_price);
+                }
+
+                flag = true;
+            }
+            this->ask_book_l2_look.unlock();
+
+            if(false == flag)
+            {
+                usleep(10);
+            }
         }
-        this->ask_book_l2_look.unlock();
     }
 
     return ret;

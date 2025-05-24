@@ -11,12 +11,12 @@ static void Engine_EventHandler_AddOrder(Event event)
 {
     Return_Type ret;
     json j_data = event.GetJsonData();
-    ret = engine.AddOrder(ConvertJsonToOrder(&j_data));
+    ret = engine.AddOrder(ConvertJsonToOrder(j_data));
 
     if(nullptr != event.GetResponceDataPtr())
     {
         (*event.GetResponceDataPtr())["error"] = ret;
-        (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
+        (*event.GetResponceDataPtr())["data"] = j_data;
     }
 
 }

@@ -54,13 +54,17 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        Return_Type CancelOrder(Order order){
+        Return_Type CancelOrderById(int id, Order *pOrder_o){
             Return_Type ret = RET_ORDER_NOT_EXISTS;
 
             this->book_lock.lock();
-            unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(order);
+            unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(Order(id));
 
             if(pOrder != this->orders.end()){
+                if(pOrder_o != nullptr)
+                {
+                    *pOrder_o = *pOrder;
+                }
                 list<Order>::iterator pBookOrder = find(this->book[pOrder->price].begin(), this->book[pOrder->price].end(), *pOrder);
 
                 if(pBookOrder != this->book[pOrder->price].end()){
@@ -80,8 +84,8 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        Return_Type CancelOrderById(int id){
-            return this->CancelOrder(Order(id));
+        Return_Type CancelOrder(Order order, Order *pOrder){
+            return this->CancelOrderById(order.id, pOrder);
         }
 
         Return_Type GetFirst(Order **pOrder){

@@ -8,19 +8,20 @@
 static void CacheOrderBookL2_EventHandler_OrderAdded(Event event)
 {
     json j_data = event.GetJsonData();
-    cache_order_book_l2.OrderAdded(ConvertJsonToOrder(&j_data));
+    cache_order_book_l2.OrderAdded(ConvertJsonToOrder(j_data));
 }
 
 static void CacheOrderBookL2_EventHandler_OrderCanceled(Event event)
 {
-    cache_order_book_l2.OrderCanceled(event.GetJsonData()["order_id"]);
+    json j_data = event.GetJsonData();
+    cache_order_book_l2.OrderCanceled(ConvertJsonToOrder(j_data));
 }
 
 static void CacheOrderBookL2_EventHandler_OrderFilled(Event event)
 {
     cache_order_book_l2.OrderFilled(
-        event.GetJsonData()["bid_order_id"],
-        event.GetJsonData()["ask_order_id"],
+        event.GetJsonData()["bid_order"]["price"], event.GetJsonData()["bid_order"]["order_type"],
+        event.GetJsonData()["ask_order"]["price"], event.GetJsonData()["ask_order"]["order_type"],
         event.GetJsonData()["quantity"]
     );
 }

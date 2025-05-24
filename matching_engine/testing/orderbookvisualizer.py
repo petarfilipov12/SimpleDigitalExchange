@@ -32,6 +32,7 @@ def main():
     while(True):
         (status, body_json) = GetOrderBook()
         if(body_json):
+            os.system("clear")
             order_book = body_json
 
             if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):

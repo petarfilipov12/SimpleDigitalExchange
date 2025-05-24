@@ -36,15 +36,19 @@ Return_Type MarketOrderBook::AddMarketOrder(Order order)
     return ret;
 }
 
-Return_Type MarketOrderBook::CancelMarketOrder(Order order)
+Return_Type MarketOrderBook::CancelMarketOrderById(int id, Order *pOrder_o)
 {
     Return_Type ret = RET_ORDER_NOT_EXISTS;
 
     this->market_book_lock.lock();
-    unordered_set<Order, Order::HashFunc>::iterator pOrder = this->market_orders.find(order);
+    unordered_set<Order, Order::HashFunc>::iterator pOrder = this->market_orders.find(Order(id));
 
     if (pOrder != this->market_orders.end())
     {
+        if(pOrder_o != nullptr)
+        {
+            *pOrder_o = *pOrder;
+        }
         list<Order>::iterator pListOrder = find(this->market_orders_queue.begin(), this->market_orders_queue.end(), *pOrder);
 
         if (pListOrder != this->market_orders_queue.end())
@@ -61,9 +65,9 @@ Return_Type MarketOrderBook::CancelMarketOrder(Order order)
     return ret;
 }
 
-Return_Type MarketOrderBook::CancelMarketOrderById(int id)
+Return_Type MarketOrderBook::CancelMarketOrder(Order order, Order *pOrder)
 {
-    return this->CancelMarketOrder(Order(id));
+    return this->CancelMarketOrder(order.id, pOrder);
 }
 
 Return_Type MarketOrderBook::GetFirst(Order **pOrder)

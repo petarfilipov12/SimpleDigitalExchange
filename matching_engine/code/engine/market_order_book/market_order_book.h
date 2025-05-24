@@ -25,9 +25,9 @@ class MarketOrderBook{
 
         Return_Type AddMarketOrder(Order order);
 
-        Return_Type CancelMarketOrder(Order order);
+        Return_Type CancelMarketOrder(Order order, Order *pOrder);
 
-        Return_Type CancelMarketOrderById(int id);
+        Return_Type CancelMarketOrderById(int id, Order *pOrder);
 
         Return_Type GetFirst(Order **pOrder);
 

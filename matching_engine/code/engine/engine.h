@@ -32,10 +32,6 @@ class Engine{
         
         Return_Type CancelOrderById(int id);
         
-        Return_Type GetOrderBook(json *l2_book);
-
-        void PrintOrderBook();
-        
         void MatchOrderBook();
         
         void MatchMarketOrder();

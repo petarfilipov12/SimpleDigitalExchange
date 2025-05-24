@@ -8,7 +8,7 @@
 static void CacheOrders_EventHandler_OrderAdded(Event event)
 {
     json j_data = event.GetJsonData();
-    cache_orders.OrderAdded(ConvertJsonToOrder(&j_data));
+    cache_orders.OrderAdded(ConvertJsonToOrder(j_data));
 }
 
 static void CacheOrders_EventHandler_OrderCanceled(Event event)
@@ -19,8 +19,8 @@ static void CacheOrders_EventHandler_OrderCanceled(Event event)
 static void CacheOrders_EventHandler_OrderFilled(Event event)
 {
     cache_orders.OrderFilled(
-        event.GetJsonData()["bid_order_id"],
-        event.GetJsonData()["ask_order_id"],
+        event.GetJsonData()["bid_order"]["order_id"],
+        event.GetJsonData()["ask_order"]["order_id"],
         event.GetJsonData()["quantity"]
     );
 }
@@ -28,16 +28,18 @@ static void CacheOrders_EventHandler_OrderFilled(Event event)
 static void CacheOrders_EventHandler_GetOrder(Event event)
 {
     Order order;
-    Return_Type ret = RET_NOT_OK;
+
+    (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
+    (*event.GetResponceDataPtr())["data"] = {};
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        // (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
-        // (*event.GetResponceDataPtr())["data"] = {};
+        (*event.GetResponceDataPtr())["error"] = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
 
-        ret = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
-        (*event.GetResponceDataPtr())["error"] = ret;
-        (*event.GetResponceDataPtr())["data"] = order.ConvertOrderToJson();
+        if(RET_OK == ((*event.GetResponceDataPtr())["error"]))
+        {
+            (*event.GetResponceDataPtr())["data"] = order.ConvertOrderToJson();
+        }
     }
 }
 

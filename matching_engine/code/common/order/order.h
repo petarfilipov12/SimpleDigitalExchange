@@ -5,6 +5,8 @@
 #include<nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include <iostream>
+
 using namespace std;
 
 enum eOrderSide_t
@@ -60,6 +62,32 @@ class Order{
         };
 };
 
-Order ConvertJsonToOrder(json *j_data);
+inline Order ConvertJsonToOrder(json &j_data){
+    return Order(
+        (j_data)["price"],
+        (j_data)["quantity"],
+        (j_data)["order_id"],
+        static_cast<enum eOrderSide_t>((j_data)["order_side"]),
+        static_cast<enum eOrderType_t>((j_data)["order_type"]),
+        (j_data)["status"]
+    );
+
+    // cout << "J_DATA: " << j_data << "\n";
+    // string price = (j_data).at("price");
+    // float qty = (j_data).at("quantity");
+    // int order_id = (j_data).at("order_id");
+    // enum eOrderSide_t order_side = static_cast<enum eOrderSide_t>((j_data).at("order_side"));
+    // enum eOrderType_t order_type = static_cast<enum eOrderType_t>((j_data).at("order_type"));
+    // bool status = (j_data).at("status");
+
+    // return Order(
+    //         price,
+    //         qty,
+    //         order_id,
+    //         order_side,
+    //         order_type,
+    //         status
+    //     );
+}
 
 #endif

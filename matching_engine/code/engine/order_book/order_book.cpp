@@ -64,22 +64,22 @@ Return_Type OrderBook::AddOrder(Order order)
     return ret;
 }
 
-Return_Type OrderBook::CancelOrder(Order order)
+Return_Type OrderBook::CancelOrder(Order order, Order *pOrder)
+{
+    return this->CancelOrderById(order.id, pOrder);
+}
+
+Return_Type OrderBook::CancelOrderById(int id, Order *pOrder)
 {
     Return_Type ret = RET_ORDER_NOT_EXISTS;
 
-    if ((RET_OK == this->bid_book.CancelOrder(order)) ||
-        (RET_OK == this->ask_book.CancelOrder(order)))
+    if ((RET_OK == this->bid_book.CancelOrderById(id, pOrder)) ||
+        (RET_OK == this->ask_book.CancelOrderById(id, pOrder)))
     {
         ret = RET_OK;
     }
 
     return ret;
-}
-
-Return_Type OrderBook::CancelOrderById(int id)
-{
-    return this->CancelOrder(Order(id));
 }
 
 Return_Type OrderBook::GetBidFirst(Order **pOrder)

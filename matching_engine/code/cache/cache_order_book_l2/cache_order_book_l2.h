@@ -24,9 +24,12 @@ class Cache_OrderBookL2
     public:
         Return_Type OrderAdded(Order order);
 
-        Return_Type OrderCanceled(int order_id);
+        Return_Type OrderCanceled(Order order);
 
-        Return_Type OrderFilled(int bid_order_id, int ask_order_id, float quantity);
+        Return_Type OrderFilled(
+            string bid_order_price, enum eOrderType_t bid_order_type,
+            string ask_order_price, enum eOrderType_t ask_order_type,
+            float quantity);
 
         Return_Type GetOrderBookL2(json *l2_book);
 };

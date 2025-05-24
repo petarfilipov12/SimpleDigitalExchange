@@ -39,118 +39,72 @@ Return_Type Cache_OrderBookL2::OrderAdded(Order order)
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::OrderCanceled(int order_id)
+Return_Type Cache_OrderBookL2::OrderCanceled(Order order)
 {
     Return_Type ret = RET_NOT_OK;
-    json responce_data;
 
-    Event event(EVENT_ID_GET_ORDER, {{"order_id", order_id}}, &responce_data);
-
-    event_bus.Send(event);
-
-    while (responce_data.empty())
+    if (ORDER_TYPE_LIMIT == order.order_type)
     {
-        // Timer
-    }
-
-    if (RET_OK == responce_data["error"])
-    {
-        Order order = ConvertJsonToOrder(&(responce_data["data"]));
-
-        if (ORDER_TYPE_LIMIT == order.order_type)
+        if (ORDER_SIDE_BUY == order.order_side)
         {
-            if (ORDER_SIDE_BUY == order.order_side)
+            this->bid_book_l2_look.lock();
+            this->bid_book_l2[order.price] -= (order.quantity - order.filled);
+            if (this->bid_book_l2[order.price] <= 0.0)
             {
-                this->bid_book_l2_look.lock();
-                this->bid_book_l2[order.price] -= (order.quantity - order.filled);
-                if (this->bid_book_l2[order.price] <= 0.0)
-                {
-                    this->bid_book_l2.erase(order.price);
-                }
-                this->bid_book_l2_look.unlock();
+                this->bid_book_l2.erase(order.price);
+            }
+            this->bid_book_l2_look.unlock();
 
-                ret = RET_OK;
-            }
-            else if (ORDER_SIDE_SELL == order.order_side)
+            ret = RET_OK;
+        }
+        else if (ORDER_SIDE_SELL == order.order_side)
+        {
+            this->ask_book_l2_look.lock();
+            this->ask_book_l2[order.price] -= (order.quantity - order.filled);
+            if (this->ask_book_l2[order.price] <= 0.0)
             {
-                this->ask_book_l2_look.lock();
-                this->ask_book_l2[order.price] -= (order.quantity - order.filled);
-                if (this->ask_book_l2[order.price] <= 0.0)
-                {
-                    this->ask_book_l2.erase(order.price);
-                }
-                this->ask_book_l2_look.unlock();
+                this->ask_book_l2.erase(order.price);
+            }
+            this->ask_book_l2_look.unlock();
 
-                ret = RET_OK;
-            }
-            else
-            {
-                // Error
-            }
+            ret = RET_OK;
+        }
+        else
+        {
+            // Error
         }
     }
 
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::OrderFilled(int bid_order_id, int ask_order_id, float quantity)
+Return_Type Cache_OrderBookL2::OrderFilled(
+    string bid_order_price, enum eOrderType_t bid_order_type,
+    string ask_order_price, enum eOrderType_t ask_order_type,
+    float quantity)
 {
     Return_Type ret = RET_NOT_OK;
-    Order order;
-    json bid_order_responce_data;
-    json ask_order_responce_data;
 
-    event_bus.Send(Event(EVENT_ID_GET_ORDER, {{"order_id", bid_order_id}}, &bid_order_responce_data));
-    event_bus.Send(Event(EVENT_ID_GET_ORDER, {{"order_id", ask_order_id}}, &ask_order_responce_data));
-
-    while (bid_order_responce_data.empty())
+    if (ORDER_TYPE_LIMIT == bid_order_type)
     {
-        // Timer
-    }
-
-    ret = bid_order_responce_data["error"];
-    if (RET_OK == ret)
-    {
-        order = ConvertJsonToOrder(&(bid_order_responce_data["data"]));
-        if (ORDER_TYPE_LIMIT == order.order_type)
+        this->bid_book_l2_look.lock();
+        this->bid_book_l2[bid_order_price] -= quantity;
+        if (this->bid_book_l2[bid_order_price] <= 0.1)
         {
-            this->bid_book_l2_look.lock();
-            this->bid_book_l2[order.price] -= quantity;
-            if (this->bid_book_l2[order.price] <= 0.1)
-            {
-                this->bid_book_l2.erase(order.price);
-            }
-            this->bid_book_l2_look.unlock();
+            this->bid_book_l2.erase(bid_order_price);
         }
-    }
-    else
-    {
-        return ret;
+        this->bid_book_l2_look.unlock();
     }
 
-    while (ask_order_responce_data.empty())
+    if (ORDER_TYPE_LIMIT == ask_order_type)
     {
-        // Timer
-    }
-
-    ret = ask_order_responce_data["error"];
-    if (RET_OK == ret)
-    {
-        order = ConvertJsonToOrder(&(ask_order_responce_data["data"]));
-        if (ORDER_TYPE_LIMIT == order.order_type)
+        this->ask_book_l2_look.lock();
+        this->ask_book_l2[ask_order_price] -= quantity;
+        if (this->ask_book_l2[ask_order_price] <= 0.1)
         {
-            this->ask_book_l2_look.lock();
-            this->ask_book_l2[order.price] -= quantity;
-            if (this->ask_book_l2[order.price] <= 0.1)
-            {
-                this->ask_book_l2.erase(order.price);
-            }
-            this->ask_book_l2_look.unlock();
+            this->ask_book_l2.erase(ask_order_price);
         }
-    }
-    else
-    {
-        return ret;
+        this->ask_book_l2_look.unlock();
     }
 
     return ret;

@@ -48,7 +48,8 @@ bool Engine::ExistsOrderId(int id) const
 Return_Type Engine::AddOrder(Order order)
 {
     Return_Type ret = RET_NOT_OK;
-    json j_data;
+    json j_data = order.ConvertOrderToJson();
+    Event event(EVENT_ID_ORDER_ADDED, j_data, nullptr);
 
     if (order.order_type == ORDER_TYPE_MARKET)
     {
@@ -63,80 +64,66 @@ Return_Type Engine::AddOrder(Order order)
         // Error
     }
 
-    j_data = order.ConvertOrderToJson();
-
     if(RET_OK != ret)
     {
-        Event event(EVENT_ID_ADD_ORDER_FAILLED, j_data, nullptr);
-        this->event_bus->Send(event);
+        event = Event(EVENT_ID_ADD_ORDER_FAILLED, j_data, nullptr);
     }
-    else
-    {
-        Event event(EVENT_ID_ORDER_ADDED, j_data, nullptr);
-        this->event_bus->Send(event);
-    }
+    
+    this->event_bus->Send(event);
 
     return ret;
 }
 
 Return_Type Engine::CancelOrder(Order order)
 {
+    Event event(EVENT_ID_CANCEL_ORDER_FAILED, order.ConvertOrderToJson(), nullptr);
+    Order *pOrder;
     Return_Type ret = RET_NOT_OK;
-    json j_data;
 
     if (order.order_type == ORDER_TYPE_MARKET)
     {
-        ret = this->market_book.CancelMarketOrder(order);
+        ret = this->market_book.CancelMarketOrder(order, pOrder);
     }
     else if (order.order_type == ORDER_TYPE_LIMIT)
     {
-        ret = this->order_book.CancelOrder(order);
+        ret = this->order_book.CancelOrder(order, pOrder);
     }
     else
     {
         // Error
     }
 
-    j_data = order.ConvertOrderToJson();
-    if(RET_OK != ret)
+    if(RET_OK == ret)
     {
-        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
-        this->event_bus->Send(event);
+        event = Event(EVENT_ID_ORDER_CANCELED, pOrder->ConvertOrderToJson(), nullptr);
     }
-    else
-    {
-        Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
-        this->event_bus->Send(event);
-    }
+        
+    this->event_bus->Send(event);
 
     return ret;
 }
 
 Return_Type Engine::CancelOrderById(int id)
 {
+    Event event(EVENT_ID_CANCEL_ORDER_FAILED, {{"order_id", id}}, nullptr);
+    Order *pOrder;
     Return_Type ret = RET_NOT_OK;
-    json j_data;
 
     if (this->market_book.ExistsMarketOrderById(id))
     {
-        ret = this->market_book.CancelMarketOrderById(id);
+        ret = this->market_book.CancelMarketOrderById(id, pOrder);
     }
     else
     {
-        ret = this->order_book.CancelOrderById(id);
+        ret = this->order_book.CancelOrderById(id, pOrder);
     }
 
-    j_data = {{"order_id", id}};
-    if(RET_OK != ret)
+    if(RET_OK == ret)
     {
-        Event event(EVENT_ID_CANCEL_ORDER_FAILED, j_data, nullptr);
-        this->event_bus->Send(event);
+        event = Event(EVENT_ID_ORDER_CANCELED, pOrder->ConvertOrderToJson(), nullptr);
     }
-    else
-    {
-        Event event(EVENT_ID_ORDER_CANCELED, j_data, nullptr);
-        this->event_bus->Send(event);
-    }
+
+    this->event_bus->Send(event);
 
     return ret;
 }
@@ -164,19 +151,19 @@ void Engine::MatchOrderBook()
 
             j_data["price"] = ask_order->price;
             j_data["quantity"] = quantity;
-            j_data["bid_order_id"] = bid_order->id;
-            j_data["ask_order_id"] = ask_order->id;
+            j_data["bid_order"] = bid_order->ConvertOrderToJson();
+            j_data["ask_order"] = ask_order->ConvertOrderToJson();
 
             ask_order->filled += quantity;
             if(ask_order->filled >= ask_order->quantity)
             {
-                this->order_book.CancelOrderById(ask_order->id);
+                this->order_book.CancelOrderById(ask_order->id, nullptr);
             }
 
             bid_order->filled += quantity;
             if(bid_order->filled >= bid_order->quantity)
             {
-                this->order_book.CancelOrderById(bid_order->id);
+                this->order_book.CancelOrderById(bid_order->id, nullptr);
             }
 
             Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
@@ -237,7 +224,7 @@ void Engine::MatchMarketOrder()
     book_order->filled += quantity;
     if (book_order->filled >= book_order->quantity)
     {
-        this->order_book.CancelOrderById(book_order->id);
+        this->order_book.CancelOrderById(book_order->id, nullptr);
     }
 
     market_order->filled += quantity;

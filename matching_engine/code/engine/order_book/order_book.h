@@ -23,9 +23,9 @@ class OrderBook{
 
         Return_Type AddOrder(Order order);
 
-        Return_Type CancelOrder(Order order);
+        Return_Type CancelOrder(Order order, Order *pOrder);
 
-        Return_Type CancelOrderById(int id);
+        Return_Type CancelOrderById(int id, Order *pOrder);
 
         Return_Type GetBidFirst(Order **pOrder);
 

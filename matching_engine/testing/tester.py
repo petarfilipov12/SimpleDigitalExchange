@@ -18,8 +18,8 @@ def ShowBookDepth(parent):
             dpg.add_plot_legend()
             dpg.add_plot_axis(dpg.mvXAxis, label="price", auto_fit=True)
             with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
-                dpg.add_stair_series([1.0, 1.1], [2, 1], tag="stair_series_ask", label="ask", shaded=True)
-                dpg.add_stair_series([1.3, 1.4], [1, 2], tag="stair_series_bid", label="bid", shaded=True)
+                dpg.add_stair_series([], [], tag="stair_series_ask", label="ask", shaded=True)
+                dpg.add_stair_series([], [], tag="stair_series_bid", label="bid", shaded=True)
 
 def ShowMainWindow():
     dpg.add_input_int(default_value=0, tag="VAL", parent="PRIMARY_WINDOW")

@@ -11,9 +11,10 @@ using namespace std;
 
 HANDLER_FUNC(RestServerHandler_AddOrder)
 {
-    cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
-
-    json responce_data;
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
     json j_data = json::parse(req.body);
     j_data["order_id"] = rand();
     j_data["status"] = true;
@@ -22,7 +23,7 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
 
     event_bus.Send(event);
 
-    while(responce_data.empty())
+    while(RET_INVALID == responce_data["error"])
     {
         usleep(10);
     }
@@ -32,18 +33,19 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
 
 HANDLER_FUNC(RestServerHandler_CancelOrder)
 {
-    cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
-
-    json responce_data;
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
     json j_data = json::parse(req.body);
 
     Event event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data);
 
     event_bus.Send(event);
 
-    while(responce_data.empty())
+    while(RET_INVALID == responce_data["error"])
     {
-        //Timer
+        usleep(10);
     }
 
     res.set_content(responce_data.dump(), "application/json");
@@ -51,18 +53,19 @@ HANDLER_FUNC(RestServerHandler_CancelOrder)
 
 HANDLER_FUNC(RestServerHandler_GetOrder)
 {
-    cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
-
-    json responce_data;
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
     json j_data = json::parse(req.body);
 
     Event event(EVENT_ID_GET_ORDER, j_data, &responce_data);
 
     event_bus.Send(event);
 
-    while(responce_data.empty())
+    while(RET_INVALID == responce_data["error"])
     {
-        //Timer
+        usleep(10);
     }
 
     res.set_content(responce_data.dump(), "application/json");
@@ -70,17 +73,18 @@ HANDLER_FUNC(RestServerHandler_GetOrder)
 
 HANDLER_FUNC(RestServerHandler_GetOrderBook)
 {
-    cout << req.remote_addr << ": " << req.remote_port << ", data: " << req.body << endl;
-
-    json responce_data;
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
 
     Event event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data);
 
     event_bus.Send(event);
 
-    while(responce_data.empty())
+    while(RET_INVALID == responce_data["error"])
     {
-        //Timer
+        usleep(10);
     }
 
     res.set_content(responce_data.dump(), "application/json");

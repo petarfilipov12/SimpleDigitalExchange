@@ -28,7 +28,20 @@ static void CacheOrderBookL2_EventHandler_OrderFilled(Event event)
 
 static void CacheOrderBookL2_EventHandler_GetOrderBookL2(Event event)
 {
-    cache_order_book_l2.GetOrderBookL2(event.GetResponceDataPtr());
+    json l2_book;
+    Return_Type ret = RET_NOT_OK;
+
+    if(nullptr != event.GetResponceDataPtr())
+    {
+        ret = cache_order_book_l2.GetOrderBookL2(&l2_book);
+
+        if(RET_OK == ret)
+        {
+            (*event.GetResponceDataPtr())["data"] = l2_book;
+        }
+
+        (*event.GetResponceDataPtr())["error"] = ret;
+    }
 }
 
 void CacheOrderBookL2_EventHandler(Event event)

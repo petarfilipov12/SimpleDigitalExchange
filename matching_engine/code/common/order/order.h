@@ -62,7 +62,7 @@ class Order{
         };
 };
 
-inline Order ConvertJsonToOrder(json &j_data){
+inline Order ConvertJsonToOrder(json j_data){
     return Order(
         (j_data)["price"],
         (j_data)["quantity"],

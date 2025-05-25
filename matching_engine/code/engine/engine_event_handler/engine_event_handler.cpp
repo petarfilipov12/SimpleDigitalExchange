@@ -9,16 +9,15 @@ using json = nlohmann::json;
 
 static void Engine_EventHandler_AddOrder(Event event)
 {
-    Return_Type ret;
+    Return_Type ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
+
     ret = engine.AddOrder(ConvertJsonToOrder(j_data));
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        (*event.GetResponceDataPtr())["error"] = ret;
-        
-        (*event.GetResponceDataPtr())["data"] = {};
         (*event.GetResponceDataPtr())["data"] = j_data;
+        (*event.GetResponceDataPtr())["error"] = ret;
     }
 
 }
@@ -31,8 +30,8 @@ static void Engine_EventHandler_CancelOrder(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        (*event.GetResponceDataPtr())["error"] = ret;
         (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
+        (*event.GetResponceDataPtr())["error"] = ret;
     }
 }
 

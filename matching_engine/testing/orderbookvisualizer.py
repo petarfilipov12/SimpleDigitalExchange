@@ -33,7 +33,7 @@ def main():
         (status, body_json) = GetOrderBook()
         if(body_json):
             os.system("clear")
-            order_book = body_json
+            order_book = body_json["data"]
 
             if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):
                 for price, amount in reversed(order_book["ask"].items()):

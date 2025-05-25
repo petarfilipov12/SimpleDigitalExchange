@@ -39,7 +39,7 @@ def TimerUpdate():
         #Get Order Book Data
         (status, body_json) = GetOrderBook()
         if(body_json):
-            order_book = body_json
+            order_book = body_json["data"]
 
             if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):
                 prices = [float(price) for price in list(order_book["ask"].keys())]

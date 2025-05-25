@@ -28,18 +28,18 @@ static void CacheOrders_EventHandler_OrderFilled(Event event)
 static void CacheOrders_EventHandler_GetOrder(Event event)
 {
     Order order;
-
-    (*event.GetResponceDataPtr())["error"] = RET_NOT_OK;
-    (*event.GetResponceDataPtr())["data"] = {};
+    Return_Type ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        (*event.GetResponceDataPtr())["error"] = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
+        ret = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
 
-        if(RET_OK == ((*event.GetResponceDataPtr())["error"]))
+        if(RET_OK == ret)
         {
             (*event.GetResponceDataPtr())["data"] = order.ConvertOrderToJson();
         }
+
+        (*event.GetResponceDataPtr())["error"] = ret;
     }
 }
 

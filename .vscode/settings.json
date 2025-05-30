@@ -8,6 +8,7 @@
         "unordered_set": "cpp",
         "algorithm": "cpp",
         "string": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "unordered_map": "cpp"
     }
 }

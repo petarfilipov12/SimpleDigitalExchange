@@ -141,21 +141,27 @@ Return_Type Cache_OrderBookL2::OrderFilled(
 
 Return_Type Cache_OrderBookL2::GetOrderBookL2(json *l2_book)
 {
+    map<string, float, greater<string> > temp_bid_book_l2;
+    map<string, float, less<string> > temp_ask_book_l2;
+
     this->bid_book_l2_look.lock();
     this->ask_book_l2_look.lock();
+    temp_bid_book_l2 = this->bid_book_l2;
+    temp_ask_book_l2 = this->ask_book_l2;
+    this->bid_book_l2_look.unlock();
+    this->ask_book_l2_look.unlock();
+
     (*l2_book)["bid"] = {};
     if (!this->bid_book_l2.empty())
     {
-        (*l2_book)["bid"] = this->bid_book_l2;
+        (*l2_book)["bid"] = temp_bid_book_l2;
     }
 
     (*l2_book)["ask"] = {};
     if (!this->ask_book_l2.empty())
     {
-        (*l2_book)["ask"] = this->ask_book_l2;
+        (*l2_book)["ask"] = temp_ask_book_l2;
     }
-    this->bid_book_l2_look.unlock();
-    this->ask_book_l2_look.unlock();
 
     return RET_OK;
 }

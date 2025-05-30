@@ -6,5 +6,6 @@
 #define RECEIVER_ID_EVENT_LOGGER        2
 #define RECEIVER_ID_CACHE_ORDERS        3
 #define RECEIVER_ID_CACHE_ORDER_BOOK_L2 4
+#define RECEIVER_ID_CACHE_CANDLES       5
 
 #endif

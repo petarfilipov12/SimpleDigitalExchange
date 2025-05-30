@@ -90,4 +90,23 @@ HANDLER_FUNC(RestServerHandler_GetOrderBook)
     res.set_content(responce_data.dump(), "application/json");
 }
 
+HANDLER_FUNC(RestServerHandler_GetCandles)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+
+    Event event(EVENT_ID_GET_CANDLES, {}, &responce_data);
+
+    event_bus.Send(event);
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
 #endif

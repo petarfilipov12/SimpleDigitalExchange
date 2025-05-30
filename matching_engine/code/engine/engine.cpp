@@ -192,8 +192,8 @@ void Engine::MatchMarketOrder()
             return;
         }
 
-        j_data["ask_order_id"] = book_order->id;
-        j_data["bid_order_id"] = market_order->id;
+        j_data["ask_order"] = book_order->ConvertOrderToJson();
+        j_data["bid_order"] = market_order->ConvertOrderToJson();
     }
     else if (market_order->order_side == ORDER_SIDE_SELL)
     {
@@ -202,8 +202,8 @@ void Engine::MatchMarketOrder()
             return;
         }
 
-        j_data["ask_order_id"] = market_order->id;
-        j_data["bid_order_id"] = book_order->id;
+        j_data["ask_order"] = market_order->ConvertOrderToJson();
+        j_data["bid_order"] = book_order->ConvertOrderToJson();
     }
     else
     {

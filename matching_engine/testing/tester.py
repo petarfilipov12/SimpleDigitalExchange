@@ -1,75 +1,89 @@
-import dearpygui.dearpygui as dpg
-import threading
-import time
 import requests
+import time
+import json
+import random
+
+ORDER_SIDE_BUY = 0
+ORDER_SIDE_SELL = 1
+ORDER_SIDE_INVALID = 2
+
+ORDER_TYPE_MARKET = 0
+ORDER_TYPE_LIMIT = 1
+ORDER_TYPE_INVALID = 2
+
+def AddOrder(priceP, qtyP, sideP, typeP):
+
+    side_s = ""
+    if(sideP == ORDER_SIDE_BUY):
+        side_s = "ORDER_SIDE_BUY"
+    elif(sideP == ORDER_SIDE_SELL):
+        side_s = "ORDER_SIDE_SELL"
+    else:
+        side_s = "ORDER_SIDE_INVALID"
+
+    type_s = ""
+    if(typeP == ORDER_TYPE_MARKET):
+        type_s = "ORDER_TYPE_MARKET"
+    elif(typeP == ORDER_TYPE_LIMIT):
+        type_s = "ORDER_TYPE_LIMIT"
+    else:
+        type_s = "ORDER_TYPE_INVALID"
+
+    print("ADD ORDER", priceP, qtyP, side_s, type_s)
+    url = "https://127.0.0.1:8080/add_order"
+    data = {}
+    data["price"] = priceP
+    data["quantity"] = qtyP
+    data["order_side"] = sideP
+    data["order_type"] = typeP
+
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+
+    return resp
+
+def CancelOrder(order_idP):
+    print("CANCEL ORDER")
+    url = "https://127.0.0.1:8080/cancel_order"
+    data = {}
+    data["order_id"] = order_idP
+
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+
+    return resp
 
 def GetOrderBook():
-    #print("GET ORDER BOOK")
+    print("GET ORDER BOOK")
     url = "https://127.0.0.1:8080/get_order_book"
     data = {}
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key)
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
-    return (resp.status_code, resp.json())
+    return resp
 
-def ShowBookDepth(parent):        
-        with dpg.plot(parent=parent, label="Order Book Depth", height=400, width=-1):
-            dpg.add_plot_legend()
-            dpg.add_plot_axis(dpg.mvXAxis, label="price", auto_fit=True)
-            with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
-                dpg.add_stair_series([], [], tag="stair_series_ask", label="ask", shaded=True)
-                dpg.add_stair_series([], [], tag="stair_series_bid", label="bid", shaded=True)
+def GetCandles(limit=10):
+    print("GET CANDLES")
+    url = "https://127.0.0.1:8080/get_candles"
+    data = {"limit": limit}
 
-def ShowMainWindow():
-    dpg.add_input_int(default_value=0, tag="VAL", parent="PRIMARY_WINDOW")
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
-    ShowBookDepth(parent="PRIMARY_WINDOW")
-    
-
-def TimerUpdate():
-    i = 0
-
-    while(True):
-        time.sleep(1)
-
-        i += 1
-        dpg.set_value("VAL", i)
-
-        #Get Order Book Data
-        (status, body_json) = GetOrderBook()
-        if(body_json):
-            order_book = body_json["data"]
-
-            if( ("ask" in order_book.keys()) and isinstance(order_book["ask"], dict) ):
-                prices = [float(price) for price in list(order_book["ask"].keys())]
-                amounts = list(order_book["ask"].values())
-
-                dpg.configure_item("stair_series_ask", x=prices, y=amounts)
-            
-            if( ("bid" in order_book.keys()) and isinstance(order_book["bid"], dict) ):
-                prices = [float(price) for price in list(order_book["bid"].keys())]
-                amounts = list(order_book["bid"].values())
-
-                dpg.configure_item("stair_series_bid", x=prices, y=amounts)
+    return resp
 
 def main():
-    t1 = threading.Thread(target=TimerUpdate)
-
-    dpg.create_context()
-    dpg.create_viewport(title='Custom Title', width=900, height=700)
-
-    dpg.add_window(tag="PRIMARY_WINDOW")
-    ShowMainWindow()
-
-    dpg.setup_dearpygui()
-    dpg.show_viewport()
-    dpg.set_primary_window("PRIMARY_WINDOW", True)
     
-    t1.start()
-    dpg.start_dearpygui()
+    while(True):
+        res = GetCandles()
+        print(order)
+        print()
 
-    dpg.destroy_context()
+        #time.sleep(0.2)
+        input("Press Enter")
+
+    
 
 if(__name__ == "__main__"):
     main()

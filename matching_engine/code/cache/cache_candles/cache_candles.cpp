@@ -70,16 +70,21 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
 
 void CacheCandles::Cyclic()
 {
+    this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
     {
+        this->current_candle_lock.unlock();
+
         this->candles_lock.lock();
-        string last_close = this->candles.back().close;
-        this->candles.push_back(Candle(last_close));
+        if(!this->candles.empty())
+        {
+            string last_close = this->candles.back().close;
+            this->candles.push_back(Candle(last_close));
+        }
         this->candles_lock.unlock();
     }
     else
     {
-        this->current_candle_lock.lock();
         Candle candle = this->current_candle.GetCandle();
         this->current_candle_lock.unlock();
         

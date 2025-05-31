@@ -102,6 +102,10 @@ void Init_RestServer()
 
 int main(void){
     srand(time(0));
+
+    // cout << "Init sleep for 1 min\n";
+    // sleep(60);
+    // cout << "Start\n";
     
     Init_EventBus();
     Init_EventLogger();

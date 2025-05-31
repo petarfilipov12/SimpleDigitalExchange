@@ -47,23 +47,42 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
 {
     vector<Candle> temp;
     vector<Candle>::size_type candles_size;
+    Candle temp_candle;
 
     this->candles_lock.lock();
     candles_size = this->candles.size();
     this->candles_lock.unlock();
 
-    if (limit > candles_size)
+    if(candles_size > 0)
     {
-        limit = candles_size;
-    }
+        if (limit > candles_size)
+        {
+            limit = candles_size;
+        }
 
-    this->candles_lock.lock();
-    temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
-    this->candles_lock.unlock();
+        this->candles_lock.lock();
+        temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
+        this->candles_lock.unlock();
 
-    reverse(temp.begin(), temp.end());
+        this->current_candle_lock.lock();
+        if (this->current_candle.IsEmpty())
+        {
+            this->current_candle_lock.unlock();
 
-    *data = temp;
+            temp_candle = Candle(temp.back().close);
+        }
+        else
+        {
+            temp_candle = this->current_candle.GetCandle();
+            this->current_candle_lock.unlock();
+        }
+
+        temp.push_back(temp_candle);
+
+        reverse(temp.begin(), temp.end());
+
+        *data = temp;
+    }    
 
     return RET_OK;
 }
@@ -78,8 +97,7 @@ void CacheCandles::Cyclic()
         this->candles_lock.lock();
         if(!this->candles.empty())
         {
-            string last_close = this->candles.back().close;
-            this->candles.push_back(Candle(last_close));
+            this->candles.push_back(Candle(this->candles.back().close));
         }
         this->candles_lock.unlock();
     }
@@ -100,7 +118,7 @@ void CacheCandles::run()
 {
     while (true)
     {
-        sleep(1);
+        sleep(60);
         this->Cyclic();
     }
 }

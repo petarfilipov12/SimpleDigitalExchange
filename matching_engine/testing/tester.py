@@ -77,7 +77,7 @@ def main():
     
     while(True):
         res = GetCandles()
-        print(order)
+        print(res)
         print()
 
         #time.sleep(0.2)

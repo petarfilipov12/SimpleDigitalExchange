@@ -96,8 +96,9 @@ HANDLER_FUNC(RestServerHandler_GetCandles)
         {"error", RET_INVALID},
         {"data", {}}
     };
+    json j_data = json::parse(req.body);
 
-    Event event(EVENT_ID_GET_CANDLES, {}, &responce_data);
+    Event event(EVENT_ID_GET_CANDLES, j_data, &responce_data);
 
     event_bus.Send(event);
 

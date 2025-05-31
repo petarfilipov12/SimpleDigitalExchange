@@ -75,8 +75,8 @@ def main():
         print(order)
         print()
 
-        time.sleep(0.2)
-        #input("Press Enter")
+        #time.sleep(0.2)
+        input("Press Enter")
 
     
 

@@ -68,6 +68,8 @@ class ExchangeUI:
         if(data != None):
             dpg.configure_item("CANDLE_SERIES", dates=data["timestamps"],
                 opens=data["opens"], closes=data["closes"], lows=data["lows"], highs=data["highs"])
+            
+            #dpg.set_axis_limits_constraints("CANDLES_Y_AXIS", vmin=min(data["lows"]), vmax=max(data["highs"]))
     
     def _UpdaterFunc(self):
         self._UpdateCandles()
@@ -92,9 +94,9 @@ class ExchangeUI:
 
         with dpg.plot(parent=parent, label="Candle Series", height=400, width=-1):
             dpg.add_plot_legend()
-            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Day", scale=dpg.mvPlotScale_Time)
-            with dpg.plot_axis(dpg.mvYAxis, label="USD"):
-                dpg.add_candle_series(timestamps, opens, closes, lows, highs, tag="CANDLE_SERIES", label="SYMBOL", time_unit=dpg.mvTimeUnit_Min)
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", scale=dpg.mvPlotScale_Time)
+            with dpg.plot_axis(dpg.mvYAxis, tag="CANDLES_Y_AXIS", label="USD", auto_fit=True):
+                dpg.add_candle_series(timestamps, opens, closes, lows, highs, tag="CANDLE_SERIES", label="SYMBOL")
                 dpg.fit_axis_data(dpg.top_container_stack())
             dpg.fit_axis_data(xaxis)
 

@@ -64,31 +64,31 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
         this->candles_lock.lock();
         temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
         this->candles_lock.unlock();
+    }
 
-        this->current_candle_lock.lock();
-        if (this->current_candle.IsEmpty())
+    this->current_candle_lock.lock();
+    if (this->current_candle.IsEmpty())
+    {
+        this->current_candle_lock.unlock();
+
+        temp_candle = Candle(temp.back().close, this->current_timestamp);
+    }
+    else
+    {
+        temp_candle = this->current_candle;
+        this->current_candle_lock.unlock();
+
+        if (temp_candle.timestamp != this->current_timestamp)
         {
-            this->current_candle_lock.unlock();
-
-            temp_candle = Candle(temp.back().close, this->current_timestamp);
+            temp_candle.timestamp = this->current_timestamp;
         }
-        else
-        {
-            temp_candle = this->current_candle;
-            this->current_candle_lock.unlock();
+    }
 
-            if(temp_candle.timestamp != this->current_timestamp)
-            {
-                temp_candle.timestamp = this->current_timestamp;
-            }
-        }
+    temp.push_back(temp_candle);
 
-        temp.push_back(temp_candle);
+    reverse(temp.begin(), temp.end());
 
-        reverse(temp.begin(), temp.end());
-
-        *data = temp;
-    }    
+    *data = temp;
 
     return RET_OK;
 }
@@ -99,7 +99,7 @@ void CacheCandles::Init()
 
     this->current_timestamp = time(nullptr);
 
-    sec_till_next_min = 60 - (this->current_timestamp % 60);
+    sec_till_next_min = this->interval - (this->current_timestamp % this->interval);
 
     this->current_timestamp = this->current_timestamp + sec_till_next_min;
 
@@ -110,7 +110,7 @@ void CacheCandles::Init()
 void CacheCandles::Cyclic()
 {
     Candle candle;
-    time_t next_timestamp = this->current_timestamp + 60;
+    time_t next_timestamp = this->current_timestamp + this->interval;
 
     this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
@@ -150,7 +150,7 @@ void CacheCandles::run()
 
     while (true)
     {
-        sleep(60);
+        sleep(this->interval);
         this->Cyclic();
     }
 }

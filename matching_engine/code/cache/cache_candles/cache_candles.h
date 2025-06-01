@@ -25,6 +25,8 @@ class CacheCandles
         float current_low;
         time_t current_timestamp;
 
+        const time_t interval = 5*60;
+
         mutable mutex candles_lock;
         mutable mutex current_candle_lock;
     

@@ -56,3 +56,9 @@ class ExchangeAPIWrapper:
     
     def GetOrderBook(self):
         return self._Request_POST("/get_order_book")
+    
+    def GetCandles(self, limit=10):
+        data = {}
+        data["limit"] = limit
+
+        return self._Request_POST("/get_candles", json_data=data)

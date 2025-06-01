@@ -7,7 +7,7 @@
 #include <string>
 #include <mutex>
 
-#include "current_candle.h"
+#include "candle.h"
 
 using namespace std;
 
@@ -20,7 +20,10 @@ class CacheCandles
 {
     private:
         vector<Candle> candles;
-        CurrentCandle current_candle;
+        Candle current_candle;
+        float current_high;
+        float current_low;
+        time_t current_timestamp;
 
         mutable mutex candles_lock;
         mutable mutex current_candle_lock;
@@ -32,6 +35,8 @@ class CacheCandles
         Return_Type OrderFilled(string price_s);
 
         Return_Type GetCandles(int limit, json* data);
+
+        void Init();
 
         void Cyclic();
         

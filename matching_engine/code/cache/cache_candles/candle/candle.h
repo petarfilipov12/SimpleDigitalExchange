@@ -4,6 +4,7 @@
 #include "types.h"
 
 #include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -20,14 +21,20 @@ namespace candle
             string open;
             string close;
             string low;
+
+            time_t timestamp;
         
             Candle();
 
-            Candle(string price);
+            Candle(time_t timestamp);
 
-            Candle(string high, string open, string close, string low);
+            Candle(string price, time_t timestamp);
+
+            Candle(string high, string open, string close, string low, time_t timestamp);
 
             ~Candle();
+
+            bool IsEmpty();
 
             json ConvertCandleToJson();
     };

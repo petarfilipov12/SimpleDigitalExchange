@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <unistd.h>
+#include <ctime>
 
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
@@ -13,29 +14,29 @@ Return_Type CacheCandles::OrderFilled(string price_s)
     this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
     {
-        this->current_candle.high_s = price_s;
-        this->current_candle.high_f = price_f;
+        this->current_candle.high = price_s;
+        this->current_high = price_f;
 
-        this->current_candle.open_s = price_s;
+        this->current_candle.open = price_s;
 
-        this->current_candle.close_s = price_s;
+        this->current_candle.close = price_s;
 
-        this->current_candle.low_s = price_s;
-        this->current_candle.low_f = price_f;
+        this->current_candle.low = price_s;
+        this->current_low = price_f;
     }
     else
     {
-        this->current_candle.close_s = price_s;
+        this->current_candle.close = price_s;
 
-        if (this->current_candle.high_f < price_f)
+        if (this->current_high < price_f)
         {
-            this->current_candle.high_s = price_s;
-            this->current_candle.high_f = price_f;
+            this->current_candle.high = price_s;
+            this->current_high = price_f;
         }
-        else if (this->current_candle.low_f > price_f)
+        else if (this->current_low > price_f)
         {
-            this->current_candle.low_s = price_s;
-            this->current_candle.low_f = price_f;
+            this->current_candle.low = price_s;
+            this->current_low = price_f;
         }
     }
     this->current_candle_lock.unlock();
@@ -69,12 +70,17 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
         {
             this->current_candle_lock.unlock();
 
-            temp_candle = Candle(temp.back().close);
+            temp_candle = Candle(temp.back().close, this->current_timestamp);
         }
         else
         {
-            temp_candle = this->current_candle.GetCandle();
+            temp_candle = this->current_candle;
             this->current_candle_lock.unlock();
+
+            if(temp_candle.timestamp != this->current_timestamp)
+            {
+                temp_candle.timestamp = this->current_timestamp;
+            }
         }
 
         temp.push_back(temp_candle);
@@ -87,35 +93,61 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
     return RET_OK;
 }
 
+void CacheCandles::Init()
+{
+    int sec_till_next_min;
+
+    this->current_timestamp = time(nullptr);
+
+    sec_till_next_min = 60 - (this->current_timestamp % 60);
+
+    this->current_timestamp = this->current_timestamp + sec_till_next_min;
+
+    sleep(sec_till_next_min);
+    this->Cyclic();
+}
+
 void CacheCandles::Cyclic()
 {
+    Candle candle;
+    time_t next_timestamp = this->current_timestamp + 60;
+
     this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
     {
+        this->current_candle = Candle(next_timestamp);
         this->current_candle_lock.unlock();
 
         this->candles_lock.lock();
         if(!this->candles.empty())
         {
-            this->candles.push_back(Candle(this->candles.back().close));
+            this->candles.push_back(Candle(this->candles.back().close, this->current_timestamp));
         }
         this->candles_lock.unlock();
     }
     else
     {
-        Candle candle = this->current_candle.GetCandle();
+        candle = this->current_candle;
+        this->current_candle = Candle(next_timestamp);
         this->current_candle_lock.unlock();
+
+        if(candle.timestamp != this->current_timestamp)
+        {
+            candle.timestamp = this->current_timestamp;
+        }
         
         this->candles_lock.lock();
         this->candles.push_back(candle);
         this->candles_lock.unlock();
     }
 
-    this->current_candle.InitCurrentCandle();
+    this->current_timestamp = next_timestamp;
 }
 
 void CacheCandles::run()
 {
+    this->Init();
+
     while (true)
     {
         sleep(60);

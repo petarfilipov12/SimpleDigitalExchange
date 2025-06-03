@@ -68,8 +68,6 @@ class ExchangeUI:
         if(data != None):
             dpg.configure_item("CANDLE_SERIES", dates=data["timestamps"],
                 opens=data["opens"], closes=data["closes"], lows=data["lows"], highs=data["highs"])
-            
-            #dpg.set_axis_limits_constraints("CANDLES_Y_AXIS", vmin=min(data["lows"]), vmax=max(data["highs"]))
     
     def _UpdaterFunc(self):
         self._UpdateCandles()

@@ -61,8 +61,9 @@ void Init_CacheOrders()
 {
     event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, CacheOrders_EventHandler);
     
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_ADDED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_MAKER_ORDER_CANCELED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_GET_ORDER);
 }
@@ -71,8 +72,8 @@ void Init_CacheOrderBookL2()
 {
     event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, CacheOrderBookL2_EventHandler);
     
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_ADDED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_ADDED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_CANCELED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_GET_ORDER_BOOK);
 }

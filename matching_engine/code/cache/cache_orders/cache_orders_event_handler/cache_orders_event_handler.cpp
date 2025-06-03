@@ -47,10 +47,11 @@ void CacheOrders_EventHandler(Event event)
 {
     switch(event.GetEventId())
     {
-        case EVENT_ID_ORDER_ADDED:
+        case EVENT_ID_TAKER_ORDER_ADDED:
             CacheOrders_EventHandler_OrderAdded(event);
             break;
-        case EVENT_ID_ORDER_CANCELED:
+        case EVENT_ID_TAKER_ORDER_CANCELED:
+        case EVENT_ID_MAKER_ORDER_CANCELED:
             CacheOrders_EventHandler_OrderCanceled(event);
             break;
         case EVENT_ID_ORDER_FILLED:

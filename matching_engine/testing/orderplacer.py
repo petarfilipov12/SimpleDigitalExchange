@@ -63,15 +63,34 @@ def GetOrderBook():
 
     return resp
 
+def RandomOrder():
+    data = {}
+
+    data["price"] = str(round(random.uniform(1, 2), 2))
+    data["qty"] = round(random.uniform(0, 500), 2)
+    data["side"] = random.choice([ORDER_SIDE_BUY, ORDER_SIDE_SELL])
+    #order_type = random.choices([ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT], weights = [30, 70])[0]
+    data["order_type"] = ORDER_TYPE_LIMIT
+
+    return data
+
+def InputOrder():
+    data = {}
+
+    data["price"] = input("price:")
+    data["qty"] = float(input("qty:"))
+    data["side"] = int(input("side:"))
+    data["order_type"] = int(input("order_type:"))
+
+    return data
+
 def main():
     
     while(True):
-        price = str(round(random.uniform(1, 2), 2))
-        qty = round(random.uniform(0, 500), 2)
-        side = random.choice([ORDER_SIDE_BUY, ORDER_SIDE_SELL])
-        #order_type = random.choices([ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT], weights = [30, 70])[0]
-        order_type = ORDER_TYPE_LIMIT
-        order = AddOrder(price, qty, side, order_type)
+        data = RandomOrder()
+        #data = InputOrder()
+        
+        order = AddOrder(data["price"], data["qty"], data["side"], data["order_type"])
         print(order)
         print()
 

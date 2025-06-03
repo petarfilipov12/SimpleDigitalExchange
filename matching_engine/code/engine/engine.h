@@ -3,7 +3,7 @@
 
 #include "types.h"
 #include "order_book.h"
-#include "market_order_book.h"
+#include "taker_order_book.h"
 #include "order.h"
 #include "event.h"
 #include "event_bus.h"
@@ -14,7 +14,7 @@ using json = nlohmann::json;
 class Engine{
     private:
         OrderBook order_book;
-        MarketOrderBook market_book;
+        TakerOrderBook taker_book;
         EventBus *event_bus;
     
     public:
@@ -31,10 +31,10 @@ class Engine{
         Return_Type CancelOrder(Order order);
         
         Return_Type CancelOrderById(int id);
+
+        Return_Type AddToOrderBook(Order *pTakerOrder);
         
-        void MatchOrderBook();
-        
-        void MatchMarketOrder();
+        Return_Type MatchTakerOrder(Order *pTakerOrder);
         
         void Cyclic();
         

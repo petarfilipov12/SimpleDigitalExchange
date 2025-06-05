@@ -44,12 +44,12 @@ Candle::Candle(string high, string open, string close, string low, time_t timest
 
 Candle::~Candle() {}
 
-bool Candle::IsEmpty()
+bool Candle::IsEmpty()const
 {
     return this->open.empty();
 }
 
-json Candle::ConvertCandleToJson()
+json Candle::ConvertCandleToJson()const
 {
     json j_candle = {
         {"high", this->high},
@@ -64,11 +64,5 @@ json Candle::ConvertCandleToJson()
 
 void candle::to_json(json &j, const Candle c)
 {
-    j = {
-        {"high", c.high},
-        {"open", c.open},
-        {"close", c.close},
-        {"low", c.low},
-        {"timestamp", c.timestamp},
-    };
+    j = c.ConvertCandleToJson();
 }

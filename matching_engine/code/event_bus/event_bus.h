@@ -23,7 +23,7 @@ private:
     mutable mutex receivers_lock;
     mutable mutex event_queue_lock;
 
-    // void Cyclic(void);
+    void Cyclic(void);
 
 public:
     EventBus();
@@ -39,8 +39,6 @@ public:
     Return_Type Unsubscribe(int receiver_id, enum eEventId_t event_id);
 
     void Send(Event event);
-
-    void Cyclic(void);
 
     void run(void);
 };

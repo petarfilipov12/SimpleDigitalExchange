@@ -134,7 +134,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eO
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::GetOrderBookL2(json *l2_book)
+Return_Type Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
 {
     map<string, float, greater<string> > temp_bid_book_l2;
     map<string, float, less<string> > temp_ask_book_l2;

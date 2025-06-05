@@ -29,6 +29,10 @@ class CacheCandles
 
         mutable mutex candles_lock;
         mutable mutex current_candle_lock;
+
+        void Init();
+
+        void Cyclic();
     
     public:
         CacheCandles();
@@ -36,11 +40,7 @@ class CacheCandles
 
         Return_Type OrderFilled(string price_s);
 
-        Return_Type GetCandles(int limit, json* data);
-
-        void Init();
-
-        void Cyclic();
+        Return_Type GetCandles(int limit, json* data)const;
         
         void run();
 };

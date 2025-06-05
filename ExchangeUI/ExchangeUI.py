@@ -90,7 +90,7 @@ class ExchangeUI:
             highs = data["highs"]
             lows = data["lows"]
 
-        with dpg.plot(parent=parent, label="Candle Series", height=400, width=-1):
+        with dpg.plot(parent=parent, label="Candle Series", height=-1, width=-1):
             dpg.add_plot_legend()
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", scale=dpg.mvPlotScale_Time)
             with dpg.plot_axis(dpg.mvYAxis, tag="CANDLES_Y_AXIS", label="USD", auto_fit=True):
@@ -99,7 +99,7 @@ class ExchangeUI:
             dpg.fit_axis_data(xaxis)
 
     def _ShowBookDepth(self, parent):        
-        with dpg.plot(parent=parent, label="Order Book Depth", height=400, width=-1):
+        with dpg.plot(parent=parent, label="Order Book Depth", height=-1, width=-1):
             dpg.add_plot_legend()
             dpg.add_plot_axis(dpg.mvXAxis, label="price", auto_fit=True)
             with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
@@ -144,8 +144,12 @@ class ExchangeUI:
 
 
     def _ShowMainWindow(self, ):
-        self._ShowCandleChart(parent="PRIMARY_WINDOW")
-        self._ShowBookDepth(parent="PRIMARY_WINDOW")
+        with dpg.child_window(parent="PRIMARY_WINDOW", resizable_x=False, resizable_y=True, height=600, width=-1) as child_w_0:
+            with dpg.group(parent=child_w_0, horizontal=True) as group:
+                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_1:
+                    self._ShowCandleChart(parent=child_w_1)
+                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_2:
+                    self._ShowBookDepth(parent=child_w_2)
         self._ShowBuySell(parent="PRIMARY_WINDOW")
     
     def Run(self):

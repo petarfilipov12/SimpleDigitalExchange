@@ -34,9 +34,9 @@ namespace candle
 
             ~Candle();
 
-            bool IsEmpty();
+            bool IsEmpty()const;
 
-            json ConvertCandleToJson();
+            json ConvertCandleToJson()const;
     };
 
     void to_json(json &j, const Candle c);

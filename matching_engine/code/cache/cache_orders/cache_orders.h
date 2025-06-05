@@ -14,6 +14,8 @@ class CacheOrders
         unordered_map<int, Order> orders;
 
         mutable mutex order_lock;
+
+        Return_Type OrderChange(int order_id, float quantity);
     
     public:
         CacheOrders();
@@ -22,8 +24,6 @@ class CacheOrders
         Return_Type OrderAdded(Order order);
 
         Return_Type OrderCanceled(int order_id);
-
-        Return_Type OrderChange(int order_id, float quantity);
 
         Return_Type OrderFilled(int taker_order_id, int book_order_id, float quantity);
 

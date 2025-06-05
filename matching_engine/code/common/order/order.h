@@ -39,7 +39,7 @@ class Order{
 
         Order(string price, float quantity, float filled, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status);
 
-        json ConvertOrderToJson();
+        json ConvertOrderToJson()const;
 
         // bool operator<(Order order2) const{
         //     return this->id < order2.id;

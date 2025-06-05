@@ -44,7 +44,7 @@ Order::Order(
     this->status = status;
 }
 
-json Order::ConvertOrderToJson()
+json Order::ConvertOrderToJson()const
 {
     json j_data;
 

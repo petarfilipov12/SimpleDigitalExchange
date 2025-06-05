@@ -28,7 +28,7 @@ class Cache_OrderBookL2
 
         Return_Type OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side);
 
-        Return_Type GetOrderBookL2(json *l2_book);
+        Return_Type GetOrderBookL2(json *l2_book)const;
 };
 
 #endif

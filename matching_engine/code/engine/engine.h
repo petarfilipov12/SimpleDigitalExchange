@@ -16,6 +16,12 @@ class Engine{
         OrderBook order_book;
         TakerOrderBook taker_book;
         EventBus *event_bus;
+
+        Return_Type AddToOrderBook(Order *pTakerOrder);
+        
+        Return_Type MatchTakerOrder(Order *pTakerOrder);
+        
+        void Cyclic();
     
     public:
         Engine(EventBus *event_bus);
@@ -31,12 +37,6 @@ class Engine{
         Return_Type CancelOrder(Order order);
         
         Return_Type CancelOrderById(int id);
-
-        Return_Type AddToOrderBook(Order *pTakerOrder);
-        
-        Return_Type MatchTakerOrder(Order *pTakerOrder);
-        
-        void Cyclic();
         
         void run();
 };

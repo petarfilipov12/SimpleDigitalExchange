@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "globals.h"
-#include "event_receiver_id.h"
+#include "event_receiver.h"
 
 using namespace std;
 

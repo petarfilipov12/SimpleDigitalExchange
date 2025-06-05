@@ -16,7 +16,7 @@ EventBus::~EventBus()
     // }
 }
 
-Return_Type EventBus::AddReceiver(int receiver_id, function<void(Event)> handler_func)
+Return_Type EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func)
 {
     Return_Type ret = RET_RECEIVER_EXISTS;
 
@@ -33,7 +33,7 @@ Return_Type EventBus::AddReceiver(int receiver_id, function<void(Event)> handler
     return ret;
 }
 
-Return_Type EventBus::RemoveReceiver(int receiver_id)
+Return_Type EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -60,7 +60,7 @@ Return_Type EventBus::RemoveReceiver(int receiver_id)
     return ret;
 }
 
-Return_Type EventBus::Subscribe(int receiver_id, enum eEventId_t event_id)
+Return_Type EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -86,7 +86,7 @@ Return_Type EventBus::Subscribe(int receiver_id, enum eEventId_t event_id)
     return ret;
 }
 
-Return_Type EventBus::Unsubscribe(int receiver_id, enum eEventId_t event_id)
+Return_Type EventBus::Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
 {
     Return_Type ret = RET_RECEIVER_NOT_EXISTS;
 

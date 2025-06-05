@@ -16,8 +16,8 @@ using namespace std;
 class EventBus
 {
 private:
-    map<int, EventReceiver> event_receivers;
-    map<int, unordered_set<int> > events_to_receivers_map;
+    map<enum eReceiverId_t, EventReceiver> event_receivers;
+    map<enum eEventId_t, unordered_set<enum eReceiverId_t> > events_to_receivers_map;
     queue<Event> event_queue;
 
     mutable mutex receivers_lock;
@@ -30,13 +30,13 @@ public:
 
     ~EventBus();
 
-    Return_Type AddReceiver(int receiver_id, function<void(Event)> handler_func);
+    Return_Type AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func);
 
-    Return_Type RemoveReceiver(int receiver_id);
+    Return_Type RemoveReceiver(enum eReceiverId_t receiver_id);
 
-    Return_Type Subscribe(int receiver_id, enum eEventId_t event_id);
+    Return_Type Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id);
 
-    Return_Type Unsubscribe(int receiver_id, enum eEventId_t event_id);
+    Return_Type Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id);
 
     void Send(Event event);
 

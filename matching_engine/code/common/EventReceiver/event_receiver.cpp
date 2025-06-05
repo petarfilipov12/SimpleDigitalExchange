@@ -4,10 +4,10 @@ using namespace std;
 
 EventReceiver::EventReceiver()
 {
-    this->id = 0;
+    this->id = RECEIVER_ID_INVALID;
 };
 
-EventReceiver::EventReceiver(int id, function<void(Event)> callback)
+EventReceiver::EventReceiver(enum eReceiverId_t id, function<void(Event)> callback)
 {
     this->id = id;
     this->callback = callback;
@@ -43,7 +43,7 @@ unordered_set<enum eEventId_t> EventReceiver::GetEvents() const
     return this->events;
 }
 
-int EventReceiver::GetId() const
+enum eReceiverId_t EventReceiver::GetId() const
 {
     return this->id;
 }

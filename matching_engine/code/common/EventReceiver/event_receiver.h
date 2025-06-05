@@ -8,23 +8,27 @@
 
 using namespace std;
 
-#define RECEIVER_ID_INVALID             0
-#define RECEIVER_ID_ENGINE              1
-#define RECEIVER_ID_EVENT_LOGGER        2
-#define RECEIVER_ID_CACHE_ORDERS        3
-#define RECEIVER_ID_CACHE_ORDER_BOOK_L2 4
-#define RECEIVER_ID_CACHE_CANDLES       5
+enum eReceiverId_t
+{
+    RECEIVER_ID_ENGINE,
+    RECEIVER_ID_EVENT_LOGGER,
+    RECEIVER_ID_CACHE_ORDERS,
+    RECEIVER_ID_CACHE_ORDER_BOOK_L2,
+    RECEIVER_ID_CACHE_CANDLES,
+
+    RECEIVER_ID_INVALID
+};
 
 class EventReceiver
 {
 private:
-    int id;
+    enum eReceiverId_t id;
     unordered_set<enum eEventId_t> events;
     function<void(Event)> callback;
 public:
     EventReceiver();
 
-    EventReceiver(int id, function<void(Event)> callback);
+    EventReceiver(enum eReceiverId_t id, function<void(Event)> callback);
 
     ~EventReceiver();
 
@@ -38,7 +42,7 @@ public:
 
     unordered_set<enum eEventId_t> GetEvents() const;
 
-    int GetId() const;
+    enum eReceiverId_t GetId() const;
 
     function<void(Event)> GetCallback() const;
 

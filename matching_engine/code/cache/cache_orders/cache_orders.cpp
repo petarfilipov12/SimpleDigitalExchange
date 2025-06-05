@@ -5,9 +5,9 @@ using namespace std;
 CacheOrders::CacheOrders() {}
 CacheOrders::~CacheOrders() {}
 
-Return_Type CacheOrders::OrderAdded(Order order)
+ReturnType CacheOrders::OrderAdded(Order order)
 {
-    Return_Type ret = RET_ORDER_EXISTS;
+    ReturnType ret = RET_ORDER_EXISTS;
 
     this->order_lock.lock();
     if (this->orders.find(order.id) == this->orders.end())
@@ -21,9 +21,9 @@ Return_Type CacheOrders::OrderAdded(Order order)
     return ret;
 }
 
-Return_Type CacheOrders::OrderCanceled(int order_id)
+ReturnType CacheOrders::OrderCanceled(int order_id)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
 
     this->order_lock.lock();
     if (this->orders.find(order_id) != this->orders.end())
@@ -37,9 +37,9 @@ Return_Type CacheOrders::OrderCanceled(int order_id)
     return ret;
 }
 
-Return_Type CacheOrders::OrderChange(int order_id, float quantity)
+ReturnType CacheOrders::OrderChange(int order_id, float quantity)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
     unordered_map<int, Order>::iterator order_itter;
 
     this->order_lock.lock();
@@ -56,7 +56,7 @@ Return_Type CacheOrders::OrderChange(int order_id, float quantity)
     return ret;
 }
 
-Return_Type CacheOrders::OrderFilled(int taker_order_id, int book_order_id, float quantity)
+ReturnType CacheOrders::OrderFilled(int taker_order_id, int book_order_id, float quantity)
 {
     this->OrderChange(taker_order_id, quantity);
     this->OrderChange(book_order_id, quantity);
@@ -64,9 +64,9 @@ Return_Type CacheOrders::OrderFilled(int taker_order_id, int book_order_id, floa
     return RET_OK;
 }
 
-Return_Type CacheOrders::GetOrder(int order_id, Order *pOrder)
+ReturnType CacheOrders::GetOrder(int order_id, Order *pOrder)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
     unordered_map<int, Order>::iterator order_itter;
 
     this->order_lock.lock();

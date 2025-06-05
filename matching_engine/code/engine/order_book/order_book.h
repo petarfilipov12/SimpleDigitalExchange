@@ -21,15 +21,15 @@ class OrderBook{
 
         bool ExistsOrderId(int id) const;
 
-        Return_Type AddOrder(Order order);
+        ReturnType AddOrder(Order order);
 
-        Return_Type CancelOrder(Order order, Order *pOrder);
+        ReturnType CancelOrder(Order order, Order *pOrder);
 
-        Return_Type CancelOrderById(int id, Order *pOrder);
+        ReturnType CancelOrderById(int id, Order *pOrder);
 
-        Return_Type GetBidFirst(Order **pOrder);
+        ReturnType GetBidFirst(Order **pOrder);
 
-        Return_Type GetAskFirst(Order **pOrder);
+        ReturnType GetAskFirst(Order **pOrder);
 
 };
 

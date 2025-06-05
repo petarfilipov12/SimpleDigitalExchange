@@ -8,9 +8,9 @@ using namespace std;
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-Return_Type Cache_OrderBookL2::OrderAdded(Order order)
+ReturnType Cache_OrderBookL2::OrderAdded(Order order)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
 
     if (ORDER_SIDE_BUY == order.order_side)
     {
@@ -36,9 +36,9 @@ Return_Type Cache_OrderBookL2::OrderAdded(Order order)
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::OrderCanceled(Order order)
+ReturnType Cache_OrderBookL2::OrderCanceled(Order order)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
 
     if (ORDER_TYPE_LIMIT == order.order_type)
     {
@@ -75,9 +75,9 @@ Return_Type Cache_OrderBookL2::OrderCanceled(Order order)
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side)
+ReturnType Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     bool flag = false;
 
     if (ORDER_SIDE_BUY == book_order_side)
@@ -134,7 +134,7 @@ Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eO
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
+ReturnType Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
 {
     map<string, float, greater<string> > temp_bid_book_l2;
     map<string, float, less<string> > temp_ask_book_l2;

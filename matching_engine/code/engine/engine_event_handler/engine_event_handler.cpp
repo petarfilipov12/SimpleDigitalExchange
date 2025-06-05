@@ -9,7 +9,7 @@ using json = nlohmann::json;
 
 static void Engine_EventHandler_AddOrder(Event event)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
 
     ret = engine.AddOrder(ConvertJsonToOrder(j_data));
@@ -24,7 +24,7 @@ static void Engine_EventHandler_AddOrder(Event event)
 
 static void Engine_EventHandler_CancelOrder(Event event)
 {
-    Return_Type ret;
+    ReturnType ret;
 
     ret = engine.CancelOrderById(event.GetJsonData()["order_id"]);
 

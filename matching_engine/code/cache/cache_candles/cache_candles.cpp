@@ -7,7 +7,7 @@
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
 
-Return_Type CacheCandles::OrderFilled(string price_s)
+ReturnType CacheCandles::OrderFilled(string price_s)
 {
     float price_f = stof(price_s);
 
@@ -44,7 +44,7 @@ Return_Type CacheCandles::OrderFilled(string price_s)
     return RET_OK;
 }
 
-Return_Type CacheCandles::GetCandles(int limit, json *data)const
+ReturnType CacheCandles::GetCandles(int limit, json *data)const
 {
     vector<Candle> temp;
     vector<Candle>::size_type candles_size;

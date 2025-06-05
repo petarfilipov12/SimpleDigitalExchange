@@ -23,17 +23,17 @@ class TakerOrderBook{
 
         bool ExistsTakerOrderById(int id) const;
 
-        Return_Type AddTakerOrder(Order order);
+        ReturnType AddTakerOrder(Order order);
 
-        Return_Type CancelTakerOrder(Order order, Order *pOrder);
+        ReturnType CancelTakerOrder(Order order, Order *pOrder);
 
-        Return_Type CancelTakerOrderById(int id, Order *pOrder);
+        ReturnType CancelTakerOrderById(int id, Order *pOrder);
 
-        Return_Type GetAt(int index, Order **pOrder);
+        ReturnType GetAt(int index, Order **pOrder);
 
-        Return_Type GetFirst(Order **pOrder);
+        ReturnType GetFirst(Order **pOrder);
 
-        Return_Type PopFirst();
+        ReturnType PopFirst();
 };
 
 #endif

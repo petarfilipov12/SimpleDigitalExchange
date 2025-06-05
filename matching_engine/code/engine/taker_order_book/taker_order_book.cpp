@@ -20,9 +20,9 @@ bool TakerOrderBook::ExistsTakerOrderById(int id) const
     return this->ExistsTakerOrder(Order(id));
 }
 
-Return_Type TakerOrderBook::AddTakerOrder(Order order)
+ReturnType TakerOrderBook::AddTakerOrder(Order order)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
 
     this->taker_book_lock.lock();
     if (this->taker_orders.find(order) == this->taker_orders.end())
@@ -37,9 +37,9 @@ Return_Type TakerOrderBook::AddTakerOrder(Order order)
     return ret;
 }
 
-Return_Type TakerOrderBook::CancelTakerOrderById(int id, Order *pOrder_o)
+ReturnType TakerOrderBook::CancelTakerOrderById(int id, Order *pOrder_o)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
 
     this->taker_book_lock.lock();
     unordered_set<Order, Order::HashFunc>::iterator pOrder = this->taker_orders.find(Order(id));
@@ -66,14 +66,14 @@ Return_Type TakerOrderBook::CancelTakerOrderById(int id, Order *pOrder_o)
     return ret;
 }
 
-Return_Type TakerOrderBook::CancelTakerOrder(Order order, Order *pOrder)
+ReturnType TakerOrderBook::CancelTakerOrder(Order order, Order *pOrder)
 {
     return this->CancelTakerOrderById(order.id, pOrder);
 }
 
-Return_Type TakerOrderBook::GetAt(int index, Order **pOrder)
+ReturnType TakerOrderBook::GetAt(int index, Order **pOrder)
 {
-    Return_Type ret = RET_BOOK_EMPTY;
+    ReturnType ret = RET_BOOK_EMPTY;
     list<Order>::iterator iter;
 
     this->taker_book_lock.lock();
@@ -99,9 +99,9 @@ Return_Type TakerOrderBook::GetAt(int index, Order **pOrder)
     return ret;
 }
 
-Return_Type TakerOrderBook::GetFirst(Order **pOrder)
+ReturnType TakerOrderBook::GetFirst(Order **pOrder)
 {
-    Return_Type ret = RET_BOOK_EMPTY;
+    ReturnType ret = RET_BOOK_EMPTY;
 
     this->taker_book_lock.lock();
     if (!this->taker_orders_queue.empty())
@@ -115,9 +115,9 @@ Return_Type TakerOrderBook::GetFirst(Order **pOrder)
     return ret;
 }
 
-Return_Type TakerOrderBook::PopFirst()
+ReturnType TakerOrderBook::PopFirst()
 {
-    Return_Type ret = RET_BOOK_EMPTY;
+    ReturnType ret = RET_BOOK_EMPTY;
 
     this->taker_book_lock.lock();
     if (!this->taker_orders_queue.empty())

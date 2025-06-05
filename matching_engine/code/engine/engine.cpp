@@ -30,9 +30,9 @@ bool Engine::ExistsOrderId(int id) const
     return this->ExistsOrder(Order(id));
 }
 
-Return_Type Engine::AddOrder(Order order)
+ReturnType Engine::AddOrder(Order order)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     json j_data = order.ConvertOrderToJson();
     Event event(EVENT_ID_TAKER_ORDER_ADDED, j_data, nullptr);
 
@@ -48,11 +48,11 @@ Return_Type Engine::AddOrder(Order order)
     return ret;
 }
 
-Return_Type Engine::CancelOrder(Order order)
+ReturnType Engine::CancelOrder(Order order)
 {
     Event event(EVENT_ID_CANCEL_ORDER_FAILED, order.ConvertOrderToJson(), nullptr);
     Order *pOrder;
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     
     ret = this->taker_book.CancelTakerOrder(order, pOrder);
 
@@ -79,14 +79,14 @@ Return_Type Engine::CancelOrder(Order order)
     return ret;
 }
 
-Return_Type Engine::CancelOrderById(int id)
+ReturnType Engine::CancelOrderById(int id)
 {
     return this->CancelOrder(Order(id));
 }
 
-Return_Type Engine::AddToOrderBook(Order *pTakerOrder)
+ReturnType Engine::AddToOrderBook(Order *pTakerOrder)
 {
-    Return_Type ret = this->order_book.AddOrder(*pTakerOrder);
+    ReturnType ret = this->order_book.AddOrder(*pTakerOrder);
 
     if(RET_OK == ret)
     {
@@ -96,9 +96,9 @@ Return_Type Engine::AddToOrderBook(Order *pTakerOrder)
     return ret;
 }
 
-Return_Type Engine::MatchTakerOrder(Order *pTakerOrder)
+ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     Order *bookOrder;
     json j_data;
     float quantity;
@@ -199,7 +199,7 @@ Return_Type Engine::MatchTakerOrder(Order *pTakerOrder)
 void Engine::Cyclic()
 {
     Order *takerOrder;
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
     int i = 1;
 
     if (RET_OK != this->taker_book.GetFirst(&takerOrder))

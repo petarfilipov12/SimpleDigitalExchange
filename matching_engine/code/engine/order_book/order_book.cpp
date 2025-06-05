@@ -44,9 +44,9 @@ bool OrderBook::ExistsOrderId(int id) const
     return ret;
 }
 
-Return_Type OrderBook::AddOrder(Order order)
+ReturnType OrderBook::AddOrder(Order order)
 {
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
 
     if (order.order_side == ORDER_SIDE_BUY)
     {
@@ -64,14 +64,14 @@ Return_Type OrderBook::AddOrder(Order order)
     return ret;
 }
 
-Return_Type OrderBook::CancelOrder(Order order, Order *pOrder)
+ReturnType OrderBook::CancelOrder(Order order, Order *pOrder)
 {
     return this->CancelOrderById(order.id, pOrder);
 }
 
-Return_Type OrderBook::CancelOrderById(int id, Order *pOrder)
+ReturnType OrderBook::CancelOrderById(int id, Order *pOrder)
 {
-    Return_Type ret = RET_ORDER_NOT_EXISTS;
+    ReturnType ret = RET_ORDER_NOT_EXISTS;
 
     if ((RET_OK == this->bid_book.CancelOrderById(id, pOrder)) ||
         (RET_OK == this->ask_book.CancelOrderById(id, pOrder)))
@@ -82,12 +82,12 @@ Return_Type OrderBook::CancelOrderById(int id, Order *pOrder)
     return ret;
 }
 
-Return_Type OrderBook::GetBidFirst(Order **pOrder)
+ReturnType OrderBook::GetBidFirst(Order **pOrder)
 {
     return this->bid_book.GetFirst(pOrder);
 }
 
-Return_Type OrderBook::GetAskFirst(Order **pOrder)
+ReturnType OrderBook::GetAskFirst(Order **pOrder)
 {
     return this->ask_book.GetFirst(pOrder);
 }

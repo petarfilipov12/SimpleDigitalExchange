@@ -15,19 +15,19 @@ class CacheOrders
 
         mutable mutex order_lock;
 
-        Return_Type OrderChange(int order_id, float quantity);
+        ReturnType OrderChange(int order_id, float quantity);
     
     public:
         CacheOrders();
         ~CacheOrders();
 
-        Return_Type OrderAdded(Order order);
+        ReturnType OrderAdded(Order order);
 
-        Return_Type OrderCanceled(int order_id);
+        ReturnType OrderCanceled(int order_id);
 
-        Return_Type OrderFilled(int taker_order_id, int book_order_id, float quantity);
+        ReturnType OrderFilled(int taker_order_id, int book_order_id, float quantity);
 
-        Return_Type GetOrder(int order_id, Order *pOrder);
+        ReturnType GetOrder(int order_id, Order *pOrder);
 };
 
 #endif

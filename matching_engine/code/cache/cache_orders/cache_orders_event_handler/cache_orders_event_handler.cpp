@@ -28,7 +28,7 @@ static void CacheOrders_EventHandler_OrderFilled(Event event)
 static void CacheOrders_EventHandler_GetOrder(Event event)
 {
     Order order;
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

@@ -38,9 +38,9 @@ class CacheCandles
         CacheCandles();
         ~CacheCandles();
 
-        Return_Type OrderFilled(string price_s);
+        ReturnType OrderFilled(string price_s);
 
-        Return_Type GetCandles(int limit, json* data)const;
+        ReturnType GetCandles(int limit, json* data)const;
         
         void run();
 };

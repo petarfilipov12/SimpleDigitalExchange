@@ -17,9 +17,9 @@ class Engine{
         TakerOrderBook taker_book;
         EventBus *event_bus;
 
-        Return_Type AddToOrderBook(Order *pTakerOrder);
+        ReturnType AddToOrderBook(Order *pTakerOrder);
         
-        Return_Type MatchTakerOrder(Order *pTakerOrder);
+        ReturnType MatchTakerOrder(Order *pTakerOrder);
         
         void Cyclic();
     
@@ -32,11 +32,11 @@ class Engine{
         
         bool ExistsOrderId(int id) const;
         
-        Return_Type AddOrder(Order order);
+        ReturnType AddOrder(Order order);
         
-        Return_Type CancelOrder(Order order);
+        ReturnType CancelOrder(Order order);
         
-        Return_Type CancelOrderById(int id);
+        ReturnType CancelOrderById(int id);
         
         void run();
 };

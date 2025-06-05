@@ -12,7 +12,7 @@ static void CacheCandles_EventHandler_OrderFilled(Event event)
 static void CacheCandles_EventHandler_GetCandles(Event event)
 {
     json candles;
-    Return_Type ret = RET_NOT_OK;
+    ReturnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

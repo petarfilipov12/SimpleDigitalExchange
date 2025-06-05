@@ -16,9 +16,9 @@ EventBus::~EventBus()
     // }
 }
 
-Return_Type EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func)
+ReturnType EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func)
 {
-    Return_Type ret = RET_RECEIVER_EXISTS;
+    ReturnType ret = RET_RECEIVER_EXISTS;
 
     this->receivers_lock.lock();
     if (this->event_receivers.find(receiver_id) == this->event_receivers.end())
@@ -33,9 +33,9 @@ Return_Type EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(
     return ret;
 }
 
-Return_Type EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
+ReturnType EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
 {
-    Return_Type ret = RET_RECEIVER_NOT_EXISTS;
+    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
     this->receivers_lock.lock();
     if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
@@ -60,9 +60,9 @@ Return_Type EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
     return ret;
 }
 
-Return_Type EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
+ReturnType EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
 {
-    Return_Type ret = RET_RECEIVER_NOT_EXISTS;
+    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
     if(event_id < EVENT_ID_INVALID)
     {
@@ -86,9 +86,9 @@ Return_Type EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t 
     return ret;
 }
 
-Return_Type EventBus::Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
+ReturnType EventBus::Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
 {
-    Return_Type ret = RET_RECEIVER_NOT_EXISTS;
+    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
     if(event_id < EVENT_ID_INVALID)
     {

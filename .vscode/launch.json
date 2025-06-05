@@ -8,7 +8,7 @@
             "name": "(gdb) Attach",
             "type": "cppdbg",
             "request": "attach",
-            "program": "${workspaceFolder}/matching_engine/build/MatchingEngine_exec",
+            "program": "${workspaceFolder}/matching_engine/MatchingEngine_exec",
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -27,7 +27,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/matching_engine/build/MatchingEngine_exec",
+            "program": "${workspaceFolder}/matching_engine/MatchingEngine_exec",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

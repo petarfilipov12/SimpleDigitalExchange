@@ -17,7 +17,7 @@ DEPENDS = $(patsubst %.cpp, %.o, $(OBJS))
 
 
 $(PROGRAM_NAME): $(OBJS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -o $(BUILD_DIR)/$(PROGRAM_NAME) $^ $(CFLAGS_END)
+	$(CC) $(CFLAGS) -o $(PROGRAM_NAME) $^ $(CFLAGS_END)
 
 $(BUILD_DIR):
 	mkdir -pv $(BUILD_DIR)
@@ -38,7 +38,7 @@ clean:
 rebuild: clean $(PROGRAM_NAME)
 
 run:
-	./$(BUILD_DIR)/$(PROGRAM_NAME)
+	./$(PROGRAM_NAME)
 
 stable_run:
 	./$(STABLE_DIR)/$(PROGRAM_NAME)

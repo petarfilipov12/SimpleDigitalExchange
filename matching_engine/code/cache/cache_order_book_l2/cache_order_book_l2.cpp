@@ -79,7 +79,6 @@ Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eO
 {
     Return_Type ret = RET_NOT_OK;
     bool flag = false;
-    int counter = 0;
 
     if (ORDER_SIDE_BUY == book_order_side)
     {
@@ -101,7 +100,6 @@ Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eO
             if(false == flag)
             {
                 usleep(10);
-                counter++;
             }
         }
     }
@@ -125,14 +123,12 @@ Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eO
             if(false == flag)
             {
                 usleep(10);
-                counter++;
             }
         }
     }
     else
     {
         //Nothing to do
-        counter++;
     }
 
     return ret;

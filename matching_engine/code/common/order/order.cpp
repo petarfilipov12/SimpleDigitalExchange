@@ -26,11 +26,18 @@ Order::Order(int id)
     this->status = false;
 }
 
-Order::Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status)
+Order::Order(
+    string price,
+    float quantity,
+    float filled,
+    int id,
+    enum eOrderSide_t order_side,
+    enum eOrderType_t order_type,
+    bool status)
 {
     this->price = price;
     this->quantity = quantity;
-    this->filled = 0.0;
+    this->filled = filled;
     this->id = id;
     this->order_side = order_side;
     this->order_type = order_type;
@@ -50,46 +57,6 @@ json Order::ConvertOrderToJson()
     j_data["status"] = this->status;
     
     return j_data;
-}
-
-string Order::Convert_OrderSide_String(enum eOrderSide_t order_side)
-{
-    string s_order_side;
-
-    if (order_side == ORDER_SIDE_BUY)
-    {
-        s_order_side = "ORDER_SIDE_BUY";
-    }
-    else if (order_side == ORDER_SIDE_SELL)
-    {
-        s_order_side = "ORDER_SIDE_SELL";
-    }
-    else
-    {
-        s_order_side = "ORDER_SIDE_INVALID";
-    }
-
-    return s_order_side;
-}
-
-string Order::Convert_OrderType_String(enum eOrderType_t order_type)
-{
-    string s_order_type;
-
-    if (order_type == ORDER_TYPE_MARKET)
-    {
-        s_order_type = "ORDER_TYPE_MARKET";
-    }
-    else if (order_type == ORDER_TYPE_LIMIT)
-    {
-        s_order_type = "ORDER_TYPE_LIMIT";
-    }
-    else
-    {
-        s_order_type = "ORDER_TYPE_INVALID";
-    }
-
-    return s_order_type;
 }
 
 // bool operator<(Order order2) const{

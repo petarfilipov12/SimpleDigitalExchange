@@ -56,10 +56,10 @@ Return_Type CacheOrders::OrderChange(int order_id, float quantity)
     return ret;
 }
 
-Return_Type CacheOrders::OrderFilled(int bid_order_id, int ask_order_id, float quantity)
+Return_Type CacheOrders::OrderFilled(int taker_order_id, int book_order_id, float quantity)
 {
-    this->OrderChange(bid_order_id, quantity);
-    this->OrderChange(ask_order_id, quantity);
+    this->OrderChange(taker_order_id, quantity);
+    this->OrderChange(book_order_id, quantity);
 
     return RET_OK;
 }

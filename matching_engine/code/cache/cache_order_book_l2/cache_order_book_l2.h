@@ -26,10 +26,7 @@ class Cache_OrderBookL2
 
         Return_Type OrderCanceled(Order order);
 
-        Return_Type OrderFilled(
-            string bid_order_price, enum eOrderType_t bid_order_type,
-            string ask_order_price, enum eOrderType_t ask_order_type,
-            float quantity);
+        Return_Type OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side);
 
         Return_Type GetOrderBookL2(json *l2_book);
 };

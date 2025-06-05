@@ -37,13 +37,9 @@ class Order{
 
         Order(int id);
 
-        Order(string price, float quantity, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status);
+        Order(string price, float quantity, float filled, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status);
 
         json ConvertOrderToJson();
-
-        static string Convert_OrderSide_String(enum eOrderSide_t order_side);
-
-        static string Convert_OrderType_String(enum eOrderType_t order_type);
 
         // bool operator<(Order order2) const{
         //     return this->id < order2.id;
@@ -66,6 +62,7 @@ inline Order ConvertJsonToOrder(json j_data){
     return Order(
         (j_data)["price"],
         (j_data)["quantity"],
+        (j_data)["filled"],
         (j_data)["order_id"],
         static_cast<enum eOrderSide_t>((j_data)["order_side"]),
         static_cast<enum eOrderType_t>((j_data)["order_type"]),

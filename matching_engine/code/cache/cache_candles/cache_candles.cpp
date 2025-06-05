@@ -95,15 +95,15 @@ Return_Type CacheCandles::GetCandles(int limit, json *data)
 
 void CacheCandles::Init()
 {
-    int sec_till_next_min;
+    int sec_till_next_interval;
 
     this->current_timestamp = time(nullptr);
 
-    sec_till_next_min = this->interval - (this->current_timestamp % this->interval);
+    sec_till_next_interval = this->interval - (this->current_timestamp % this->interval);
 
-    this->current_timestamp = this->current_timestamp + sec_till_next_min;
+    this->current_timestamp = this->current_timestamp + sec_till_next_interval;
 
-    sleep(sec_till_next_min);
+    sleep(sec_till_next_interval);
     this->Cyclic();
 }
 

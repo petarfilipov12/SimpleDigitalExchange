@@ -12,28 +12,25 @@ Return_Type Cache_OrderBookL2::OrderAdded(Order order)
 {
     Return_Type ret = RET_NOT_OK;
 
-    if (ORDER_TYPE_LIMIT == order.order_type)
+    if (ORDER_SIDE_BUY == order.order_side)
     {
-        if (ORDER_SIDE_BUY == order.order_side)
-        {
-            this->bid_book_l2_look.lock();
-            this->bid_book_l2[order.price] += order.quantity;
-            this->bid_book_l2_look.unlock();
+        this->bid_book_l2_look.lock();
+        this->bid_book_l2[order.price] += (order.quantity - order.filled);
+        this->bid_book_l2_look.unlock();
 
-            ret = RET_OK;
-        }
-        else if (ORDER_SIDE_SELL == order.order_side)
-        {
-            this->ask_book_l2_look.lock();
-            this->ask_book_l2[order.price] += order.quantity;
-            this->ask_book_l2_look.unlock();
+        ret = RET_OK;
+    }
+    else if (ORDER_SIDE_SELL == order.order_side)
+    {
+        this->ask_book_l2_look.lock();
+        this->ask_book_l2[order.price] += (order.quantity - order.filled);
+        this->ask_book_l2_look.unlock();
 
-            ret = RET_OK;
-        }
-        else
-        {
-            // Error
-        }
+        ret = RET_OK;
+    }
+    else
+    {
+        // Error
     }
 
     return ret;
@@ -78,25 +75,23 @@ Return_Type Cache_OrderBookL2::OrderCanceled(Order order)
     return ret;
 }
 
-Return_Type Cache_OrderBookL2::OrderFilled(
-    string bid_order_price, enum eOrderType_t bid_order_type,
-    string ask_order_price, enum eOrderType_t ask_order_type,
-    float quantity)
+Return_Type Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side)
 {
     Return_Type ret = RET_NOT_OK;
     bool flag = false;
+    int counter = 0;
 
-    if (ORDER_TYPE_LIMIT == bid_order_type)
+    if (ORDER_SIDE_BUY == book_order_side)
     {
         while(false == flag)
         {
             this->bid_book_l2_look.lock();
-            if(this->bid_book_l2[bid_order_price] >= (quantity - 0.1))
+            if(this->bid_book_l2[price] >= (quantity - 0.1))
             {
-                this->bid_book_l2[bid_order_price] -= quantity;
-                if (this->bid_book_l2[bid_order_price] <= 0.1)
+                this->bid_book_l2[price] -= quantity;
+                if (this->bid_book_l2[price] <= 0.1)
                 {
-                    this->bid_book_l2.erase(bid_order_price);
+                    this->bid_book_l2.erase(price);
                 }
 
                 flag = true;
@@ -106,23 +101,21 @@ Return_Type Cache_OrderBookL2::OrderFilled(
             if(false == flag)
             {
                 usleep(10);
+                counter++;
             }
         }
     }
-
-    if (ORDER_TYPE_LIMIT == ask_order_type)
+    else if (ORDER_SIDE_SELL == book_order_side)
     {
-        flag = false;
-
         while(false == flag)
         {
             this->ask_book_l2_look.lock();
-            if(this->ask_book_l2[ask_order_price] >= (quantity - 0.1))
+            if(this->ask_book_l2[price] >= (quantity - 0.1))
             {
-                this->ask_book_l2[ask_order_price] -= quantity;
-                if (this->ask_book_l2[ask_order_price] <= 0.1)
+                this->ask_book_l2[price] -= quantity;
+                if (this->ask_book_l2[price] <= 0.1)
                 {
-                    this->ask_book_l2.erase(ask_order_price);
+                    this->ask_book_l2.erase(price);
                 }
 
                 flag = true;
@@ -132,8 +125,14 @@ Return_Type Cache_OrderBookL2::OrderFilled(
             if(false == flag)
             {
                 usleep(10);
+                counter++;
             }
         }
+    }
+    else
+    {
+        //Nothing to do
+        counter++;
     }
 
     return ret;

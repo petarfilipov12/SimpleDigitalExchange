@@ -135,9 +135,6 @@ Return_Type Engine::MatchTakerOrder(Order *pTakerOrder)
                     this->AddToOrderBook(pTakerOrder);
                     break;
                 }
-
-                j_data["ask_order"] = bookOrder->ConvertOrderToJson();
-                j_data["bid_order"] = pTakerOrder->ConvertOrderToJson();
             }
             else if (pTakerOrder->order_side == ORDER_SIDE_SELL)
             {
@@ -165,9 +162,6 @@ Return_Type Engine::MatchTakerOrder(Order *pTakerOrder)
                     this->AddToOrderBook(pTakerOrder);
                     break;
                 }
-
-                j_data["ask_order"] = pTakerOrder->ConvertOrderToJson();
-                j_data["bid_order"] = bookOrder->ConvertOrderToJson();
             }
             else
             {
@@ -180,6 +174,8 @@ Return_Type Engine::MatchTakerOrder(Order *pTakerOrder)
                 quantity = bookOrder_quantity;
             }
 
+            j_data["taker_order"] = pTakerOrder->ConvertOrderToJson();
+            j_data["book_order"] = bookOrder->ConvertOrderToJson();
             j_data["price"] = bookOrder->price;
             j_data["quantity"] = quantity;
 

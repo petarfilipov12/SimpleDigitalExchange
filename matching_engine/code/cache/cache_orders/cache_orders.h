@@ -25,7 +25,7 @@ class CacheOrders
 
         Return_Type OrderChange(int order_id, float quantity);
 
-        Return_Type OrderFilled(int bid_order_id, int ask_order_id, float quantity);
+        Return_Type OrderFilled(int taker_order_id, int book_order_id, float quantity);
 
         Return_Type GetOrder(int order_id, Order *pOrder);
 };

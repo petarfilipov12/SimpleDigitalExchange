@@ -17,6 +17,7 @@ HANDLER_FUNC(RestServerHandler_AddOrder)
     };
     json j_data = json::parse(req.body);
     j_data["order_id"] = rand();
+    j_data["filled"] = 0.0;
     j_data["status"] = true;
 
     Event event(EVENT_ID_ADD_ORDER, j_data, &responce_data);

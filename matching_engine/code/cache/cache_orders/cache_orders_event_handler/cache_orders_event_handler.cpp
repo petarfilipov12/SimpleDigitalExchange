@@ -19,8 +19,8 @@ static void CacheOrders_EventHandler_OrderCanceled(Event event)
 static void CacheOrders_EventHandler_OrderFilled(Event event)
 {
     cache_orders.OrderFilled(
-        event.GetJsonData()["bid_order"]["order_id"],
-        event.GetJsonData()["ask_order"]["order_id"],
+        event.GetJsonData()["taker_order"]["order_id"],
+        event.GetJsonData()["book_order"]["order_id"],
         event.GetJsonData()["quantity"]
     );
 }

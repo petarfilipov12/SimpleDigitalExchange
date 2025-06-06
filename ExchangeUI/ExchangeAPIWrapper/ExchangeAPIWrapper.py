@@ -62,3 +62,9 @@ class ExchangeAPIWrapper:
         data["limit"] = limit
 
         return self._Request_POST("/get_candles", json_data=data)
+    
+    def GetTrades(self, limit=10):
+        data = {}
+        data["limit"] = limit
+
+        return self._Request_POST("/get_trades", json_data=data)

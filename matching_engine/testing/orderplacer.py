@@ -87,15 +87,15 @@ def InputOrder():
 def main():
     
     while(True):
-        #data = RandomOrder()
-        data = InputOrder()
+        data = RandomOrder()
+        #data = InputOrder()
         
         order = AddOrder(data["price"], data["qty"], data["side"], data["order_type"])
         print(order)
         print()
 
-        #time.sleep(0.2)
-        input("Press Enter")
+        time.sleep(0.2)
+        #input("Press Enter")
 
     
 

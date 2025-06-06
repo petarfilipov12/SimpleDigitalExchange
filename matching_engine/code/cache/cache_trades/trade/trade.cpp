@@ -6,6 +6,7 @@ void trade::to_json(json& j, const struct sTrade t)
 {
     j = {
         {"price", t.price},
-        {"amount", t.amount}
+        {"quantity", t.quantity},
+        {"timestamp", t.timestamp}
     };
 }

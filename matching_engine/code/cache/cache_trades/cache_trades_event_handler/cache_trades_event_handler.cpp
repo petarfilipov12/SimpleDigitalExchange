@@ -4,12 +4,12 @@
 
 #include "globals.h"
 
-static void CacheCandles_EventHandler_OrderFilled(Event event)
+static void CacheTrades_EventHandler_OrderFilled(Event event)
 {
-    cache_trades.OrderFilled(event.GetJsonData()["price"], event.GetJsonData()["amount"]);
+    cache_trades.OrderFilled(event.GetJsonData()["price"], event.GetJsonData()["quantity"]);
 }
 
-static void CacheCandles_EventHandler_GetTrades(Event event)
+static void CacheTrades_EventHandler_GetTrades(Event event)
 {
     json trades;
     ReturnType ret = RET_NOT_OK;
@@ -32,10 +32,10 @@ void CacheTrades_EventHandler(Event event)
     switch(event.GetEventId())
     {
         case EVENT_ID_ORDER_FILLED:
-            CacheCandles_EventHandler_OrderFilled(event);
+            CacheTrades_EventHandler_OrderFilled(event);
             break;
         case EVENT_ID_GET_TRADES:
-            CacheCandles_EventHandler_GetTrades(event);
+            CacheTrades_EventHandler_GetTrades(event);
             break;
         default:
             break;

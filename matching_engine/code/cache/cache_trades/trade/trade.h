@@ -4,6 +4,7 @@
 #include "types.h"
 
 #include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -16,7 +17,8 @@ namespace trade
     struct sTrade
     {
         string price;
-        float amount;
+        float quantity;
+        time_t timestamp;
     };
     
     void to_json(json& j, const struct sTrade t);

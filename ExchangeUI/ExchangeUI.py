@@ -69,9 +69,31 @@ class ExchangeUI:
             dpg.configure_item("CANDLE_SERIES", dates=data["timestamps"],
                 opens=data["opens"], closes=data["closes"], lows=data["lows"], highs=data["highs"])
     
+    def _GetTrades(self):
+        data = None
+
+        body_json = self.api_client.GetTrades(limit=20)
+        if(body_json):
+            data = body_json["data"]
+        
+        return data
+
+    def _UpdateTrades(self):
+        data = self._GetTrades()      
+
+        if(data != None):
+            dpg.delete_item("TARDES_TABLE", children_only=True, slot=1)
+
+            for trade in data:
+                with dpg.table_row(parent="TARDES_TABLE"):
+                    dpg.add_text(trade["timestamp"])
+                    dpg.add_text(trade["price"])
+                    dpg.add_text(trade["quantity"])
+    
     def _UpdaterFunc(self):
         self._UpdateCandles()
         self._UpdateOrderBook()
+        self._UpdateTrades()
         
     
     def _ShowCandleChart(self, parent):
@@ -105,6 +127,12 @@ class ExchangeUI:
             with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
                 dpg.add_stair_series([], [], tag="STAIR_SERIES_ASK", label="ask", shaded=True)
                 dpg.add_stair_series([], [], tag="STAIR_SERIES_BID", label="bid", shaded=True)
+    
+    def _ShowTrades(self, parent):
+        with dpg.table(tag="TARDES_TABLE", label="Trades", header_row=True, borders_innerV=True):
+            dpg.add_table_column(label="Time")
+            dpg.add_table_column(label="Price")
+            dpg.add_table_column(label="Quantity")
     
     def _AddOrder_Callback(self, sender, app_data, user_data):
         print(sender, app_data, user_data)
@@ -148,8 +176,10 @@ class ExchangeUI:
             with dpg.group(parent=child_w_0, horizontal=True) as group:
                 with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_1:
                     self._ShowCandleChart(parent=child_w_1)
-                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_2:
+                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_2:
                     self._ShowBookDepth(parent=child_w_2)
+                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_3:
+                    self._ShowTrades(parent=child_w_3)
         self._ShowBuySell(parent="PRIMARY_WINDOW")
     
     def Run(self):

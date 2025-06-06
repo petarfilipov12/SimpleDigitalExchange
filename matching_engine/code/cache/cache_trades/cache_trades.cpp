@@ -1,12 +1,14 @@
 #include "cache_trades.h"
 
+#include <ctime>
+
 CacheTrades::CacheTrades() {}
 CacheTrades::~CacheTrades() {}
 
-ReturnType CacheTrades::OrderFilled(string price, float amount)
+ReturnType CacheTrades::OrderFilled(string price, float quantity)
 {
     this->trades_lock.lock();
-    this->trades.push_back((struct sTrade){price, amount});
+    this->trades.push_back((struct sTrade){price, quantity, time(nullptr)});
     this->trades_lock.unlock();
     
     return RET_OK;

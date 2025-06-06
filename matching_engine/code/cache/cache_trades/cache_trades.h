@@ -27,7 +27,7 @@ class CacheTrades
         CacheTrades();
         ~CacheTrades();
 
-        ReturnType OrderFilled(string price, float amount);
+        ReturnType OrderFilled(string price, float quantity);
 
         ReturnType GetTrades(int limit, json* data)const;
         

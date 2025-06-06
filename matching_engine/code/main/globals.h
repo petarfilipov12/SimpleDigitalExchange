@@ -7,6 +7,7 @@
 #include "cache_orders.h"
 #include "cache_order_book_l2.h"
 #include "cache_candles.h"
+#include "cache_trades.h"
 
 extern EventBus event_bus;
 extern Engine engine;
@@ -14,5 +15,6 @@ extern RestServer rest_server;
 extern CacheOrders cache_orders;
 extern Cache_OrderBookL2 cache_order_book_l2;
 extern CacheCandles cache_candles;
+extern CacheTrades cache_trades;
 
 #endif

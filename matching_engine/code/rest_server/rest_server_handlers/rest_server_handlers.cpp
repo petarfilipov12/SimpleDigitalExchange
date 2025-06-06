@@ -107,3 +107,23 @@ void RestServerHandler_GetCandles(const Request &req, Response &res)
 
     res.set_content(responce_data.dump(), "application/json");
 }
+
+void RestServerHandler_GetTrades(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+
+    Event event(EVENT_ID_GET_TRADES, j_data, &responce_data);
+
+    event_bus.Send(event);
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}

@@ -26,6 +26,8 @@ enum eEventId_t
 
     EVENT_ID_GET_CANDLES,
 
+    EVENT_ID_GET_TRADES,
+
     EVENT_ID_INVALID
 };
 

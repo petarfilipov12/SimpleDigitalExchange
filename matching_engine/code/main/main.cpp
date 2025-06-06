@@ -23,6 +23,8 @@
 
 #include "cache_candles_event_handler.h"
 
+#include "cache_trades_event_handler.h"
+
 
 using json = nlohmann::json;
 using namespace std;
@@ -34,6 +36,7 @@ RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.
 CacheOrders cache_orders;
 Cache_OrderBookL2 cache_order_book_l2;
 CacheCandles cache_candles;
+CacheTrades cache_trades;
 
 void Init_EventBus()
 {
@@ -90,6 +93,14 @@ void Init_CacheCandles()
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
 }
 
+void Init_CacheTrades()
+{
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, CacheTrades_EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);
+}
+
 void Init_RestServer()
 {
     rest_server.Post("/add_order", RestServerHandler_AddOrder);
@@ -97,6 +108,7 @@ void Init_RestServer()
     rest_server.Post("/get_order", RestServerHandler_GetOrder);
     rest_server.Post("/get_order_book", RestServerHandler_GetOrderBook);
     rest_server.Post("/get_candles", RestServerHandler_GetCandles);
+    rest_server.Post("/get_trades", RestServerHandler_GetTrades);
 
     thread thread_rest_server([]{rest_server.run();});
     thread_rest_server.detach();
@@ -114,6 +126,7 @@ int main(void){
     Init_CacheOrders();
     Init_CacheOrderBookL2();
     Init_CacheCandles();
+    Init_CacheTrades();
     Init_Engine();
     Init_RestServer();
 

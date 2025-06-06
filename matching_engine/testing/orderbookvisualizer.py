@@ -49,8 +49,8 @@ def main():
             print(status, "ERROR")
             logger.log(str(datetime.datetime.now()) + ": " + str(status) + ":" + str(body_json))
         
-        time.sleep(0.3)
-        #input("Press Enter")
+        #time.sleep(0.3)
+        input("Press Enter")
 
 if(__name__ == "__main__"):
     main()

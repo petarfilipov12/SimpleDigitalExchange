@@ -73,10 +73,20 @@ def GetCandles(limit=10):
 
     return resp
 
+def GetTrades(limit=10):
+    print("GET TRADES")
+    url = "https://127.0.0.1:8080/get_trades"
+    data = {"limit": limit}
+
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+
+    return resp
+
 def main():
     
     while(True):
-        res = GetCandles()
+        res = GetTrades()
         print(res)
         print()
 

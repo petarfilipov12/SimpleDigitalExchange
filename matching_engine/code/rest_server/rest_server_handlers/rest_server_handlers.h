@@ -14,4 +14,6 @@ void RestServerHandler_GetOrderBook(const Request &req, Response &res);
 
 void RestServerHandler_GetCandles(const Request &req, Response &res);
 
+void RestServerHandler_GetTrades(const Request &req, Response &res);
+
 #endif

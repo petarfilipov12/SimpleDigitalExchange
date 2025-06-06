@@ -9,6 +9,7 @@
         "algorithm": "cpp",
         "string": "cpp",
         "map": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "mutex": "cpp"
     }
 }

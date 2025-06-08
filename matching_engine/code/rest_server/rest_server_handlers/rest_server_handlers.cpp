@@ -18,9 +18,7 @@ void RestServerHandler_AddOrder(const Request &req, Response &res)
     j_data["status"] = true;
     j_data["order_added_timestamp"] = 0;
 
-    Event event(EVENT_ID_ADD_ORDER, j_data, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_ADD_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -38,9 +36,7 @@ void RestServerHandler_CancelOrder(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    Event event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -58,9 +54,7 @@ void RestServerHandler_GetOrder(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    Event event(EVENT_ID_GET_ORDER, j_data, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_GET_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -77,9 +71,7 @@ void RestServerHandler_GetOrderBook(const Request &req, Response &res)
         {"data", {}}
     };
 
-    Event event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -97,9 +89,7 @@ void RestServerHandler_GetCandles(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    Event event(EVENT_ID_GET_CANDLES, j_data, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_GET_CANDLES, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -117,9 +107,7 @@ void RestServerHandler_GetTrades(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    Event event(EVENT_ID_GET_TRADES, j_data, &responce_data);
-
-    event_bus.Send(event);
+    event_bus.Send(Event(EVENT_ID_GET_TRADES, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {

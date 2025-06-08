@@ -32,8 +32,8 @@ bool Engine::ExistsOrderId(int id) const
 
 ReturnType Engine::AddOrder(Order order)
 {
-    ReturnType ret = RET_NOT_OK;
     enum eEventId_t event_id = EVENT_ID_ADD_ORDER_FAILLED;
+    ReturnType ret = RET_NOT_OK;
 
     ret = this->taker_book.AddTakerOrder(order);
 
@@ -50,15 +50,17 @@ ReturnType Engine::AddOrder(Order order)
 
 ReturnType Engine::CancelOrder(Order order)
 {
-    Event event(EVENT_ID_CANCEL_ORDER_FAILED, order.ConvertOrderToJson(), nullptr);
-    Order *pOrder;
+    enum eEventId_t event_id = EVENT_ID_CANCEL_ORDER_FAILED;
+    json j_data = order.ConvertOrderToJson();
     ReturnType ret = RET_NOT_OK;
+    Order *pOrder;
     
     ret = this->taker_book.CancelTakerOrder(order, pOrder);
 
     if(RET_OK == ret)
     {
-        event = Event(EVENT_ID_TAKER_ORDER_CANCELED, pOrder->ConvertOrderToJson(), nullptr);
+        event_id = EVENT_ID_TAKER_ORDER_CANCELED;
+        j_data = pOrder->ConvertOrderToJson();
     }
     else if(RET_ORDER_NOT_EXISTS == ret)
     {
@@ -66,7 +68,8 @@ ReturnType Engine::CancelOrder(Order order)
 
         if(RET_OK == ret)
         {
-            event = Event(EVENT_ID_MAKER_ORDER_CANCELED, pOrder->ConvertOrderToJson(), nullptr);
+            event_id = EVENT_ID_MAKER_ORDER_CANCELED;
+            j_data = pOrder->ConvertOrderToJson();
         }
     }
     else
@@ -74,7 +77,7 @@ ReturnType Engine::CancelOrder(Order order)
         //Nothing to do
     }
         
-    this->event_bus->Send(event);
+    this->event_bus->Send(Event(event_id, j_data, nullptr));
 
     return ret;
 }
@@ -185,8 +188,7 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
                 this->order_book.CancelOrderById(bookOrder->id, nullptr);
             }
 
-            Event event(EVENT_ID_ORDER_FILLED, j_data, nullptr);
-            this->event_bus->Send(event);
+            this->event_bus->Send(Event(EVENT_ID_ORDER_FILLED, j_data, nullptr));
 
             pTakerOrder->filled += quantity;
             j_data = {};

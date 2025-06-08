@@ -7,6 +7,8 @@ using json = nlohmann::json;
 
 #include <iostream>
 
+#include <ctime>
+
 using namespace std;
 
 enum eOrderSide_t
@@ -32,12 +34,24 @@ class Order{
         enum eOrderSide_t order_side;
         enum eOrderType_t order_type;
         bool status;
+        time_t order_added_timestamp;
     
         Order();
 
         Order(int id);
 
-        Order(string price, float quantity, float filled, int id, enum eOrderSide_t order_side, enum eOrderType_t order_type, bool status);
+        Order(
+            string price,
+            float quantity,
+            float filled,
+            int id,
+            enum eOrderSide_t order_side,
+            enum eOrderType_t order_type,
+            bool status,
+            time_t order_added_timestamp
+        );
+
+        void SetCurrentTimestamp();
 
         json ConvertOrderToJson()const;
 

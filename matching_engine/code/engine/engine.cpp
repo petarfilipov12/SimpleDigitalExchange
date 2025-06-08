@@ -33,17 +33,17 @@ bool Engine::ExistsOrderId(int id) const
 ReturnType Engine::AddOrder(Order order)
 {
     ReturnType ret = RET_NOT_OK;
-    json j_data = order.ConvertOrderToJson();
-    Event event(EVENT_ID_TAKER_ORDER_ADDED, j_data, nullptr);
+    enum eEventId_t event_id = EVENT_ID_ADD_ORDER_FAILLED;
 
     ret = this->taker_book.AddTakerOrder(order);
 
-    if(RET_OK != ret)
+    if(RET_OK == ret)
     {
-        event = Event(EVENT_ID_ADD_ORDER_FAILLED, j_data, nullptr);
+        order.SetCurrentTimestamp();
+        event_id = EVENT_ID_TAKER_ORDER_ADDED;
     }
     
-    this->event_bus->Send(event);
+    this->event_bus->Send(Event(event_id, order.ConvertOrderToJson(), nullptr));
 
     return ret;
 }

@@ -13,6 +13,7 @@ Order::Order()
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
     this->status = false;
+    this->order_added_timestamp = 0;
 }
 
 Order::Order(int id)
@@ -24,6 +25,7 @@ Order::Order(int id)
     this->order_side = ORDER_SIDE_INVALID;
     this->order_type = ORDER_TYPE_INVALID;
     this->status = false;
+    this->order_added_timestamp = 0;
 }
 
 Order::Order(
@@ -33,7 +35,9 @@ Order::Order(
     int id,
     enum eOrderSide_t order_side,
     enum eOrderType_t order_type,
-    bool status)
+    bool status,
+    time_t order_added_timestamp
+)
 {
     this->price = price;
     this->quantity = quantity;
@@ -42,6 +46,12 @@ Order::Order(
     this->order_side = order_side;
     this->order_type = order_type;
     this->status = status;
+    this->order_added_timestamp = order_added_timestamp;
+}
+
+void Order::SetCurrentTimestamp()
+{
+    this->order_added_timestamp = time(nullptr);
 }
 
 json Order::ConvertOrderToJson()const
@@ -55,6 +65,7 @@ json Order::ConvertOrderToJson()const
     j_data["order_side"] = this->order_side;
     j_data["order_type"] = this->order_type;
     j_data["status"] = this->status;
+    j_data["order_added_timestamp"] = this->order_added_timestamp;
     
     return j_data;
 }
@@ -72,6 +83,7 @@ Order &Order::operator=(const Order &order2)
     this->order_side = order2.order_side;
     this->order_type = order2.order_type;
     this->status = order2.status;
+    this->order_added_timestamp = order2.order_added_timestamp;
 
     return *this;
 }
@@ -89,6 +101,7 @@ Order Order::ConvertJsonToOrder(json j_data){
         (j_data)["order_id"],
         static_cast<enum eOrderSide_t>((j_data)["order_side"]),
         static_cast<enum eOrderType_t>((j_data)["order_type"]),
-        (j_data)["status"]
+        (j_data)["status"],
+        (j_data)["order_added_timestamp"]
     );
 }

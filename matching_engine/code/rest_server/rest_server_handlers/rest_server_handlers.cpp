@@ -16,6 +16,7 @@ void RestServerHandler_AddOrder(const Request &req, Response &res)
     j_data["order_id"] = rand();
     j_data["filled"] = 0.0;
     j_data["status"] = true;
+    j_data["order_added_timestamp"] = 0;
 
     Event event(EVENT_ID_ADD_ORDER, j_data, &responce_data);
 

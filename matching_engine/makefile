@@ -5,7 +5,6 @@ CFLAGS_END = -lssl -lcrypto
 PROGRAM_NAME = MatchingEngine_exec
 
 BUILD_DIR = build
-STABLE_DIR = stable
 CODE_DIR = code
 
 INCLUDES = $(sort $(shell find $(CODE_DIR) -type f -name '*.h' -printf "%h\n"))
@@ -39,9 +38,6 @@ rebuild: clean $(PROGRAM_NAME)
 
 run:
 	./$(PROGRAM_NAME)
-
-stable_run:
-	./$(STABLE_DIR)/$(PROGRAM_NAME)
 
 print:
 	echo $(INCLUDES)

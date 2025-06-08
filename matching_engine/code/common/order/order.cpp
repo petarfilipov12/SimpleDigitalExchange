@@ -80,3 +80,15 @@ bool Order::operator==(const Order &order2) const
 {
     return this->id == order2.id;
 }
+
+Order Order::ConvertJsonToOrder(json j_data){
+    return Order(
+        (j_data)["price"],
+        (j_data)["quantity"],
+        (j_data)["filled"],
+        (j_data)["order_id"],
+        static_cast<enum eOrderSide_t>((j_data)["order_side"]),
+        static_cast<enum eOrderType_t>((j_data)["order_type"]),
+        (j_data)["status"]
+    );
+}

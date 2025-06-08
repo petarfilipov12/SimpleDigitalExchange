@@ -12,7 +12,7 @@ static void Engine_EventHandler_AddOrder(Event event)
     ReturnType ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
 
-    ret = engine.AddOrder(ConvertJsonToOrder(j_data));
+    ret = engine.AddOrder(Order::ConvertJsonToOrder(j_data));
 
     if(nullptr != event.GetResponceDataPtr())
     {

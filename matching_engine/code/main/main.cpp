@@ -10,21 +10,17 @@
 #include "event.h"
 #include "event_bus.h"
 
-#include "engine_event_handler.h"
+#include "engine.h"
 #include "event_receiver.h"
 #include "event_logger.h"
 
 #include "rest_server.h"
 #include "rest_server_handlers.h"
 
-//#include "cache_orders.h"
-#include "cache_orders_event_handler.h"
-#include "cache_order_book_l2_event_handler.h"
-
-#include "cache_candles_event_handler.h"
-
-#include "cache_trades_event_handler.h"
-
+#include "cache_orders.h"
+#include "cache_order_book_l2.h"
+#include "cache_candles.h"
+#include "cache_trades.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -49,7 +45,7 @@ void Init_Engine()
     thread thread_engine([]{engine.run();});
     thread_engine.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine_EventHandler);
+    event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine::EventHandler);
 
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
@@ -63,7 +59,7 @@ void Init_EventLogger()
 
 void Init_CacheOrders()
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, CacheOrders_EventHandler);
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, CacheOrders::EventHandler);
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);
@@ -74,7 +70,7 @@ void Init_CacheOrders()
 
 void Init_CacheOrderBookL2()
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, CacheOrderBookL2_EventHandler);
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, Cache_OrderBookL2::EventHandler);
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_CANCELED);
@@ -87,7 +83,7 @@ void Init_CacheCandles()
     thread thread_cache_candles([]{cache_candles.run();});
     thread_cache_candles.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, CacheCandles_EventHandler);
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, CacheCandles::EventHandler);
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
@@ -95,7 +91,7 @@ void Init_CacheCandles()
 
 void Init_CacheTrades()
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, CacheTrades_EventHandler);
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, CacheTrades::EventHandler);
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);

@@ -8,6 +8,7 @@
 #include <mutex>
 
 #include "candle.h"
+#include "event.h"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ class CacheCandles
         ReturnType GetCandles(int limit, json* data)const;
         
         void run();
+
+        static void EventHandler(Event event);
 };
 
 #endif

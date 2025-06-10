@@ -8,6 +8,7 @@
 #include <mutex>
 
 #include "trade.h"
+#include "event.h"
 
 using namespace std;
 
@@ -30,6 +31,8 @@ class CacheTrades
         ReturnType OrderFilled(string price, float quantity);
 
         ReturnType GetTrades(int limit, json* data)const;
+
+        static void EventHandler(Event event);
         
 };
 

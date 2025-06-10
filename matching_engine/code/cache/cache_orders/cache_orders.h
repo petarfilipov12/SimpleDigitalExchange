@@ -4,7 +4,9 @@
 #include "types.h"
 #include <unordered_map>
 #include <mutex>
+
 #include "order.h"
+#include "event.h"
 
 using namespace std;
 
@@ -28,6 +30,8 @@ class CacheOrders
         ReturnType OrderFilled(int taker_order_id, int book_order_id, float quantity);
 
         ReturnType GetOrder(int order_id, Order *pOrder);
+
+        static void EventHandler(Event event);
 };
 
 #endif

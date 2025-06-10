@@ -39,6 +39,8 @@ class Engine{
         ReturnType CancelOrderById(int id);
         
         void run();
+
+        static void EventHandler(Event event);
 };
 
 #endif

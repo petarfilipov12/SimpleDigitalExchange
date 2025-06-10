@@ -5,7 +5,9 @@
 #include <map>
 #include <string>
 #include <mutex>
+
 #include "order.h"
+#include "event.h"
 
 using namespace std;
 
@@ -29,6 +31,8 @@ class Cache_OrderBookL2
         ReturnType OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side);
 
         ReturnType GetOrderBookL2(json *l2_book)const;
+
+        static void EventHandler(Event event);
 };
 
 #endif

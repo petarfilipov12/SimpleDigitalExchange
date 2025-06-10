@@ -160,3 +160,65 @@ ReturnType Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
 
     return RET_OK;
 }
+
+/******************************/
+/*Event_Handler Implementation*/
+/******************************/
+static void Cache_OrderBookL2_EventHandler_OrderAdded(Event event)
+{
+    json j_data = event.GetJsonData();
+    cache_order_book_l2.OrderAdded(Order::ConvertJsonToOrder(j_data));
+}
+
+static void Cache_OrderBookL2_EventHandler_OrderCanceled(Event event)
+{
+    json j_data = event.GetJsonData();
+    cache_order_book_l2.OrderCanceled(Order::ConvertJsonToOrder(j_data));
+}
+
+static void Cache_OrderBookL2_EventHandler_OrderFilled(Event event)
+{
+    cache_order_book_l2.OrderFilled(
+        event.GetJsonData()["price"], event.GetJsonData()["quantity"],
+        event.GetJsonData()["book_order"]["order_side"]
+    );
+}
+
+static void Cache_OrderBookL2_EventHandler_GetOrderBookL2(Event event)
+{
+    json l2_book;
+    ReturnType ret = RET_NOT_OK;
+
+    if(nullptr != event.GetResponceDataPtr())
+    {
+        ret = cache_order_book_l2.GetOrderBookL2(&l2_book);
+
+        if(RET_OK == ret)
+        {
+            (*event.GetResponceDataPtr())["data"] = l2_book;
+        }
+
+        (*event.GetResponceDataPtr())["error"] = ret;
+    }
+}
+
+void Cache_OrderBookL2::EventHandler(Event event)
+{
+    switch(event.GetEventId())
+    {
+        case EVENT_ID_MAKER_ORDER_ADDED:
+            Cache_OrderBookL2_EventHandler_OrderAdded(event);
+            break;
+        case EVENT_ID_MAKER_ORDER_CANCELED:
+            Cache_OrderBookL2_EventHandler_OrderCanceled(event);
+            break;
+        case EVENT_ID_ORDER_FILLED:
+            Cache_OrderBookL2_EventHandler_OrderFilled(event);
+            break;
+        case EVENT_ID_GET_ORDER_BOOK:
+            Cache_OrderBookL2_EventHandler_GetOrderBookL2(event);
+            break;
+        default:
+            break;
+    }
+}

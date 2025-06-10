@@ -1,5 +1,7 @@
 #include "cache_orders.h"
 
+#include "globals.h"
+
 using namespace std;
 
 CacheOrders::CacheOrders() {}
@@ -80,4 +82,67 @@ ReturnType CacheOrders::GetOrder(int order_id, Order *pOrder)
     this->order_lock.unlock();
 
     return ret;
+}
+
+/******************************/
+/*Event_Handler Implementation*/
+/******************************/
+static inline void CacheOrders_EventHandler_OrderAdded(Event event)
+{
+    cache_orders.OrderAdded(Order::ConvertJsonToOrder(event.GetJsonData()));
+}
+
+static inline void CacheOrders_EventHandler_OrderCanceled(Event event)
+{
+    cache_orders.OrderCanceled(event.GetJsonData()["order_id"]);
+}
+
+static inline void CacheOrders_EventHandler_OrderFilled(Event event)
+{
+    cache_orders.OrderFilled(
+        event.GetJsonData()["taker_order"]["order_id"],
+        event.GetJsonData()["book_order"]["order_id"],
+        event.GetJsonData()["quantity"]
+    );
+}
+
+static inline void CacheOrders_EventHandler_GetOrder(Event event)
+{
+    Order order;
+    ReturnType ret = RET_NOT_OK;
+
+    if(nullptr != event.GetResponceDataPtr())
+    {
+        ret = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
+
+        if(RET_OK == ret)
+        {
+            (*event.GetResponceDataPtr())["data"] = order.ConvertOrderToJson();
+        }
+
+        (*event.GetResponceDataPtr())["error"] = ret;
+    }
+}
+
+void CacheOrders::EventHandler(Event event)
+{
+    switch(event.GetEventId())
+    {
+        case EVENT_ID_TAKER_ORDER_ADDED:
+            CacheOrders_EventHandler_OrderAdded(event);
+            break;
+        case EVENT_ID_TAKER_ORDER_CANCELED:
+        case EVENT_ID_MAKER_ORDER_CANCELED:
+            CacheOrders_EventHandler_OrderCanceled(event);
+            break;
+        case EVENT_ID_ORDER_FILLED:
+            CacheOrders_EventHandler_OrderFilled(event);
+            break;
+        case EVENT_ID_GET_ORDER:
+            CacheOrders_EventHandler_GetOrder(event);
+            break;
+        default:
+            break;
+    }
+
 }

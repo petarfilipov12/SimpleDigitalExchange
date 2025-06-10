@@ -38,7 +38,7 @@ public:
 
     ReturnType Unsubscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id);
 
-    void Send(const Event event);
+    void Send(const Event& event);
 
     void run(void);
 };

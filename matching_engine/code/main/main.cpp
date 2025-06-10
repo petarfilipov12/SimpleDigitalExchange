@@ -25,7 +25,7 @@ using json = nlohmann::json;
 using namespace std;
 
 EventBus event_bus;
-Engine engine(&event_bus);
+Engine engine(event_bus);
 RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem");
 
 CacheOrders cache_orders;

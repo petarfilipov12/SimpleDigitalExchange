@@ -15,7 +15,7 @@ class Engine{
     private:
         OrderBook order_book;
         TakerOrderBook taker_book;
-        EventBus *event_bus;
+        EventBus& event_bus;
 
         ReturnType AddToOrderBook(Order& pTakerOrder);
         
@@ -24,7 +24,7 @@ class Engine{
         void Cyclic();
     
     public:
-        Engine(const EventBus *event_bus);
+        Engine(EventBus& event_busP);
         
         ~Engine();
         

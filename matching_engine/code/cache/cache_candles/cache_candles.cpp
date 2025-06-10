@@ -56,41 +56,45 @@ ReturnType CacheCandles::GetCandles(int limit, json& data)const
     candles_size = this->candles.size();
     this->candles_lock.unlock();
 
-    if(candles_size > 0)
-    {
-        if (limit > candles_size)
-        {
-            limit = candles_size;
-        }
-
-        this->candles_lock.lock();
-        temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
-        this->candles_lock.unlock();
-    }
-
     this->current_candle_lock.lock();
-    if (this->current_candle.IsEmpty())
-    {
-        this->current_candle_lock.unlock();
+    temp_candle = this->current_candle;
+    this->current_candle_lock.unlock();
 
-        temp_candle = Candle(temp.back().close, this->current_timestamp);
-    }
-    else
+    if ((candles_size > 0) || (!temp_candle.IsEmpty()))
     {
-        temp_candle = this->current_candle;
-        this->current_candle_lock.unlock();
-
-        if (temp_candle.timestamp != this->current_timestamp)
+        if (candles_size > 0)
         {
-            temp_candle.timestamp = this->current_timestamp;
+            if (limit > candles_size)
+            {
+                limit = candles_size;
+            }
+
+            this->candles_lock.lock();
+            temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
+            this->candles_lock.unlock();
         }
+        
+        if (temp_candle.IsEmpty())
+        {
+            temp_candle = Candle(temp.back().close, this->current_timestamp);
+        }
+        else
+        {
+            if (temp_candle.timestamp != this->current_timestamp)
+            {
+                temp_candle.timestamp = this->current_timestamp;
+            }
+        }
+
+        temp.push_back(temp_candle);
+
+        if (temp.size() > 1)
+        {
+            reverse(temp.begin(), temp.end());
+        }
+
+        data = temp;
     }
-
-    temp.push_back(temp_candle);
-
-    reverse(temp.begin(), temp.end());
-
-    data = temp;
 
     return RET_OK;
 }

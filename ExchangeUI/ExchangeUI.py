@@ -37,7 +37,7 @@ class ExchangeUI:
         data = None
 
         body_json = self.api_client.GetCandles(limit=100)
-        if(body_json):
+        if(body_json and body_json["data"]):
             candles = body_json["data"]
 
             timestamps = []

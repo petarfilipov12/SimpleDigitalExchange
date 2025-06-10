@@ -117,7 +117,7 @@ ReturnType EventBus::Unsubscribe(const enum eReceiverId_t receiver_id, const enu
     return ret;
 }
 
-void EventBus::Send(const Event event)
+void EventBus::Send(const Event& event)
 {
     this->event_queue_lock.lock();
     this->event_queue.push(event);

@@ -2,9 +2,9 @@
 
 #include "globals.h"
 
-Engine::Engine(const EventBus *event_bus)
+Engine::Engine(EventBus& event_busP): event_bus(event_busP)
 {
-    this->event_bus = (EventBus *)event_bus;
+    //this->event_bus = (EventBus *)event_bus;
 }
 
 Engine::~Engine()
@@ -45,7 +45,7 @@ ReturnType Engine::AddOrder(Order order)
         event_id = EVENT_ID_TAKER_ORDER_ADDED;
     }
     
-    this->event_bus->Send(Event(event_id, order.ConvertOrderToJson(), nullptr));
+    this->event_bus.Send(Event(event_id, order.ConvertOrderToJson(), nullptr));
 
     return ret;
 }
@@ -79,7 +79,7 @@ ReturnType Engine::CancelOrder(const Order& order)
         //Nothing to do
     }
         
-    this->event_bus->Send(Event(event_id, j_data, nullptr));
+    this->event_bus.Send(Event(event_id, j_data, nullptr));
 
     return ret;
 }
@@ -95,7 +95,7 @@ ReturnType Engine::AddToOrderBook(Order& pTakerOrder)
 
     if(RET_OK == ret)
     {
-        this->event_bus->Send(Event(EVENT_ID_MAKER_ORDER_ADDED, pTakerOrder.ConvertOrderToJson(), nullptr));
+        this->event_bus.Send(Event(EVENT_ID_MAKER_ORDER_ADDED, pTakerOrder.ConvertOrderToJson(), nullptr));
     }
 
     return ret;
@@ -190,7 +190,7 @@ ReturnType Engine::MatchTakerOrder(Order& pTakerOrder)
                 this->order_book.CancelOrderById(bookOrder->id, nullptr);
             }
 
-            this->event_bus->Send(Event(EVENT_ID_ORDER_FILLED, j_data, nullptr));
+            this->event_bus.Send(Event(EVENT_ID_ORDER_FILLED, j_data, nullptr));
 
             pTakerOrder.filled += quantity;
             j_data = {};

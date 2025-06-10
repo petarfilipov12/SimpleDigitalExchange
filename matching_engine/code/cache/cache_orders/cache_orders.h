@@ -17,19 +17,19 @@ class CacheOrders
 
         mutable mutex order_lock;
 
-        ReturnType OrderChange(int order_id, float quantity);
+        ReturnType OrderChange(const int order_id, const float quantity);
     
     public:
         CacheOrders();
         ~CacheOrders();
 
-        ReturnType OrderAdded(Order order);
+        ReturnType OrderAdded(const Order& order);
 
-        ReturnType OrderCanceled(int order_id);
+        ReturnType OrderCanceled(const int order_id);
 
-        ReturnType OrderFilled(int taker_order_id, int book_order_id, float quantity);
+        ReturnType OrderFilled(const int taker_order_id, const int book_order_id, const float quantity);
 
-        ReturnType GetOrder(int order_id, Order *pOrder);
+        ReturnType GetOrder(const int order_id, Order& pOrder);
 
         static void EventHandler(Event event);
 };

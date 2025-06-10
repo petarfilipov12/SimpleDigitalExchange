@@ -16,7 +16,7 @@ Order::Order()
     this->order_added_timestamp = 0;
 }
 
-Order::Order(int id)
+Order::Order(const int id)
 {
     this->price = "0.0";
     this->quantity = 0.0;
@@ -29,14 +29,14 @@ Order::Order(int id)
 }
 
 Order::Order(
-    string price,
-    float quantity,
-    float filled,
-    int id,
-    enum eOrderSide_t order_side,
-    enum eOrderType_t order_type,
-    bool status,
-    time_t order_added_timestamp
+    const string& price,
+    const float quantity,
+    const float filled,
+    const int id,
+    const enum eOrderSide_t order_side,
+    const enum eOrderType_t order_type,
+    const bool status,
+    const time_t order_added_timestamp
 )
 {
     this->price = price;
@@ -93,7 +93,7 @@ bool Order::operator==(const Order &order2) const
     return this->id == order2.id;
 }
 
-Order Order::ConvertJsonToOrder(json j_data){
+Order Order::ConvertJsonToOrder(const json &j_data){
     return Order(
         (j_data)["price"],
         (j_data)["quantity"],

@@ -6,7 +6,7 @@
 TakerOrderBook::TakerOrderBook() {}
 TakerOrderBook::~TakerOrderBook() {}
 
-bool TakerOrderBook::ExistsTakerOrder(Order order) const
+bool TakerOrderBook::ExistsTakerOrder(const Order& order) const
 {
     this->taker_book_lock.lock();
     bool ret = this->taker_orders.find(order) != this->taker_orders.end();
@@ -15,12 +15,12 @@ bool TakerOrderBook::ExistsTakerOrder(Order order) const
     return ret;
 }
 
-bool TakerOrderBook::ExistsTakerOrderById(int id) const
+bool TakerOrderBook::ExistsTakerOrderById(const int id) const
 {
     return this->ExistsTakerOrder(Order(id));
 }
 
-ReturnType TakerOrderBook::AddTakerOrder(Order order)
+ReturnType TakerOrderBook::AddTakerOrder(const Order& order)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
 
@@ -37,7 +37,7 @@ ReturnType TakerOrderBook::AddTakerOrder(Order order)
     return ret;
 }
 
-ReturnType TakerOrderBook::CancelTakerOrderById(int id, Order *pOrder_o)
+ReturnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
 
@@ -66,12 +66,12 @@ ReturnType TakerOrderBook::CancelTakerOrderById(int id, Order *pOrder_o)
     return ret;
 }
 
-ReturnType TakerOrderBook::CancelTakerOrder(Order order, Order *pOrder)
+ReturnType TakerOrderBook::CancelTakerOrder(const Order& order, Order *pOrder)
 {
     return this->CancelTakerOrderById(order.id, pOrder);
 }
 
-ReturnType TakerOrderBook::GetAt(int index, Order **pOrder)
+ReturnType TakerOrderBook::GetAt(const int index, Order **pOrder)
 {
     ReturnType ret = RET_BOOK_EMPTY;
     list<Order>::iterator iter;

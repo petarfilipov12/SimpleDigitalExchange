@@ -30,15 +30,15 @@ public:
 
     ~EventBus();
 
-    ReturnType AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func);
+    ReturnType AddReceiver(const enum eReceiverId_t receiver_id, const function<void(Event)> handler_func);
 
-    ReturnType RemoveReceiver(enum eReceiverId_t receiver_id);
+    ReturnType RemoveReceiver(const enum eReceiverId_t receiver_id);
 
-    ReturnType Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id);
+    ReturnType Subscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id);
 
-    ReturnType Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id);
+    ReturnType Unsubscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id);
 
-    void Send(Event event);
+    void Send(const Event event);
 
     void run(void);
 };

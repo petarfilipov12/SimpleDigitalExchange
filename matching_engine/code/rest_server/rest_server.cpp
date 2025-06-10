@@ -11,7 +11,7 @@ using json = nlohmann::json;
 using namespace httplib;
 using namespace std;
 
-RestServer::RestServer(string cert_path, string key_path)
+RestServer::RestServer(const string& cert_path, const string& key_path)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -19,7 +19,7 @@ RestServer::RestServer(string cert_path, string key_path)
     this->port = 8080;
 }
 
-RestServer::RestServer(string cert_path, string key_path, string host, unsigned int port)
+RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -32,7 +32,7 @@ RestServer::~RestServer()
     delete this->svr;
 }
 
-void RestServer::Post(string url_path, function<void(const Request &, Response &)> handler_func)
+void RestServer::Post(const string& url_path, const function<void(const Request &, Response &)> handler_func)
 {
     this->svr->Post(url_path, handler_func);
 }
@@ -42,9 +42,9 @@ void RestServer::run()
     this->svr->listen(this->host, this->port);
 }
 
-/******************************/
-/*Event_Handler Implementation*/
-/******************************/
+/************************/
+/*Handler Implementation*/
+/************************/
 void RestServer::Handler_AddOrder(const Request &req, Response &res)
 {
     json responce_data = {

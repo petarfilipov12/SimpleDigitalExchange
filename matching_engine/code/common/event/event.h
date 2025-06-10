@@ -41,7 +41,7 @@ class Event{
     public:
         Event();
 
-        Event(enum eEventId_t event_id, json json_data, json *responce_data);
+        Event(const enum eEventId_t event_id, const json json_data, const json *responce_data);
 
         Event(const Event& event2);
 

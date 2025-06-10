@@ -28,9 +28,9 @@ class CacheTrades
         CacheTrades();
         ~CacheTrades();
 
-        ReturnType OrderFilled(string price, float quantity);
+        ReturnType OrderFilled(const string& price, const float quantity);
 
-        ReturnType GetTrades(int limit, json* data)const;
+        ReturnType GetTrades(int limit, json& data)const;
 
         static void EventHandler(Event event);
         

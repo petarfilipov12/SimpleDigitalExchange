@@ -29,17 +29,17 @@ private:
 public:
     EventReceiver();
 
-    EventReceiver(enum eReceiverId_t id, function<void(Event)> callback);
+    EventReceiver(const enum eReceiverId_t id, const function<void(Event)> callback);
 
     ~EventReceiver();
 
-    void AddEvent(enum eEventId_t event_id);
+    void AddEvent(const enum eEventId_t event_id);
 
-    void RemoveEvent(enum eEventId_t event_id);
+    void RemoveEvent(const enum eEventId_t event_id);
 
     bool HaveEvents() const;
 
-    bool ContainsEvent(enum eEventId_t event_id);
+    bool ContainsEvent(const enum eEventId_t event_id) const;
 
     unordered_set<enum eEventId_t> GetEvents() const;
 

@@ -12,7 +12,7 @@ OrderBook::~OrderBook()
     // this->ask_book.~Book();
 }
 
-bool OrderBook::ExistsOrder(Order order) const
+bool OrderBook::ExistsOrder(const Order& order) const
 {
     bool ret = false;
 
@@ -31,7 +31,7 @@ bool OrderBook::ExistsOrder(Order order) const
     return ret;
 }
 
-bool OrderBook::ExistsOrderId(int id) const
+bool OrderBook::ExistsOrderId(const int id) const
 {
     Order order(id);
     bool ret = this->bid_book.ExistsOrder(order);
@@ -44,7 +44,7 @@ bool OrderBook::ExistsOrderId(int id) const
     return ret;
 }
 
-ReturnType OrderBook::AddOrder(Order order)
+ReturnType OrderBook::AddOrder(const Order& order)
 {
     ReturnType ret = RET_NOT_OK;
 
@@ -64,12 +64,12 @@ ReturnType OrderBook::AddOrder(Order order)
     return ret;
 }
 
-ReturnType OrderBook::CancelOrder(Order order, Order *pOrder)
+ReturnType OrderBook::CancelOrder(const Order& order, Order *pOrder)
 {
     return this->CancelOrderById(order.id, pOrder);
 }
 
-ReturnType OrderBook::CancelOrderById(int id, Order *pOrder)
+ReturnType OrderBook::CancelOrderById(const int id, Order *pOrder)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
 

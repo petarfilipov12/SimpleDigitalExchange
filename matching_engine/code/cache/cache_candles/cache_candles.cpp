@@ -9,9 +9,9 @@
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
 
-ReturnType CacheCandles::OrderFilled(string price_s)
+ReturnType CacheCandles::OrderFilled(const string& price_s)
 {
-    float price_f = stof(price_s);
+    const float price_f = stof(price_s);
 
     this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
@@ -46,7 +46,7 @@ ReturnType CacheCandles::OrderFilled(string price_s)
     return RET_OK;
 }
 
-ReturnType CacheCandles::GetCandles(int limit, json *data)const
+ReturnType CacheCandles::GetCandles(int limit, json& data)const
 {
     vector<Candle> temp;
     vector<Candle>::size_type candles_size;
@@ -90,7 +90,7 @@ ReturnType CacheCandles::GetCandles(int limit, json *data)const
 
     reverse(temp.begin(), temp.end());
 
-    *data = temp;
+    data = temp;
 
     return RET_OK;
 }
@@ -172,7 +172,7 @@ static inline void CacheCandles_EventHandler_GetCandles(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        ret = cache_candles.GetCandles(event.GetJsonData()["limit"], &candles);
+        ret = cache_candles.GetCandles(event.GetJsonData()["limit"], candles);
 
         if(RET_OK == ret)
         {

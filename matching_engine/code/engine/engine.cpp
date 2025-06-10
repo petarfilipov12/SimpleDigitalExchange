@@ -2,9 +2,9 @@
 
 #include "globals.h"
 
-Engine::Engine(EventBus *event_bus)
+Engine::Engine(const EventBus *event_bus)
 {
-    this->event_bus = event_bus;
+    this->event_bus = (EventBus *)event_bus;
 }
 
 Engine::~Engine()
@@ -15,7 +15,7 @@ Engine::~Engine()
     // this->order_book.~OrderBook();
 }
 
-bool Engine::ExistsOrder(Order order) const
+bool Engine::ExistsOrder(const Order& order) const
 {
     bool ret = this->taker_book.ExistsTakerOrder(order);
 
@@ -27,7 +27,7 @@ bool Engine::ExistsOrder(Order order) const
     return ret;
 }
 
-bool Engine::ExistsOrderId(int id) const
+bool Engine::ExistsOrderId(const int id) const
 {
     return this->ExistsOrder(Order(id));
 }
@@ -50,7 +50,7 @@ ReturnType Engine::AddOrder(Order order)
     return ret;
 }
 
-ReturnType Engine::CancelOrder(Order order)
+ReturnType Engine::CancelOrder(const Order& order)
 {
     enum eEventId_t event_id = EVENT_ID_CANCEL_ORDER_FAILED;
     json j_data = order.ConvertOrderToJson();
@@ -84,24 +84,24 @@ ReturnType Engine::CancelOrder(Order order)
     return ret;
 }
 
-ReturnType Engine::CancelOrderById(int id)
+ReturnType Engine::CancelOrderById(const int id)
 {
     return this->CancelOrder(Order(id));
 }
 
-ReturnType Engine::AddToOrderBook(Order *pTakerOrder)
+ReturnType Engine::AddToOrderBook(Order& pTakerOrder)
 {
-    ReturnType ret = this->order_book.AddOrder(*pTakerOrder);
+    ReturnType ret = this->order_book.AddOrder(pTakerOrder);
 
     if(RET_OK == ret)
     {
-        this->event_bus->Send(Event(EVENT_ID_MAKER_ORDER_ADDED, pTakerOrder->ConvertOrderToJson(), nullptr));
+        this->event_bus->Send(Event(EVENT_ID_MAKER_ORDER_ADDED, pTakerOrder.ConvertOrderToJson(), nullptr));
     }
 
     return ret;
 }
 
-ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
+ReturnType Engine::MatchTakerOrder(Order& pTakerOrder)
 {
     ReturnType ret = RET_NOT_OK;
     Order *bookOrder;
@@ -109,18 +109,18 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
     float quantity;
     float bookOrder_quantity;
 
-    if ((ORDER_TYPE_MARKET == pTakerOrder->order_type) || (ORDER_TYPE_LIMIT == pTakerOrder->order_type))
+    if ((ORDER_TYPE_MARKET == pTakerOrder.order_type) || (ORDER_TYPE_LIMIT == pTakerOrder.order_type))
     {
-        while (pTakerOrder->filled < pTakerOrder->quantity)
+        while (pTakerOrder.filled < pTakerOrder.quantity)
         {
-            quantity = (pTakerOrder->quantity - pTakerOrder->filled);
+            quantity = (pTakerOrder.quantity - pTakerOrder.filled);
 
-            if (pTakerOrder->order_side == ORDER_SIDE_BUY)
+            if (pTakerOrder.order_side == ORDER_SIDE_BUY)
             {
                 ret = this->order_book.GetAskFirst(&bookOrder);
                 if (RET_BOOK_EMPTY == ret)
                 {
-                    if(ORDER_TYPE_LIMIT == pTakerOrder->order_type)
+                    if(ORDER_TYPE_LIMIT == pTakerOrder.order_type)
                     {
                         this->AddToOrderBook(pTakerOrder);
                         break;
@@ -135,18 +135,18 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
                     return RET_NOT_OK;
                 }
 
-                if ( (ORDER_TYPE_LIMIT == pTakerOrder->order_type) && (stof(pTakerOrder->price) < stof(bookOrder->price)) )
+                if ( (ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) < stof(bookOrder->price)) )
                 {
                     this->AddToOrderBook(pTakerOrder);
                     break;
                 }
             }
-            else if (pTakerOrder->order_side == ORDER_SIDE_SELL)
+            else if (pTakerOrder.order_side == ORDER_SIDE_SELL)
             {
                 ret = this->order_book.GetBidFirst(&bookOrder);
                 if (RET_BOOK_EMPTY == ret)
                 {
-                    if(ORDER_TYPE_LIMIT == pTakerOrder->order_type)
+                    if(ORDER_TYPE_LIMIT == pTakerOrder.order_type)
                     {
                         this->AddToOrderBook(pTakerOrder);
                         break;
@@ -162,7 +162,7 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
                     return RET_NOT_OK;
                 }
 
-                if ( (ORDER_TYPE_LIMIT == pTakerOrder->order_type) && (stof(pTakerOrder->price) > stof(bookOrder->price)) )
+                if ( (ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) > stof(bookOrder->price)) )
                 {
                     this->AddToOrderBook(pTakerOrder);
                     break;
@@ -179,7 +179,7 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
                 quantity = bookOrder_quantity;
             }
 
-            j_data["taker_order"] = pTakerOrder->ConvertOrderToJson();
+            j_data["taker_order"] = pTakerOrder.ConvertOrderToJson();
             j_data["book_order"] = bookOrder->ConvertOrderToJson();
             j_data["price"] = bookOrder->price;
             j_data["quantity"] = quantity;
@@ -192,7 +192,7 @@ ReturnType Engine::MatchTakerOrder(Order *pTakerOrder)
 
             this->event_bus->Send(Event(EVENT_ID_ORDER_FILLED, j_data, nullptr));
 
-            pTakerOrder->filled += quantity;
+            pTakerOrder.filled += quantity;
             j_data = {};
         }
     }
@@ -211,7 +211,7 @@ void Engine::Cyclic()
         return;
     }
 
-    ret = this->MatchTakerOrder(takerOrder);
+    ret = this->MatchTakerOrder(*takerOrder);
 
     if(RET_OK == ret)
     {
@@ -226,7 +226,7 @@ void Engine::Cyclic()
                 return;
             }
 
-            ret = this->MatchTakerOrder(takerOrder);
+            ret = this->MatchTakerOrder(*takerOrder);
         }
 
         if(RET_OK == ret)

@@ -27,7 +27,7 @@ template <typename Comparator> class Book{
             // this->orders.clear();
         }
 
-        bool ExistsOrder(Order order) const{
+        bool ExistsOrder(const Order& order) const{
             this->book_lock.lock();
             bool ret = this->orders.find(order) != this->orders.end();
             this->book_lock.unlock();
@@ -35,11 +35,11 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        bool ExistsOrderId(int id) const{
+        bool ExistsOrderId(const int id) const{
             return this->ExistsOrder(Order(id));
         }
 
-        ReturnType AddOrder(Order order){
+        ReturnType AddOrder(const Order& order){
             ReturnType ret = RET_ORDER_EXISTS;
 
             this->book_lock.lock();
@@ -54,7 +54,7 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        ReturnType CancelOrderById(int id, Order *pOrder_o){
+        ReturnType CancelOrderById(const int id, Order *pOrder_o){
             ReturnType ret = RET_ORDER_NOT_EXISTS;
 
             this->book_lock.lock();
@@ -85,7 +85,7 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        ReturnType CancelOrder(Order order, Order *pOrder){
+        ReturnType CancelOrder(const Order& order, Order *pOrder){
             return this->CancelOrderById(order.id, pOrder);
         }
 

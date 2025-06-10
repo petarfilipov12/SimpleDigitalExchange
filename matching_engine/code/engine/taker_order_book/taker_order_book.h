@@ -19,17 +19,17 @@ class TakerOrderBook{
         TakerOrderBook();
         ~TakerOrderBook();
 
-        bool ExistsTakerOrder(Order order) const;
+        bool ExistsTakerOrder(const Order& order) const;
 
-        bool ExistsTakerOrderById(int id) const;
+        bool ExistsTakerOrderById(const int id) const;
 
-        ReturnType AddTakerOrder(Order order);
+        ReturnType AddTakerOrder(const Order& order);
 
-        ReturnType CancelTakerOrder(Order order, Order *pOrder);
+        ReturnType CancelTakerOrder(const Order& order, Order *pOrder);
 
-        ReturnType CancelTakerOrderById(int id, Order *pOrder);
+        ReturnType CancelTakerOrderById(const int id, Order *pOrder);
 
-        ReturnType GetAt(int index, Order **pOrder);
+        ReturnType GetAt(const int index, Order **pOrder);
 
         ReturnType GetFirst(Order **pOrder);
 

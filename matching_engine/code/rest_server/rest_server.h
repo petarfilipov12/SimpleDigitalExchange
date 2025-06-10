@@ -18,13 +18,13 @@ private:
     unsigned int port;
 
 public:
-    RestServer(string cert_path, string key_path);
+    RestServer(const string& cert_path, const string& key_path);
 
-    RestServer(string cert_path, string key_path, string host, unsigned int port);
+    RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port);
 
     ~RestServer();
 
-    void Post(string url_path, function<void(const Request&, Response&)> handler_func);
+    void Post(const string& url_path, const function<void(const Request&, Response&)> handler_func);
 
     void run();
 

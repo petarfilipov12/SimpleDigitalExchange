@@ -8,7 +8,7 @@ using namespace std;
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-ReturnType Cache_OrderBookL2::OrderAdded(Order order)
+ReturnType Cache_OrderBookL2::OrderAdded(const Order& order)
 {
     ReturnType ret = RET_NOT_OK;
 
@@ -36,7 +36,7 @@ ReturnType Cache_OrderBookL2::OrderAdded(Order order)
     return ret;
 }
 
-ReturnType Cache_OrderBookL2::OrderCanceled(Order order)
+ReturnType Cache_OrderBookL2::OrderCanceled(const Order& order)
 {
     ReturnType ret = RET_NOT_OK;
 
@@ -75,7 +75,7 @@ ReturnType Cache_OrderBookL2::OrderCanceled(Order order)
     return ret;
 }
 
-ReturnType Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side)
+ReturnType Cache_OrderBookL2::OrderFilled(const string& price, const float quantity, const enum eOrderSide_t book_order_side)
 {
     ReturnType ret = RET_NOT_OK;
     bool flag = false;
@@ -134,7 +134,7 @@ ReturnType Cache_OrderBookL2::OrderFilled(string price, float quantity, enum eOr
     return ret;
 }
 
-ReturnType Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
+ReturnType Cache_OrderBookL2::GetOrderBookL2(json& l2_book)const
 {
     map<string, float, greater<string> > temp_bid_book_l2;
     map<string, float, less<string> > temp_ask_book_l2;
@@ -146,16 +146,16 @@ ReturnType Cache_OrderBookL2::GetOrderBookL2(json *l2_book)const
     this->bid_book_l2_look.unlock();
     this->ask_book_l2_look.unlock();
 
-    (*l2_book)["bid"] = {};
+    l2_book["bid"] = {};
     if (!this->bid_book_l2.empty())
     {
-        (*l2_book)["bid"] = temp_bid_book_l2;
+        l2_book["bid"] = temp_bid_book_l2;
     }
 
-    (*l2_book)["ask"] = {};
+    l2_book["ask"] = {};
     if (!this->ask_book_l2.empty())
     {
-        (*l2_book)["ask"] = temp_ask_book_l2;
+        l2_book["ask"] = temp_ask_book_l2;
     }
 
     return RET_OK;
@@ -191,7 +191,7 @@ static void Cache_OrderBookL2_EventHandler_GetOrderBookL2(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        ret = cache_order_book_l2.GetOrderBookL2(&l2_book);
+        ret = cache_order_book_l2.GetOrderBookL2(l2_book);
 
         if(RET_OK == ret)
         {

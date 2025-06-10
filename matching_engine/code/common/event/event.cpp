@@ -6,11 +6,11 @@ Event::Event()
     this->responce_data = nullptr;
 }
 
-Event::Event(enum eEventId_t event_id, json json_data, json *responce_data)
+Event::Event(const enum eEventId_t event_id, const json json_data, const json *responce_data)
 {
     this->event_id = event_id;
     this->json_data = json_data;
-    this->responce_data = responce_data;
+    this->responce_data = (json*)responce_data;
 }
 
 Event::Event(const Event &event2)

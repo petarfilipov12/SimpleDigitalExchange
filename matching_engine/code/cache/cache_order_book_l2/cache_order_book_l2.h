@@ -24,13 +24,13 @@ class Cache_OrderBookL2
         mutable mutex ask_book_l2_look;
 
     public:
-        ReturnType OrderAdded(Order order);
+        ReturnType OrderAdded(const Order& order);
 
-        ReturnType OrderCanceled(Order order);
+        ReturnType OrderCanceled(const Order& order);
 
-        ReturnType OrderFilled(string price, float quantity, enum eOrderSide_t book_order_side);
+        ReturnType OrderFilled(const string& price, const float quantity, const enum eOrderSide_t book_order_side);
 
-        ReturnType GetOrderBookL2(json *l2_book)const;
+        ReturnType GetOrderBookL2(json& l2_book)const;
 
         static void EventHandler(Event event);
 };

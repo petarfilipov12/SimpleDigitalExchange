@@ -7,7 +7,7 @@
 CacheTrades::CacheTrades() {}
 CacheTrades::~CacheTrades() {}
 
-ReturnType CacheTrades::OrderFilled(string price, float quantity)
+ReturnType CacheTrades::OrderFilled(const string& price, const float quantity)
 {
     this->trades_lock.lock();
     this->trades.push_back((struct sTrade){price, quantity, time(nullptr)});
@@ -16,7 +16,7 @@ ReturnType CacheTrades::OrderFilled(string price, float quantity)
     return RET_OK;
 }
 
-ReturnType CacheTrades::GetTrades(int limit, json *data)const
+ReturnType CacheTrades::GetTrades(int limit, json& data)const
 {
     vector<sTrade> temp;
     vector<sTrade>::size_type trades_size;
@@ -38,7 +38,7 @@ ReturnType CacheTrades::GetTrades(int limit, json *data)const
 
         reverse(temp.begin(), temp.end());
 
-        *data = temp;
+        data = temp;
     }
 
     return RET_OK;
@@ -59,7 +59,7 @@ static inline void CacheTrades_EventHandler_GetTrades(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        ret = cache_trades.GetTrades(event.GetJsonData()["limit"], &trades);
+        ret = cache_trades.GetTrades(event.GetJsonData()["limit"], trades);
 
         if(RET_OK == ret)
         {

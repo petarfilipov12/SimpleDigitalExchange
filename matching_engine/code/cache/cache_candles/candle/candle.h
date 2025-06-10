@@ -26,11 +26,11 @@ namespace candle
         
             Candle();
 
-            Candle(time_t timestamp);
+            Candle(const time_t timestamp);
 
-            Candle(string price, time_t timestamp);
+            Candle(const string& price, const time_t timestamp);
 
-            Candle(string high, string open, string close, string low, time_t timestamp);
+            Candle(const string& high, const string& open, const string& close, const string& low, const time_t timestamp);
 
             ~Candle();
 

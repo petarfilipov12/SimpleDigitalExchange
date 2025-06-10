@@ -12,7 +12,7 @@ Candle::Candle()
     this->timestamp = 0;
 }
 
-Candle::Candle(time_t timestamp) 
+Candle::Candle(const time_t timestamp) 
 {
     this->high = "";
     this->open = "";
@@ -22,7 +22,7 @@ Candle::Candle(time_t timestamp)
     this->timestamp = timestamp;
 }
 
-Candle::Candle(string price, time_t timestamp)
+Candle::Candle(const string& price, const time_t timestamp)
 {
     this->high = price;
     this->open = price;
@@ -32,7 +32,7 @@ Candle::Candle(string price, time_t timestamp)
     this->timestamp = timestamp;
 }
 
-Candle::Candle(string high, string open, string close, string low, time_t timestamp)
+Candle::Candle(const string& high, const string& open, const string& close, const string& low, const time_t timestamp)
 {
     this->high = high;
     this->open = open;

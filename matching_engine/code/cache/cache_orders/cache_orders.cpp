@@ -7,7 +7,7 @@ using namespace std;
 CacheOrders::CacheOrders() {}
 CacheOrders::~CacheOrders() {}
 
-ReturnType CacheOrders::OrderAdded(Order order)
+ReturnType CacheOrders::OrderAdded(const Order& order)
 {
     ReturnType ret = RET_ORDER_EXISTS;
 
@@ -23,7 +23,7 @@ ReturnType CacheOrders::OrderAdded(Order order)
     return ret;
 }
 
-ReturnType CacheOrders::OrderCanceled(int order_id)
+ReturnType CacheOrders::OrderCanceled(const int order_id)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
 
@@ -39,7 +39,7 @@ ReturnType CacheOrders::OrderCanceled(int order_id)
     return ret;
 }
 
-ReturnType CacheOrders::OrderChange(int order_id, float quantity)
+ReturnType CacheOrders::OrderChange(const int order_id, const float quantity)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
     unordered_map<int, Order>::iterator order_itter;
@@ -58,7 +58,7 @@ ReturnType CacheOrders::OrderChange(int order_id, float quantity)
     return ret;
 }
 
-ReturnType CacheOrders::OrderFilled(int taker_order_id, int book_order_id, float quantity)
+ReturnType CacheOrders::OrderFilled(const int taker_order_id, const int book_order_id, const float quantity)
 {
     this->OrderChange(taker_order_id, quantity);
     this->OrderChange(book_order_id, quantity);
@@ -66,7 +66,7 @@ ReturnType CacheOrders::OrderFilled(int taker_order_id, int book_order_id, float
     return RET_OK;
 }
 
-ReturnType CacheOrders::GetOrder(int order_id, Order *pOrder)
+ReturnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 {
     ReturnType ret = RET_ORDER_NOT_EXISTS;
     unordered_map<int, Order>::iterator order_itter;
@@ -75,7 +75,7 @@ ReturnType CacheOrders::GetOrder(int order_id, Order *pOrder)
     order_itter = this->orders.find(order_id);
     if (order_itter != this->orders.end())
     {
-        *pOrder = order_itter->second;
+        pOrder = order_itter->second;
 
         ret = RET_OK;
     }
@@ -113,7 +113,7 @@ static inline void CacheOrders_EventHandler_GetOrder(Event event)
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        ret = cache_orders.GetOrder(event.GetJsonData()["order_id"], &order);
+        ret = cache_orders.GetOrder(event.GetJsonData()["order_id"], order);
 
         if(RET_OK == ret)
         {

@@ -16,7 +16,7 @@ EventBus::~EventBus()
     // }
 }
 
-ReturnType EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(Event)> handler_func)
+ReturnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const function<void(Event)> handler_func)
 {
     ReturnType ret = RET_RECEIVER_EXISTS;
 
@@ -33,7 +33,7 @@ ReturnType EventBus::AddReceiver(enum eReceiverId_t receiver_id, function<void(E
     return ret;
 }
 
-ReturnType EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
+ReturnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
 {
     ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -60,7 +60,7 @@ ReturnType EventBus::RemoveReceiver(enum eReceiverId_t receiver_id)
     return ret;
 }
 
-ReturnType EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
+ReturnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id)
 {
     ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -86,7 +86,7 @@ ReturnType EventBus::Subscribe(enum eReceiverId_t receiver_id, enum eEventId_t e
     return ret;
 }
 
-ReturnType EventBus::Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t event_id)
+ReturnType EventBus::Unsubscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id)
 {
     ReturnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -117,7 +117,7 @@ ReturnType EventBus::Unsubscribe(enum eReceiverId_t receiver_id, enum eEventId_t
     return ret;
 }
 
-void EventBus::Send(Event event)
+void EventBus::Send(const Event event)
 {
     this->event_queue_lock.lock();
     this->event_queue.push(event);

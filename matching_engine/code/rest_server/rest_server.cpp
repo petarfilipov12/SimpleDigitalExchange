@@ -1,5 +1,13 @@
 #include "rest_server.h"
 
+#include "types.h"
+
+#include "event.h"
+#include "globals.h"
+
+#include<nlohmann/json.hpp>
+using json = nlohmann::json;
+
 using namespace httplib;
 using namespace std;
 
@@ -32,4 +40,118 @@ void RestServer::Post(string url_path, function<void(const Request &, Response &
 void RestServer::run()
 {
     this->svr->listen(this->host, this->port);
+}
+
+/******************************/
+/*Event_Handler Implementation*/
+/******************************/
+void RestServer::Handler_AddOrder(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+    j_data["order_id"] = rand();
+    j_data["filled"] = 0.0;
+    j_data["status"] = true;
+    j_data["order_added_timestamp"] = 0;
+
+    event_bus.Send(Event(EVENT_ID_ADD_ORDER, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_CancelOrder(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+
+    event_bus.Send(Event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_GetOrder(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+
+    event_bus.Send(Event(EVENT_ID_GET_ORDER, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_GetOrderBook(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+
+    event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_GetCandles(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+
+    event_bus.Send(Event(EVENT_ID_GET_CANDLES, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_GetTrades(const Request &req, Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+    json j_data = json::parse(req.body);
+
+    event_bus.Send(Event(EVENT_ID_GET_TRADES, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
 }

@@ -15,7 +15,6 @@
 #include "event_logger.h"
 
 #include "rest_server.h"
-#include "rest_server_handlers.h"
 
 #include "cache_orders.h"
 #include "cache_order_book_l2.h"
@@ -99,12 +98,12 @@ void Init_CacheTrades()
 
 void Init_RestServer()
 {
-    rest_server.Post("/add_order", RestServerHandler_AddOrder);
-    rest_server.Post("/cancel_order", RestServerHandler_CancelOrder);
-    rest_server.Post("/get_order", RestServerHandler_GetOrder);
-    rest_server.Post("/get_order_book", RestServerHandler_GetOrderBook);
-    rest_server.Post("/get_candles", RestServerHandler_GetCandles);
-    rest_server.Post("/get_trades", RestServerHandler_GetTrades);
+    rest_server.Post("/add_order", RestServer::Handler_AddOrder);
+    rest_server.Post("/cancel_order", RestServer::Handler_CancelOrder);
+    rest_server.Post("/get_order", RestServer::Handler_GetOrder);
+    rest_server.Post("/get_order_book", RestServer::Handler_GetOrderBook);
+    rest_server.Post("/get_candles", RestServer::Handler_GetCandles);
+    rest_server.Post("/get_trades", RestServer::Handler_GetTrades);
 
     thread thread_rest_server([]{rest_server.run();});
     thread_rest_server.detach();

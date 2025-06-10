@@ -28,7 +28,17 @@ public:
 
     void run();
 
+    static void Handler_AddOrder(const Request &req, Response &res);
 
+    static void Handler_CancelOrder(const Request &req, Response &res);
+
+    static void Handler_GetOrder(const Request &req, Response &res);
+
+    static void Handler_GetOrderBook(const Request &req, Response &res);
+
+    static void Handler_GetCandles(const Request &req, Response &res);
+
+    static void Handler_GetTrades(const Request &req, Response &res);
 };
 
 #endif

@@ -1,43 +1,41 @@
 #include "event_logger.h"
 
-#include <iostream>
-#include <unordered_map>
-
 #include "globals.h"
-#include "event_receiver.h"
 
-using namespace std;
+#include <iostream>
 
-unordered_map<enum eEventId_t, string> eventIdToStringMap = {
-    {EVENT_ID_ADD_ORDER, "EVENT_ID_ADD_ORDER"},
-    {EVENT_ID_CANCEL_ORDER, "EVENT_ID_CANCEL_ORDER"},
+EventLogger::EventLogger() {}
+EventLogger::~EventLogger() {}
 
-    {EVENT_ID_TAKER_ORDER_ADDED, "EVENT_ID_TAKER_ORDER_ADDED"},
-    {EVENT_ID_MAKER_ORDER_ADDED, "EVENT_ID_MAKER_ORDER_ADDED"},
-    {EVENT_ID_ADD_ORDER_FAILLED, "EVENT_ID_ADD_ORDER_FAILLED"},
-
-    {EVENT_ID_TAKER_ORDER_CANCELED, "EVENT_ID_TAKER_ORDER_CANCELED"},
-    {EVENT_ID_MAKER_ORDER_CANCELED, "EVENT_ID_MAKER_ORDER_CANCELED"},
-    {EVENT_ID_CANCEL_ORDER_FAILED, "EVENT_ID_CANCEL_ORDER_FAILED"},
-
-    {EVENT_ID_ORDER_FILLED, "EVENT_ID_ORDER_FILLED"},
-
-    {EVENT_ID_GET_ORDER, "EVENT_ID_GET_ORDER"},
-    {EVENT_ID_GET_ORDER_BOOK, "EVENT_ID_GET_ORDER_BOOK"},
-
-    {EVENT_ID_GET_CANDLES, "EVENT_ID_GET_CANDLES"},
-
-    {EVENT_ID_INVALID, "EVENT_ID_INVALID"}
-};
-
-void EventLogger_EventHandler(Event event)
+ReturnType EventLogger::ConvertEventIdToString(enum eEventId_t event_id, string& event_id_s)
 {
-    cout << "event_logger: event_id=" << eventIdToStringMap[event.GetEventId()] << ", data=" << event.GetJsonData() << endl;
+    ReturnType ret = RET_NOT_OK;
+
+    if(event_id <= EVENT_ID_INVALID)
+    {
+        event_id_s = this->eventIdToStringMap[event_id];
+
+        ret = RET_OK;
+    }
+
+    return ret;
 }
 
-void EventLogger_Subscribe()
+void EventLogger::EventHandler(Event event)
+{
+    string event_id_s;
+
+    if(RET_OK == event_logger.ConvertEventIdToString(event.GetEventId(), event_id_s))
+    {
+        cout << "event_logger: event_id=" << event_id_s << ", data=" << event.GetJsonData() << endl;
+    }
+}
+
+void EventLogger::init(EventBus& event_bus)
 {
     int event_id;
+
+    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger::EventHandler);
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {

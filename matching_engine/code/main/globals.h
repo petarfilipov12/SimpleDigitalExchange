@@ -4,6 +4,8 @@
 #include "event_bus.h"
 #include "engine.h"
 #include "rest_server.h"
+#include "event_logger.h"
+
 #include "cache_orders.h"
 #include "cache_order_book_l2.h"
 #include "cache_candles.h"
@@ -12,6 +14,8 @@
 extern EventBus event_bus;
 extern Engine engine;
 extern RestServer rest_server;
+extern EventLogger event_logger;
+
 extern CacheOrders cache_orders;
 extern Cache_OrderBookL2 cache_order_book_l2;
 extern CacheCandles cache_candles;

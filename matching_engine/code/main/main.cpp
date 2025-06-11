@@ -27,17 +27,12 @@ using namespace std;
 EventBus event_bus;
 Engine engine(event_bus);
 RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem");
+EventLogger event_logger;
 
 CacheOrders cache_orders;
 Cache_OrderBookL2 cache_order_book_l2;
 CacheCandles cache_candles;
 CacheTrades cache_trades;
-
-void Init_EventLogger()
-{
-    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger_EventHandler);
-    EventLogger_Subscribe();
-}
 
 int main(void){
     srand(time(0));
@@ -47,7 +42,7 @@ int main(void){
     // cout << "Start\n";
     
     EventBus::init(event_bus);
-    Init_EventLogger();
+    EventLogger::init(event_bus);
     CacheOrders::init(event_bus);
     Cache_OrderBookL2::init(event_bus);
     CacheCandles::init(cache_candles, event_bus);

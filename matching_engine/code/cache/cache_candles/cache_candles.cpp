@@ -99,7 +99,7 @@ ReturnType CacheCandles::GetCandles(int limit, json& data)const
     return RET_OK;
 }
 
-void CacheCandles::Init()
+void CacheCandles::InitFunc()
 {
     int sec_till_next_interval;
 
@@ -152,13 +152,26 @@ void CacheCandles::Cyclic()
 
 void CacheCandles::run()
 {
-    this->Init();
+    this->InitFunc();
 
     while (true)
     {
         sleep(this->interval);
         this->Cyclic();
     }
+}
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void CacheCandles::init(CacheCandles& cache_candles, EventBus& event_bus)
+{
+    thread thread_cache_candles([&cache_candles]{cache_candles.run();});
+    thread_cache_candles.detach();
+
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, CacheCandles::EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
 }
 
 /******************************/

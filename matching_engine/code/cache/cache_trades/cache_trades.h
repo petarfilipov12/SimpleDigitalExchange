@@ -9,6 +9,7 @@
 
 #include "trade.h"
 #include "event.h"
+#include "event_bus.h"
 
 using namespace std;
 
@@ -33,6 +34,8 @@ class CacheTrades
         ReturnType GetTrades(int limit, json& data)const;
 
         static void EventHandler(Event event);
+
+        static void init(EventBus& event_bus);
         
 };
 

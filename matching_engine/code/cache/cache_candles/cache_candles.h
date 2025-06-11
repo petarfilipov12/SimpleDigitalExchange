@@ -9,6 +9,7 @@
 
 #include "candle.h"
 #include "event.h"
+#include "event_bus.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ class CacheCandles
         mutable mutex candles_lock;
         mutable mutex current_candle_lock;
 
-        void Init();
+        void InitFunc();
 
         void Cyclic();
     
@@ -46,6 +47,8 @@ class CacheCandles
         void run();
 
         static void EventHandler(Event event);
+
+        static void init(CacheCandles& cache_candles, EventBus& event_bus);
 };
 
 #endif

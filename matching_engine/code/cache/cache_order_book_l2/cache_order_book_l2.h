@@ -8,6 +8,7 @@
 
 #include "order.h"
 #include "event.h"
+#include "event_bus.h"
 
 using namespace std;
 
@@ -33,6 +34,8 @@ class Cache_OrderBookL2
         ReturnType GetOrderBookL2(json& l2_book)const;
 
         static void EventHandler(Event event);
+
+        static void init(EventBus& event_bus);
 };
 
 #endif

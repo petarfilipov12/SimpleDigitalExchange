@@ -41,6 +41,21 @@ void RestServer::run()
 {
     this->svr->listen(this->host, this->port);
 }
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void RestServer::init(RestServer& rest_server)
+{
+    rest_server.Post("/add_order", RestServer::Handler_AddOrder);
+    rest_server.Post("/cancel_order", RestServer::Handler_CancelOrder);
+    rest_server.Post("/get_order", RestServer::Handler_GetOrder);
+    rest_server.Post("/get_order_book", RestServer::Handler_GetOrderBook);
+    rest_server.Post("/get_candles", RestServer::Handler_GetCandles);
+    rest_server.Post("/get_trades", RestServer::Handler_GetTrades);
+
+    thread thread_rest_server([&rest_server]{rest_server.run();});
+    thread_rest_server.detach();
+}
 
 /************************/
 /*Handler Implementation*/

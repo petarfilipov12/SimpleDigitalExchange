@@ -7,6 +7,7 @@
 
 #include "order.h"
 #include "event.h"
+#include "event_bus.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ class CacheOrders
         ReturnType GetOrder(const int order_id, Order& pOrder);
 
         static void EventHandler(Event event);
+
+        static void init(EventBus& event_bus);
 };
 
 #endif

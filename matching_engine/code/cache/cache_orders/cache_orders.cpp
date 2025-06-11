@@ -83,6 +83,19 @@ ReturnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 
     return ret;
 }
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void CacheOrders::init(EventBus& event_bus)
+{
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, CacheOrders::EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_MAKER_ORDER_CANCELED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_GET_ORDER);
+}
 
 /******************************/
 /*Event_Handler Implementation*/

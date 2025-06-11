@@ -43,6 +43,16 @@ ReturnType CacheTrades::GetTrades(int limit, json& data)const
 
     return RET_OK;
 }
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void CacheTrades::init(EventBus& event_bus)
+{
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, CacheTrades::EventHandler);
+    
+    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);
+}
 
 /******************************/
 /*Event_Handler Implementation*/

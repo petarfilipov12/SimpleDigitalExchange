@@ -41,6 +41,8 @@ class Engine{
         void run();
 
         static void EventHandler(Event event);
+
+        static void init(Engine& engine, EventBus& event_bus);
 };
 
 #endif

@@ -40,7 +40,9 @@ public:
 
     void Send(const Event& event);
 
-    void run(void);
+    void run();
+
+    static void init(EventBus& event_bus);
 };
 
 #endif

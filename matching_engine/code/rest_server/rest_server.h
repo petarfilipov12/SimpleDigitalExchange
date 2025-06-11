@@ -28,6 +28,8 @@ public:
 
     void run();
 
+    static void init(RestServer& rest_server);
+
     static void Handler_AddOrder(const Request &req, Response &res);
 
     static void Handler_CancelOrder(const Request &req, Response &res);

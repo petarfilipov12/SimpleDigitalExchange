@@ -243,11 +243,24 @@ void Engine::run()
         this->Cyclic();
     }
 }
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void Engine::init(Engine& engine, EventBus& event_bus)
+{
+    thread thread_engine([&engine]{engine.run();});
+    thread_engine.detach();
+
+    event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine::EventHandler);
+
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
+}
 
 /******************************/
 /*Event_Handler Implementation*/
 /******************************/
-static void Engine_EventHandler_AddOrder(Event event)
+static inline void Engine_EventHandler_AddOrder(Event event)
 {
     ReturnType ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
@@ -262,7 +275,7 @@ static void Engine_EventHandler_AddOrder(Event event)
 
 }
 
-static void Engine_EventHandler_CancelOrder(Event event)
+static inline void Engine_EventHandler_CancelOrder(Event event)
 {
     ReturnType ret;
 

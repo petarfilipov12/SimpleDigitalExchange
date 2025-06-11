@@ -158,3 +158,12 @@ void EventBus::run(void)
         this->Cyclic();
     }
 }
+
+/**************************/
+/*Init Func implementation*/
+/**************************/
+void EventBus::init(EventBus& event_bus)
+{
+    thread thread_event_bus([&event_bus]{event_bus.run();});
+    thread_event_bus.detach();
+}

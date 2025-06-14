@@ -1,8 +1,5 @@
 #include "cache_orders.h"
 
-
-#include "cache_orders_event_receiver.h"
-
 using namespace std;
 
 CacheOrders::CacheOrders() {}
@@ -89,7 +86,7 @@ ReturnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 /**************************/
 void CacheOrders::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(CacheOrders_EventReceiver(RECEIVER_ID_CACHE_ORDERS, *this));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, bind(&CacheOrders::EventHandler, this, placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);

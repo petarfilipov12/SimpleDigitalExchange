@@ -5,9 +5,6 @@
 #include <ctime>
 #include <thread>
 
-
-#include "cache_candles_event_receiver.h"
-
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
 
@@ -170,7 +167,7 @@ void CacheCandles::init(EventBus& event_bus)
     thread thread_cache_candles([this]{this->run();});
     thread_cache_candles.detach();
 
-    event_bus.AddReceiver(CacheCandles_EventReceiver(RECEIVER_ID_CACHE_CANDLES, *this));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, bind(&CacheCandles::EventHandler, this, placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);

@@ -4,14 +4,13 @@
 
 #include "event.h"
 
-
 #include<nlohmann/json.hpp>
 using json = nlohmann::json;
 
 using namespace httplib;
 using namespace std;
 
-RestServer::RestServer(const string& cert_path, const string& key_path, EventBus& event_busP): event_bus(event_busP)
+RestServer::RestServer(const string& cert_path, const string& key_path, EventBus& event_bus): event_bus(event_bus)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -19,7 +18,7 @@ RestServer::RestServer(const string& cert_path, const string& key_path, EventBus
     this->port = 8080;
 }
 
-RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_busP): event_bus(event_busP)
+RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_bus): event_bus(event_bus)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -32,6 +31,11 @@ RestServer::~RestServer()
     delete this->svr;
 }
 
+void RestServer::Post(const string& url_path, const function<void(const Request &, Response &)> handler_func)
+{
+    this->svr->Post(url_path, handler_func);
+}
+
 void RestServer::run()
 {
     this->svr->listen(this->host, this->port);
@@ -41,14 +45,12 @@ void RestServer::run()
 /**************************/
 void RestServer::init()
 {
-    this->svr->Post("/add_order", [](const Request &req, Response &res){res.set_content({"testkey", "testval"}, "application/json");});
-
-    // this->svr->Post("/add_order", [this](const Request &req, Response &res){this->Handler_AddOrder(req, res);});
-    // this->svr->Post("/cancel_order", httplib::SSLServer::Handler(bind(&RestServer::Handler_CancelOrder, this, placeholders::_1, placeholders::_2)));
-    // this->svr->Post("/get_order", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetOrder, this, placeholders::_1, placeholders::_2)));
-    // this->svr->Post("/get_order_book", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetOrderBook, this, placeholders::_1, placeholders::_2)));
-    // this->svr->Post("/get_candles", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetCandles, this, placeholders::_1, placeholders::_2)));
-    // this->svr->Post("/get_trades", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetTrades, this, placeholders::_1, placeholders::_2)));
+    this->Post("/add_order", bind(&RestServer::Handler_AddOrder, this, placeholders::_1, placeholders::_2));
+    this->Post("/cancel_order", bind(&RestServer::Handler_CancelOrder, this, placeholders::_1, placeholders::_2));
+    this->Post("/get_order", bind(&RestServer::Handler_GetOrder, this, placeholders::_1, placeholders::_2));
+    this->Post("/get_order_book", bind(&RestServer::Handler_GetOrderBook, this, placeholders::_1, placeholders::_2));
+    this->Post("/get_candles", bind(&RestServer::Handler_GetCandles, this, placeholders::_1, placeholders::_2));
+    this->Post("/get_trades", bind(&RestServer::Handler_GetTrades, this, placeholders::_1, placeholders::_2));
 
     thread thread_rest_server([this]{this->run();});
     thread_rest_server.detach();

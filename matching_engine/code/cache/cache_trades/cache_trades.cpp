@@ -2,9 +2,6 @@
 
 #include <ctime>
 
-
-#include "cache_trades_event_receiver.h"
-
 CacheTrades::CacheTrades() {}
 CacheTrades::~CacheTrades() {}
 
@@ -49,7 +46,7 @@ ReturnType CacheTrades::GetTrades(int limit, json& data)const
 /**************************/
 void CacheTrades::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(CacheTrades_EventReceiver(RECEIVER_ID_CACHE_TRADES, *this));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, bind(&CacheTrades::EventHandler, this, placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);

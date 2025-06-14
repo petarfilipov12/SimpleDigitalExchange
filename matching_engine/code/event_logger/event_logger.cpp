@@ -1,8 +1,5 @@
 #include "event_logger.h"
 
-
-#include "event_logger_event_receiver.h"
-
 #include <iostream>
 
 EventLogger::EventLogger() {}
@@ -36,7 +33,7 @@ void EventLogger::init(EventBus& event_bus)
 {
     int event_id;
 
-    event_bus.AddReceiver(EventLogger_EventReceiver(RECEIVER_ID_EVENT_LOGGER, *this));
+    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, bind(&EventLogger::EventHandler, this, placeholders::_1));
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {

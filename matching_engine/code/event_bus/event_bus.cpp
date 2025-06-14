@@ -16,14 +16,15 @@ EventBus::~EventBus()
     // }
 }
 
-ReturnType EventBus::AddReceiver(const EventReceiver& event_receiver)
+ReturnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const function<void(Event)> handler_func)
 {
     ReturnType ret = RET_RECEIVER_EXISTS;
 
     this->receivers_lock.lock();
-    if (this->event_receivers.find(event_receiver.GetId()) == this->event_receivers.end())
+    if (this->event_receivers.find(receiver_id) == this->event_receivers.end())
     {
-        this->event_receivers[event_receiver.GetId()] = event_receiver;
+        EventReceiver receiver = EventReceiver(receiver_id, handler_func);
+        this->event_receivers[receiver_id] = receiver;
 
         ret = RET_OK;
     }
@@ -68,9 +69,7 @@ ReturnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const enum 
         this->receivers_lock.lock();
         if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
-            EventReceiver receiver = this->event_receivers[receiver_id];
-
-            receiver.AddEvent(event_id);
+            this->event_receivers[receiver_id].AddEvent(event_id);
             this->events_to_receivers_map[event_id].insert(receiver_id);
 
             ret = RET_OK;
@@ -142,7 +141,7 @@ void EventBus::Cyclic(void)
         {
             for (auto receiver_id : this->events_to_receivers_map[event.GetEventId()])
             {
-                thread t([this, receiver_id, event]{this->event_receivers[receiver_id].CallEventHandler(event);});
+                thread t(this->event_receivers[receiver_id].GetCallback(), event);
                 t.detach();
             }
         }

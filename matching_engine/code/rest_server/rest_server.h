@@ -5,6 +5,7 @@
 #include "httplib.h"
 
 #include <string>
+#include <functional>
 
 #include "event_bus.h"
 
@@ -17,14 +18,17 @@ private:
     SSLServer *svr;
     string host;
     unsigned int port;
+
     EventBus& event_bus;
 
 public:
-    RestServer(const string& cert_path, const string& key_path, EventBus& event_busP);
+    RestServer(const string& cert_path, const string& key_path, EventBus& event_bus);
 
-    RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_busP);
+    RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_bus);
 
     ~RestServer();
+
+    void Post(const string& url_path, const function<void(const Request&, Response&)> handler_func);
 
     void run();
 

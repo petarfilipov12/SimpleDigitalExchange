@@ -2,8 +2,6 @@
 
 #include <thread>
 
-#include "engine_event_receiver.h"
-
 Engine::Engine(EventBus& event_busP): event_bus(event_busP)
 {
     //this->event_bus = (EventBus *)event_bus;
@@ -253,7 +251,7 @@ void Engine::init()
     thread thread_engine([this]{this->run();});
     thread_engine.detach();
 
-    this->event_bus.AddReceiver(Engine_EventReceiver(RECEIVER_ID_ENGINE, *this));
+    this->event_bus.AddReceiver(RECEIVER_ID_ENGINE, bind(&Engine::EventHandler, this, placeholders::_1));
 
     this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);

@@ -7,9 +7,10 @@ EventReceiver::EventReceiver()
     this->id = RECEIVER_ID_INVALID;
 };
 
-EventReceiver::EventReceiver(const enum eReceiverId_t id)
+EventReceiver::EventReceiver(const enum eReceiverId_t id, const function<void(Event)> callback)
 {
     this->id = id;
+    this->callback = callback;
 }
 
 EventReceiver::~EventReceiver()
@@ -45,6 +46,11 @@ unordered_set<enum eEventId_t> EventReceiver::GetEvents() const
 enum eReceiverId_t EventReceiver::GetId() const
 {
     return this->id;
+}
+
+function<void(Event)> EventReceiver::GetCallback() const
+{
+    return this->callback;
 }
 
 bool EventReceiver::operator<(const EventReceiver &event_receiver2) const

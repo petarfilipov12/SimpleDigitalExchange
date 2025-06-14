@@ -3,7 +3,6 @@
 #include "unistd.h"
 
 #include "event.h"
-#include "cache_order_book_l2_event_receiver.h"
 
 using namespace std;
 
@@ -167,8 +166,8 @@ ReturnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
 /**************************/
 void CacheOrderBookL2::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(CacheOrderBookL2_EventReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, *this));
-    
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, bind(&CacheOrderBookL2::EventHandler, this, placeholders::_1));
+
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_CANCELED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_FILLED);

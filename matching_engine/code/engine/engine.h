@@ -22,6 +22,10 @@ class Engine{
         ReturnType MatchTakerOrder(Order& pTakerOrder);
         
         void Cyclic();
+
+        void EventHandler_AddOrder(Event& event);
+
+        void EventHandler_CancelOrder(Event& event);
     
     public:
         Engine(EventBus& event_busP);
@@ -40,9 +44,9 @@ class Engine{
         
         void run();
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(Engine& engine, EventBus& event_bus);
+        void init();
 };
 
 #endif

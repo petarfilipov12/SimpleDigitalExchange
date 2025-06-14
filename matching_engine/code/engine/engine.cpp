@@ -1,6 +1,8 @@
 #include "engine.h"
 
-#include "globals.h"
+#include <thread>
+
+#include "engine_event_receiver.h"
 
 Engine::Engine(EventBus& event_busP): event_bus(event_busP)
 {
@@ -246,26 +248,26 @@ void Engine::run()
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void Engine::init(Engine& engine, EventBus& event_bus)
+void Engine::init()
 {
-    thread thread_engine([&engine]{engine.run();});
+    thread thread_engine([this]{this->run();});
     thread_engine.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_ENGINE, Engine::EventHandler);
+    this->event_bus.AddReceiver(Engine_EventReceiver(RECEIVER_ID_ENGINE, *this));
 
-    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
-    event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
+    this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
+    this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
 }
 
 /******************************/
 /*Event_Handler Implementation*/
 /******************************/
-static inline void Engine_EventHandler_AddOrder(Event event)
+void Engine::EventHandler_AddOrder(Event& event)
 {
     ReturnType ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
 
-    ret = engine.AddOrder(Order::ConvertJsonToOrder(j_data));
+    ret = this->AddOrder(Order::ConvertJsonToOrder(j_data));
 
     if(nullptr != event.GetResponceDataPtr())
     {
@@ -275,11 +277,11 @@ static inline void Engine_EventHandler_AddOrder(Event event)
 
 }
 
-static inline void Engine_EventHandler_CancelOrder(Event event)
+void Engine::EventHandler_CancelOrder(Event& event)
 {
     ReturnType ret;
 
-    ret = engine.CancelOrderById(event.GetJsonData()["order_id"]);
+    ret = this->CancelOrderById(event.GetJsonData()["order_id"]);
 
     if(nullptr != event.GetResponceDataPtr())
     {
@@ -293,10 +295,10 @@ void Engine::EventHandler(Event event)
     switch(event.GetEventId())
     {
         case EVENT_ID_ADD_ORDER:
-            Engine_EventHandler_AddOrder(event);
+            this->EventHandler_AddOrder(event);
             break;
         case EVENT_ID_CANCEL_ORDER:
-            Engine_EventHandler_CancelOrder(event);
+            this->EventHandler_CancelOrder(event);
             break;
         default:
             break;

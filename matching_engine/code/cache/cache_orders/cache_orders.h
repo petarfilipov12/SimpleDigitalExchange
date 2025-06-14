@@ -19,6 +19,14 @@ class CacheOrders
         mutable mutex order_lock;
 
         ReturnType OrderChange(const int order_id, const float quantity);
+
+        void EventHandler_OrderAdded(Event& event);
+
+        void EventHandler_OrderCanceled(Event& event);
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetOrder(Event& event);
     
     public:
         CacheOrders();
@@ -32,9 +40,9 @@ class CacheOrders
 
         ReturnType GetOrder(const int order_id, Order& pOrder);
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(EventBus& event_bus);
+        void init(EventBus& event_bus);
 };
 
 #endif

@@ -38,7 +38,9 @@ def AddOrder(priceP, qtyP, sideP, typeP):
     data["order_type"] = typeP
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json=data, verify=path_to_pub_key).json()
+    print("TUK1")
+    resp = requests.post(url, json=data, verify=path_to_pub_key)#.json()
+    print("TUK2")
 
     return resp
 
@@ -91,11 +93,11 @@ def main():
         #data = InputOrder()
         
         order = AddOrder(data["price"], data["qty"], data["side"], data["order_type"])
-        print(order)
+        print(order.content)
         print()
 
-        time.sleep(0.2)
-        #input("Press Enter")
+        #time.sleep(0.2)
+        input("Press Enter")
 
     
 

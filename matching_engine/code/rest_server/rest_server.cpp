@@ -3,7 +3,7 @@
 #include "types.h"
 
 #include "event.h"
-#include "globals.h"
+
 
 #include<nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -11,7 +11,7 @@ using json = nlohmann::json;
 using namespace httplib;
 using namespace std;
 
-RestServer::RestServer(const string& cert_path, const string& key_path)
+RestServer::RestServer(const string& cert_path, const string& key_path, EventBus& event_busP): event_bus(event_busP)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -19,7 +19,7 @@ RestServer::RestServer(const string& cert_path, const string& key_path)
     this->port = 8080;
 }
 
-RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port)
+RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_busP): event_bus(event_busP)
 {
     this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
 
@@ -32,11 +32,6 @@ RestServer::~RestServer()
     delete this->svr;
 }
 
-void RestServer::Post(const string& url_path, const function<void(const Request &, Response &)> handler_func)
-{
-    this->svr->Post(url_path, handler_func);
-}
-
 void RestServer::run()
 {
     this->svr->listen(this->host, this->port);
@@ -44,16 +39,18 @@ void RestServer::run()
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void RestServer::init(RestServer& rest_server)
+void RestServer::init()
 {
-    rest_server.Post("/add_order", RestServer::Handler_AddOrder);
-    rest_server.Post("/cancel_order", RestServer::Handler_CancelOrder);
-    rest_server.Post("/get_order", RestServer::Handler_GetOrder);
-    rest_server.Post("/get_order_book", RestServer::Handler_GetOrderBook);
-    rest_server.Post("/get_candles", RestServer::Handler_GetCandles);
-    rest_server.Post("/get_trades", RestServer::Handler_GetTrades);
+    this->svr->Post("/add_order", [](const Request &req, Response &res){res.set_content({"testkey", "testval"}, "application/json");});
 
-    thread thread_rest_server([&rest_server]{rest_server.run();});
+    // this->svr->Post("/add_order", [this](const Request &req, Response &res){this->Handler_AddOrder(req, res);});
+    // this->svr->Post("/cancel_order", httplib::SSLServer::Handler(bind(&RestServer::Handler_CancelOrder, this, placeholders::_1, placeholders::_2)));
+    // this->svr->Post("/get_order", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetOrder, this, placeholders::_1, placeholders::_2)));
+    // this->svr->Post("/get_order_book", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetOrderBook, this, placeholders::_1, placeholders::_2)));
+    // this->svr->Post("/get_candles", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetCandles, this, placeholders::_1, placeholders::_2)));
+    // this->svr->Post("/get_trades", httplib::SSLServer::Handler(bind(&RestServer::Handler_GetTrades, this, placeholders::_1, placeholders::_2)));
+
+    thread thread_rest_server([this]{this->run();});
     thread_rest_server.detach();
 }
 
@@ -72,7 +69,7 @@ void RestServer::Handler_AddOrder(const Request &req, Response &res)
     j_data["status"] = true;
     j_data["order_added_timestamp"] = 0;
 
-    event_bus.Send(Event(EVENT_ID_ADD_ORDER, j_data, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_ADD_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -90,7 +87,7 @@ void RestServer::Handler_CancelOrder(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    event_bus.Send(Event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_CANCEL_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -108,7 +105,7 @@ void RestServer::Handler_GetOrder(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    event_bus.Send(Event(EVENT_ID_GET_ORDER, j_data, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_GET_ORDER, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -125,7 +122,7 @@ void RestServer::Handler_GetOrderBook(const Request &req, Response &res)
         {"data", {}}
     };
 
-    event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -143,7 +140,7 @@ void RestServer::Handler_GetCandles(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    event_bus.Send(Event(EVENT_ID_GET_CANDLES, j_data, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_GET_CANDLES, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {
@@ -161,7 +158,7 @@ void RestServer::Handler_GetTrades(const Request &req, Response &res)
     };
     json j_data = json::parse(req.body);
 
-    event_bus.Send(Event(EVENT_ID_GET_TRADES, j_data, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_GET_TRADES, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {

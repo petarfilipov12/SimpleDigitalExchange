@@ -15,7 +15,7 @@ using namespace std;
 #include<nlohmann/json.hpp>
 using json = nlohmann::json;
 
-class Cache_OrderBookL2
+class CacheOrderBookL2
 {
     private:
         map<string, float, greater<string> > bid_book_l2;
@@ -23,6 +23,14 @@ class Cache_OrderBookL2
 
         mutable mutex bid_book_l2_look;
         mutable mutex ask_book_l2_look;
+
+        void EventHandler_OrderAdded(Event& event);
+
+        void EventHandler_OrderCanceled(Event& event);
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetOrderBookL2(Event& event);
 
     public:
         ReturnType OrderAdded(const Order& order);
@@ -33,9 +41,9 @@ class Cache_OrderBookL2
 
         ReturnType GetOrderBookL2(json& l2_book)const;
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(EventBus& event_bus);
+        void init(EventBus& event_bus);
 };
 
 #endif

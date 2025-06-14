@@ -39,9 +39,9 @@ class EventLogger
 
         ReturnType ConvertEventIdToString(enum eEventId_t event_id, string& event_id_s);
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(EventBus& event_bus);
+        void init(EventBus& event_bus);
 };
 
 #endif

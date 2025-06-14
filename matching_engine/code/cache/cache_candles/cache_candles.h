@@ -35,6 +35,10 @@ class CacheCandles
         void InitFunc();
 
         void Cyclic();
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetCandles(Event& event);
     
     public:
         CacheCandles();
@@ -46,9 +50,9 @@ class CacheCandles
         
         void run();
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(CacheCandles& cache_candles, EventBus& event_bus);
+        void init(EventBus& event_bus);
 };
 
 #endif

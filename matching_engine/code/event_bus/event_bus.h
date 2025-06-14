@@ -30,7 +30,7 @@ public:
 
     ~EventBus();
 
-    ReturnType AddReceiver(const enum eReceiverId_t receiver_id, const function<void(Event)> handler_func);
+    ReturnType AddReceiver(const EventReceiver& event_receiver);
 
     ReturnType RemoveReceiver(const enum eReceiverId_t receiver_id);
 
@@ -42,7 +42,7 @@ public:
 
     void run();
 
-    static void init(EventBus& event_bus);
+    void init();
 };
 
 #endif

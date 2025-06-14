@@ -24,6 +24,10 @@ class CacheTrades
         vector<sTrade> trades;
 
         mutable mutex trades_lock;
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetTrades(Event& event);
     
     public:
         CacheTrades();
@@ -33,9 +37,9 @@ class CacheTrades
 
         ReturnType GetTrades(int limit, json& data)const;
 
-        static void EventHandler(Event event);
+        void EventHandler(Event event);
 
-        static void init(EventBus& event_bus);
+        void init(EventBus& event_bus);
         
 };
 

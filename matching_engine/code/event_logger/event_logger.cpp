@@ -1,6 +1,7 @@
 #include "event_logger.h"
 
-#include "globals.h"
+
+#include "event_logger_event_receiver.h"
 
 #include <iostream>
 
@@ -25,7 +26,7 @@ void EventLogger::EventHandler(Event event)
 {
     string event_id_s;
 
-    if(RET_OK == event_logger.ConvertEventIdToString(event.GetEventId(), event_id_s))
+    if(RET_OK == this->ConvertEventIdToString(event.GetEventId(), event_id_s))
     {
         cout << "event_logger: event_id=" << event_id_s << ", data=" << event.GetJsonData() << endl;
     }
@@ -35,7 +36,7 @@ void EventLogger::init(EventBus& event_bus)
 {
     int event_id;
 
-    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, EventLogger::EventHandler);
+    event_bus.AddReceiver(EventLogger_EventReceiver(RECEIVER_ID_EVENT_LOGGER, *this));
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {

@@ -25,11 +25,10 @@ class EventReceiver
 private:
     enum eReceiverId_t id;
     unordered_set<enum eEventId_t> events;
-    function<void(Event)> callback;
 public:
     EventReceiver();
 
-    EventReceiver(const enum eReceiverId_t id, const function<void(Event)> callback);
+    EventReceiver(const enum eReceiverId_t id);
 
     ~EventReceiver();
 
@@ -45,7 +44,7 @@ public:
 
     enum eReceiverId_t GetId() const;
 
-    function<void(Event)> GetCallback() const;
+    /*virtual*/ void CallEventHandler(const Event& event) const {}
 
     bool operator<(const EventReceiver &event_receiver2) const;
 };

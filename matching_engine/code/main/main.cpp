@@ -1,17 +1,11 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include <thread>
 
-#include "globals.h"
 
 #include "engine.h"
-#include "order.h"
-
-#include "event.h"
 #include "event_bus.h"
 
 #include "engine.h"
-#include "event_receiver.h"
 #include "event_logger.h"
 
 #include "rest_server.h"
@@ -24,16 +18,6 @@
 using json = nlohmann::json;
 using namespace std;
 
-EventBus event_bus;
-Engine engine(event_bus);
-RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem");
-EventLogger event_logger;
-
-CacheOrders cache_orders;
-Cache_OrderBookL2 cache_order_book_l2;
-CacheCandles cache_candles;
-CacheTrades cache_trades;
-
 int main(void){
     srand(time(0));
 
@@ -41,14 +25,24 @@ int main(void){
     // sleep(60);
     // cout << "Start\n";
     
-    EventBus::init(event_bus);
-    EventLogger::init(event_bus);
-    CacheOrders::init(event_bus);
-    Cache_OrderBookL2::init(event_bus);
-    CacheCandles::init(cache_candles, event_bus);
-    CacheTrades::init(event_bus);
-    Engine::init(engine, event_bus);
-    RestServer::init(rest_server);
+    EventBus event_bus;
+    Engine engine(event_bus);
+    RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem", event_bus);
+    EventLogger event_logger;
+
+    CacheOrders cache_orders;
+    CacheOrderBookL2 cache_order_book_l2;
+    CacheCandles cache_candles;
+    CacheTrades cache_trades;
+
+    event_bus.init();
+    event_logger.init(event_bus);
+    cache_orders.init(event_bus);
+    cache_order_book_l2.init(event_bus);
+    cache_candles.init(event_bus);
+    cache_trades.init(event_bus);
+    engine.init();
+    rest_server.init();
 
     while(true)
     {

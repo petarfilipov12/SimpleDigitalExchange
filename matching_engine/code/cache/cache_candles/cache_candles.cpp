@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <unistd.h>
 #include <ctime>
+#include <thread>
 
-#include "globals.h"
+
+#include "cache_candles_event_receiver.h"
 
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
@@ -163,12 +165,12 @@ void CacheCandles::run()
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void CacheCandles::init(CacheCandles& cache_candles, EventBus& event_bus)
+void CacheCandles::init(EventBus& event_bus)
 {
-    thread thread_cache_candles([&cache_candles]{cache_candles.run();});
+    thread thread_cache_candles([this]{this->run();});
     thread_cache_candles.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, CacheCandles::EventHandler);
+    event_bus.AddReceiver(CacheCandles_EventReceiver(RECEIVER_ID_CACHE_CANDLES, *this));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
@@ -177,19 +179,19 @@ void CacheCandles::init(CacheCandles& cache_candles, EventBus& event_bus)
 /******************************/
 /*Event_Handler Implementation*/
 /******************************/
-static inline void CacheCandles_EventHandler_OrderFilled(Event event)
+void CacheCandles::EventHandler_OrderFilled(Event& event)
 {
-    cache_candles.OrderFilled(event.GetJsonData()["price"]);
+    this->OrderFilled(event.GetJsonData()["price"]);
 }
 
-static inline void CacheCandles_EventHandler_GetCandles(Event event)
+void CacheCandles::EventHandler_GetCandles(Event& event)
 {
     json candles;
     ReturnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {
-        ret = cache_candles.GetCandles(event.GetJsonData()["limit"], candles);
+        ret = this->GetCandles(event.GetJsonData()["limit"], candles);
 
         if(RET_OK == ret)
         {
@@ -205,10 +207,10 @@ void CacheCandles::EventHandler(Event event)
     switch(event.GetEventId())
     {
         case EVENT_ID_ORDER_FILLED:
-            CacheCandles_EventHandler_OrderFilled(event);
+            this->EventHandler_OrderFilled(event);
             break;
         case EVENT_ID_GET_CANDLES:
-            CacheCandles_EventHandler_GetCandles(event);
+            this->EventHandler_GetCandles(event);
             break;
         default:
             break;

@@ -8,7 +8,7 @@
 CacheCandles::CacheCandles() {}
 CacheCandles::~CacheCandles() {}
 
-ReturnType CacheCandles::OrderFilled(const string& price_s)
+returnType CacheCandles::OrderFilled(const std::string& price_s)
 {
     const float price_f = stof(price_s);
 
@@ -45,11 +45,11 @@ ReturnType CacheCandles::OrderFilled(const string& price_s)
     return RET_OK;
 }
 
-ReturnType CacheCandles::GetCandles(int limit, json& data)const
+returnType CacheCandles::GetCandles(int limit, json& data)const
 {
-    vector<Candle> temp;
-    vector<Candle>::size_type candles_size;
-    Candle temp_candle;
+    std::vector<candle::Candle> temp;
+    std::vector<candle::Candle>::size_type candles_size;
+    candle::Candle temp_candle;
 
     this->candles_lock.lock();
     candles_size = this->candles.size();
@@ -69,13 +69,13 @@ ReturnType CacheCandles::GetCandles(int limit, json& data)const
             }
 
             this->candles_lock.lock();
-            temp = vector<Candle>((this->candles.end() - limit), this->candles.end());
+            temp = std::vector<candle::Candle>((this->candles.end() - limit), this->candles.end());
             this->candles_lock.unlock();
         }
         
         if (temp_candle.IsEmpty())
         {
-            temp_candle = Candle(temp.back().close, this->current_timestamp);
+            temp_candle = candle::Candle(temp.back().close, this->current_timestamp);
         }
         else
         {
@@ -114,26 +114,26 @@ void CacheCandles::InitFunc()
 
 void CacheCandles::Cyclic()
 {
-    Candle candle;
+    candle::Candle candle;
     time_t next_timestamp = this->current_timestamp + this->interval;
 
     this->current_candle_lock.lock();
     if (this->current_candle.IsEmpty())
     {
-        this->current_candle = Candle(next_timestamp);
+        this->current_candle = candle::Candle(next_timestamp);
         this->current_candle_lock.unlock();
 
         this->candles_lock.lock();
         if(!this->candles.empty())
         {
-            this->candles.push_back(Candle(this->candles.back().close, this->current_timestamp));
+            this->candles.push_back(candle::Candle(this->candles.back().close, this->current_timestamp));
         }
         this->candles_lock.unlock();
     }
     else
     {
         candle = this->current_candle;
-        this->current_candle = Candle(next_timestamp);
+        this->current_candle = candle::Candle(next_timestamp);
         this->current_candle_lock.unlock();
 
         if(candle.timestamp != this->current_timestamp)
@@ -164,10 +164,10 @@ void CacheCandles::run()
 /**************************/
 void CacheCandles::init(EventBus& event_bus)
 {
-    thread thread_cache_candles([this]{this->run();});
+    std::thread thread_cache_candles([this]{this->run();});
     thread_cache_candles.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, bind(&CacheCandles::EventHandler, this, placeholders::_1));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, std::bind(&CacheCandles::EventHandler, this, std::placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
@@ -184,7 +184,7 @@ void CacheCandles::EventHandler_OrderFilled(Event& event)
 void CacheCandles::EventHandler_GetCandles(Event& event)
 {
     json candles;
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

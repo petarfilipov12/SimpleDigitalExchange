@@ -1,26 +1,24 @@
 #include "rest_server.h"
 
-#include "types.h"
+#include "return_type.h"
 
 #include "event.h"
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+#include "json.h"
 
-using namespace httplib;
-using namespace std;
 
-RestServer::RestServer(const string& cert_path, const string& key_path, EventBus& event_bus): event_bus(event_bus)
+
+RestServer::RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus): event_bus(event_bus)
 {
-    this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
+    this->svr = new httplib::SSLServer(cert_path.c_str(), key_path.c_str());
 
     this->host = "0.0.0.0";
     this->port = 8080;
 }
 
-RestServer::RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_bus): event_bus(event_bus)
+RestServer::RestServer(const std::string& cert_path, const std::string& key_path, const std::string& host, const unsigned int port, EventBus& event_bus): event_bus(event_bus)
 {
-    this->svr = new SSLServer(cert_path.c_str(), key_path.c_str());
+    this->svr = new httplib::SSLServer(cert_path.c_str(), key_path.c_str());
 
     this->host = host;
     this->port = port;
@@ -31,7 +29,7 @@ RestServer::~RestServer()
     delete this->svr;
 }
 
-void RestServer::Post(const string& url_path, const function<void(const Request &, Response &)> handler_func)
+void RestServer::Post(const std::string& url_path, const std::function<void(const httplib::Request &, httplib::Response &)> handler_func)
 {
     this->svr->Post(url_path, handler_func);
 }
@@ -45,21 +43,21 @@ void RestServer::run()
 /**************************/
 void RestServer::init()
 {
-    this->Post("/add_order", bind(&RestServer::Handler_AddOrder, this, placeholders::_1, placeholders::_2));
-    this->Post("/cancel_order", bind(&RestServer::Handler_CancelOrder, this, placeholders::_1, placeholders::_2));
-    this->Post("/get_order", bind(&RestServer::Handler_GetOrder, this, placeholders::_1, placeholders::_2));
-    this->Post("/get_order_book", bind(&RestServer::Handler_GetOrderBook, this, placeholders::_1, placeholders::_2));
-    this->Post("/get_candles", bind(&RestServer::Handler_GetCandles, this, placeholders::_1, placeholders::_2));
-    this->Post("/get_trades", bind(&RestServer::Handler_GetTrades, this, placeholders::_1, placeholders::_2));
+    this->Post("/add_order", std::bind(&RestServer::Handler_AddOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/cancel_order", std::bind(&RestServer::Handler_CancelOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_order", std::bind(&RestServer::Handler_GetOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_order_book", std::bind(&RestServer::Handler_GetOrderBook, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_candles", std::bind(&RestServer::Handler_GetCandles, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_trades", std::bind(&RestServer::Handler_GetTrades, this, std::placeholders::_1, std::placeholders::_2));
 
-    thread thread_rest_server([this]{this->run();});
+    std::thread thread_rest_server([this]{this->run();});
     thread_rest_server.detach();
 }
 
 /************************/
 /*Handler Implementation*/
 /************************/
-void RestServer::Handler_AddOrder(const Request &req, Response &res)
+void RestServer::Handler_AddOrder(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},
@@ -81,7 +79,7 @@ void RestServer::Handler_AddOrder(const Request &req, Response &res)
     res.set_content(responce_data.dump(), "application/json");
 }
 
-void RestServer::Handler_CancelOrder(const Request &req, Response &res)
+void RestServer::Handler_CancelOrder(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},
@@ -99,7 +97,7 @@ void RestServer::Handler_CancelOrder(const Request &req, Response &res)
     res.set_content(responce_data.dump(), "application/json");
 }
 
-void RestServer::Handler_GetOrder(const Request &req, Response &res)
+void RestServer::Handler_GetOrder(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},
@@ -117,7 +115,7 @@ void RestServer::Handler_GetOrder(const Request &req, Response &res)
     res.set_content(responce_data.dump(), "application/json");
 }
 
-void RestServer::Handler_GetOrderBook(const Request &req, Response &res)
+void RestServer::Handler_GetOrderBook(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},
@@ -134,7 +132,7 @@ void RestServer::Handler_GetOrderBook(const Request &req, Response &res)
     res.set_content(responce_data.dump(), "application/json");
 }
 
-void RestServer::Handler_GetCandles(const Request &req, Response &res)
+void RestServer::Handler_GetCandles(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},
@@ -152,7 +150,7 @@ void RestServer::Handler_GetCandles(const Request &req, Response &res)
     res.set_content(responce_data.dump(), "application/json");
 }
 
-void RestServer::Handler_GetTrades(const Request &req, Response &res)
+void RestServer::Handler_GetTrades(const httplib::Request &req, httplib::Response &res)
 {
     json responce_data = {
         {"error", RET_INVALID},

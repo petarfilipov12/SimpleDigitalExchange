@@ -1,9 +1,5 @@
 #include "order_book.h"
 
-#include <iostream>
-
-using namespace std;
-
 OrderBook::OrderBook() {}
 
 OrderBook::~OrderBook()
@@ -44,9 +40,9 @@ bool OrderBook::ExistsOrderId(const int id) const
     return ret;
 }
 
-ReturnType OrderBook::AddOrder(const Order& order)
+returnType OrderBook::AddOrder(const Order& order)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if (order.order_side == ORDER_SIDE_BUY)
     {
@@ -64,14 +60,14 @@ ReturnType OrderBook::AddOrder(const Order& order)
     return ret;
 }
 
-ReturnType OrderBook::CancelOrder(const Order& order, Order *pOrder)
+returnType OrderBook::CancelOrder(const Order& order, Order *pOrder)
 {
     return this->CancelOrderById(order.id, pOrder);
 }
 
-ReturnType OrderBook::CancelOrderById(const int id, Order *pOrder)
+returnType OrderBook::CancelOrderById(const int id, Order *pOrder)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
+    returnType ret = RET_ORDER_NOT_EXISTS;
 
     if ((RET_OK == this->bid_book.CancelOrderById(id, pOrder)) ||
         (RET_OK == this->ask_book.CancelOrderById(id, pOrder)))
@@ -82,12 +78,12 @@ ReturnType OrderBook::CancelOrderById(const int id, Order *pOrder)
     return ret;
 }
 
-ReturnType OrderBook::GetBidFirst(Order **pOrder)
+returnType OrderBook::GetBidFirst(Order **pOrder)
 {
     return this->bid_book.GetFirst(pOrder);
 }
 
-ReturnType OrderBook::GetAskFirst(Order **pOrder)
+returnType OrderBook::GetAskFirst(Order **pOrder)
 {
     return this->ask_book.GetFirst(pOrder);
 }

@@ -5,19 +5,19 @@
 CacheTrades::CacheTrades() {}
 CacheTrades::~CacheTrades() {}
 
-ReturnType CacheTrades::OrderFilled(const string& price, const float quantity)
+returnType CacheTrades::OrderFilled(const std::string& price, const float quantity)
 {
     this->trades_lock.lock();
-    this->trades.push_back((struct sTrade){price, quantity, time(nullptr)});
+    this->trades.push_back((struct trade::sTrade){price, quantity, time(nullptr)});
     this->trades_lock.unlock();
     
     return RET_OK;
 }
 
-ReturnType CacheTrades::GetTrades(int limit, json& data)const
+returnType CacheTrades::GetTrades(int limit, json& data)const
 {
-    vector<sTrade> temp;
-    vector<sTrade>::size_type trades_size;
+    std::vector<trade::sTrade> temp;
+    std::vector<trade::sTrade>::size_type trades_size;
 
     this->trades_lock.lock();
     trades_size = this->trades.size();
@@ -31,7 +31,7 @@ ReturnType CacheTrades::GetTrades(int limit, json& data)const
         }
 
         this->trades_lock.lock();
-        temp = vector<sTrade>((this->trades.end() - limit), this->trades.end());
+        temp = std::vector<trade::sTrade>((this->trades.end() - limit), this->trades.end());
         this->trades_lock.unlock();
 
         reverse(temp.begin(), temp.end());
@@ -46,7 +46,7 @@ ReturnType CacheTrades::GetTrades(int limit, json& data)const
 /**************************/
 void CacheTrades::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, bind(&CacheTrades::EventHandler, this, placeholders::_1));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, std::bind(&CacheTrades::EventHandler, this, std::placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);
@@ -63,7 +63,7 @@ void CacheTrades::EventHandler_OrderFilled(Event& event)
 void CacheTrades::EventHandler_GetTrades(Event& event)
 {
     json trades;
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

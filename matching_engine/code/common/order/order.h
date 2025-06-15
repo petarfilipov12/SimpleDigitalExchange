@@ -2,14 +2,10 @@
 #define ORDER_H
 
 #include <string>
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
-
-#include <iostream>
+#include "json.h"
 
 #include <ctime>
 
-using namespace std;
 
 enum eOrderSide_t
 {
@@ -17,6 +13,7 @@ enum eOrderSide_t
     ORDER_SIDE_SELL,
     ORDER_SIDE_INVALID
 };
+typedef enum eOrderSide_t orderSide_t;
 
 enum eOrderType_t
 {
@@ -24,15 +21,16 @@ enum eOrderType_t
     ORDER_TYPE_LIMIT,
     ORDER_TYPE_INVALID
 };
+typedef enum eOrderType_t orderType_t;
 
 class Order{
     public:
-        string price;
+        std::string price;
         float quantity;
         float filled;
         int id;
-        enum eOrderSide_t order_side;
-        enum eOrderType_t order_type;
+        orderSide_t order_side;
+        orderType_t order_type;
         bool status;
         time_t order_added_timestamp;
     
@@ -41,12 +39,12 @@ class Order{
         Order(const int id);
 
         Order(
-            const string& price,
+            const std::string& price,
             const float quantity,
             const float filled,
             const int id,
-            const enum eOrderSide_t order_side,
-            const enum eOrderType_t order_type,
+            const orderSide_t order_side,
+            const orderType_t order_type,
             const bool status,
             const time_t order_added_timestamp
         );
@@ -67,7 +65,7 @@ class Order{
             public:
                 size_t operator()(const Order& order) const
                 {
-                    return hash<int>{}(order.id);
+                    return std::hash<int>{}(order.id);
                 }
         };
 

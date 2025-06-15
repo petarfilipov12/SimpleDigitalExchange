@@ -7,17 +7,17 @@
 #include <algorithm>
 #include <mutex>
 
-#include "types.h"
+#include "return_type.h"
 #include "order.h"
 
-using namespace std;
+
 
 template <typename Comparator> class Book{
     private:
-        map<string, list<Order>, Comparator > book;
-        unordered_set<Order, Order::HashFunc> orders;
+        std::map<std::string, std::list<Order>, Comparator > book;
+        std::unordered_set<Order, Order::HashFunc> orders;
 
-        mutable mutex book_lock;
+        mutable std::mutex book_lock;
     
     public:
         Book(){}
@@ -39,8 +39,8 @@ template <typename Comparator> class Book{
             return this->ExistsOrder(Order(id));
         }
 
-        ReturnType AddOrder(const Order& order){
-            ReturnType ret = RET_ORDER_EXISTS;
+        returnType AddOrder(const Order& order){
+            returnType ret = RET_ORDER_EXISTS;
 
             this->book_lock.lock();
             if(this->orders.find(order) == this->orders.end()){
@@ -54,11 +54,11 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        ReturnType CancelOrderById(const int id, Order *pOrder_o){
-            ReturnType ret = RET_ORDER_NOT_EXISTS;
+        returnType CancelOrderById(const int id, Order *pOrder_o){
+            returnType ret = RET_ORDER_NOT_EXISTS;
 
             this->book_lock.lock();
-            unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(Order(id));
+            std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(Order(id));
 
             if(pOrder != this->orders.end()){
                 if(pOrder_o != nullptr)
@@ -66,7 +66,7 @@ template <typename Comparator> class Book{
                     *pOrder_o = *pOrder;
                 }
                 
-                list<Order>::iterator pBookOrder = find(this->book[pOrder->price].begin(), this->book[pOrder->price].end(), *pOrder);
+                std::list<Order>::iterator pBookOrder = find(this->book[pOrder->price].begin(), this->book[pOrder->price].end(), *pOrder);
 
                 if(pBookOrder != this->book[pOrder->price].end()){
                     this->book[pOrder->price].erase(pBookOrder);
@@ -85,12 +85,12 @@ template <typename Comparator> class Book{
             return ret;
         }
 
-        ReturnType CancelOrder(const Order& order, Order *pOrder){
+        returnType CancelOrder(const Order& order, Order *pOrder){
             return this->CancelOrderById(order.id, pOrder);
         }
 
-        ReturnType GetFirst(Order **pOrder){
-            ReturnType ret = RET_BOOK_EMPTY;
+        returnType GetFirst(Order **pOrder){
+            returnType ret = RET_BOOK_EMPTY;
 
             this->book_lock.lock();
             if(!this->book.empty())

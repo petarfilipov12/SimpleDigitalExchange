@@ -1,13 +1,11 @@
 #include "cache_orders.h"
 
-using namespace std;
-
 CacheOrders::CacheOrders() {}
 CacheOrders::~CacheOrders() {}
 
-ReturnType CacheOrders::OrderAdded(const Order& order)
+returnType CacheOrders::OrderAdded(const Order& order)
 {
-    ReturnType ret = RET_ORDER_EXISTS;
+    returnType ret = RET_ORDER_EXISTS;
 
     this->order_lock.lock();
     if (this->orders.find(order.id) == this->orders.end())
@@ -21,9 +19,9 @@ ReturnType CacheOrders::OrderAdded(const Order& order)
     return ret;
 }
 
-ReturnType CacheOrders::OrderCanceled(const int order_id)
+returnType CacheOrders::OrderCanceled(const int order_id)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
+    returnType ret = RET_ORDER_NOT_EXISTS;
 
     this->order_lock.lock();
     if (this->orders.find(order_id) != this->orders.end())
@@ -37,10 +35,10 @@ ReturnType CacheOrders::OrderCanceled(const int order_id)
     return ret;
 }
 
-ReturnType CacheOrders::OrderChange(const int order_id, const float quantity)
+returnType CacheOrders::OrderChange(const int order_id, const float quantity)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
-    unordered_map<int, Order>::iterator order_itter;
+    returnType ret = RET_ORDER_NOT_EXISTS;
+    std::unordered_map<int, Order>::iterator order_itter;
 
     this->order_lock.lock();
     order_itter = this->orders.find(order_id);
@@ -56,7 +54,7 @@ ReturnType CacheOrders::OrderChange(const int order_id, const float quantity)
     return ret;
 }
 
-ReturnType CacheOrders::OrderFilled(const int taker_order_id, const int book_order_id, const float quantity)
+returnType CacheOrders::OrderFilled(const int taker_order_id, const int book_order_id, const float quantity)
 {
     this->OrderChange(taker_order_id, quantity);
     this->OrderChange(book_order_id, quantity);
@@ -64,10 +62,10 @@ ReturnType CacheOrders::OrderFilled(const int taker_order_id, const int book_ord
     return RET_OK;
 }
 
-ReturnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
+returnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
-    unordered_map<int, Order>::iterator order_itter;
+    returnType ret = RET_ORDER_NOT_EXISTS;
+    std::unordered_map<int, Order>::iterator order_itter;
 
     this->order_lock.lock();
     order_itter = this->orders.find(order_id);
@@ -86,7 +84,7 @@ ReturnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 /**************************/
 void CacheOrders::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, bind(&CacheOrders::EventHandler, this, placeholders::_1));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, std::bind(&CacheOrders::EventHandler, this, std::placeholders::_1));
     
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);
@@ -120,7 +118,7 @@ void CacheOrders::EventHandler_OrderFilled(Event& event)
 void CacheOrders::EventHandler_GetOrder(Event& event)
 {
     Order order;
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

@@ -1,15 +1,15 @@
 #ifndef CANDLE_H
 #define CANDLE_H
 
-#include "types.h"
+#include "return_type.h"
 
 #include <string>
 #include <ctime>
 
-using namespace std;
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+
+#include "json.h"
+
 
 
 namespace candle
@@ -17,10 +17,10 @@ namespace candle
     class Candle
     {
         public:
-            string high;
-            string open;
-            string close;
-            string low;
+            std::string high;
+            std::string open;
+            std::string close;
+            std::string low;
 
             time_t timestamp;
         
@@ -28,9 +28,9 @@ namespace candle
 
             Candle(const time_t timestamp);
 
-            Candle(const string& price, const time_t timestamp);
+            Candle(const std::string& price, const time_t timestamp);
 
-            Candle(const string& high, const string& open, const string& close, const string& low, const time_t timestamp);
+            Candle(const std::string& high, const std::string& open, const std::string& close, const std::string& low, const time_t timestamp);
 
             ~Candle();
 

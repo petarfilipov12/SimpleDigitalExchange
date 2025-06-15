@@ -6,12 +6,12 @@
 #include "event.h"
 #include "event_bus.h"
 
-using namespace std;
+
 
 class EventLogger
 {
     private:
-        unordered_map<enum eEventId_t, string> eventIdToStringMap = {
+        std::unordered_map<eventId_t, std::string> eventIdToStringMap = {
             {EVENT_ID_ADD_ORDER, "EVENT_ID_ADD_ORDER"},
             {EVENT_ID_CANCEL_ORDER, "EVENT_ID_CANCEL_ORDER"},
         
@@ -37,7 +37,7 @@ class EventLogger
         EventLogger();
         ~EventLogger();
 
-        ReturnType ConvertEventIdToString(enum eEventId_t event_id, string& event_id_s);
+        returnType ConvertEventIdToString(eventId_t event_id, std::string& event_id_s);
 
         void EventHandler(Event event);
 

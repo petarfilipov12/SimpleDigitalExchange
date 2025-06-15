@@ -1,10 +1,10 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include "types.h"
+#include "return_type.h"
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+#include "json.h"
+
 
 enum eEventId_t
 {
@@ -31,21 +31,23 @@ enum eEventId_t
     EVENT_ID_INVALID
 };
 
+typedef enum eEventId_t eventId_t;
+
 
 class Event{
     private:
-        enum eEventId_t event_id;
+        eventId_t event_id;
         json json_data;
         json *responce_data;
 
     public:
         Event();
 
-        Event(const enum eEventId_t event_id, const json json_data, const json *responce_data);
+        Event(const eventId_t event_id, const json json_data, const json *responce_data);
 
         Event(const Event& event2);
 
-        enum eEventId_t GetEventId() const;
+        eventId_t GetEventId() const;
 
         json GetJsonData() const;
 

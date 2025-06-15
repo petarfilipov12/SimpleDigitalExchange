@@ -1,7 +1,7 @@
 #include "event_bus.h"
 #include <thread>
 
-using namespace std;
+
 
 EventBus::EventBus() {}
 
@@ -16,9 +16,9 @@ EventBus::~EventBus()
     // }
 }
 
-ReturnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const function<void(Event)> handler_func)
+returnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const std::function<void(Event)> handler_func)
 {
-    ReturnType ret = RET_RECEIVER_EXISTS;
+    returnType ret = RET_RECEIVER_EXISTS;
 
     this->receivers_lock.lock();
     if (this->event_receivers.find(receiver_id) == this->event_receivers.end())
@@ -33,9 +33,9 @@ ReturnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const fun
     return ret;
 }
 
-ReturnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
+returnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
 {
-    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
+    returnType ret = RET_RECEIVER_NOT_EXISTS;
 
     this->receivers_lock.lock();
     if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
@@ -60,9 +60,9 @@ ReturnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
     return ret;
 }
 
-ReturnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id)
+returnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const eventId_t event_id)
 {
-    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
+    returnType ret = RET_RECEIVER_NOT_EXISTS;
 
     if(event_id < EVENT_ID_INVALID)
     {
@@ -84,9 +84,9 @@ ReturnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const enum 
     return ret;
 }
 
-ReturnType EventBus::Unsubscribe(const enum eReceiverId_t receiver_id, const enum eEventId_t event_id)
+returnType EventBus::Unsubscribe(const enum eReceiverId_t receiver_id, const eventId_t event_id)
 {
-    ReturnType ret = RET_RECEIVER_NOT_EXISTS;
+    returnType ret = RET_RECEIVER_NOT_EXISTS;
 
     if(event_id < EVENT_ID_INVALID)
     {
@@ -141,7 +141,7 @@ void EventBus::Cyclic(void)
         {
             for (auto receiver_id : this->events_to_receivers_map[event.GetEventId()])
             {
-                thread t(this->event_receivers[receiver_id].GetCallback(), event);
+                std::thread t(this->event_receivers[receiver_id].GetCallback(), event);
                 t.detach();
             }
         }
@@ -162,6 +162,6 @@ void EventBus::run(void)
 /**************************/
 void EventBus::init()
 {
-    thread thread_event_bus([this]{this->run();});
+    std::thread thread_event_bus([this]{this->run();});
     thread_event_bus.detach();
 }

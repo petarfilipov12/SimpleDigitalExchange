@@ -5,15 +5,15 @@
 #include <unordered_set>
 #include <mutex>
 
-#include "types.h"
+#include "return_type.h"
 #include "order.h"
 
 class TakerOrderBook{
     private:
-        list<Order> taker_orders_queue;
-        unordered_set<Order, Order::HashFunc> taker_orders;
+        std::list<Order> taker_orders_queue;
+        std::unordered_set<Order, Order::HashFunc> taker_orders;
 
-        mutable mutex taker_book_lock;
+        mutable std::mutex taker_book_lock;
     
     public:
         TakerOrderBook();
@@ -23,17 +23,17 @@ class TakerOrderBook{
 
         bool ExistsTakerOrderById(const int id) const;
 
-        ReturnType AddTakerOrder(const Order& order);
+        returnType AddTakerOrder(const Order& order);
 
-        ReturnType CancelTakerOrder(const Order& order, Order *pOrder);
+        returnType CancelTakerOrder(const Order& order, Order *pOrder);
 
-        ReturnType CancelTakerOrderById(const int id, Order *pOrder);
+        returnType CancelTakerOrderById(const int id, Order *pOrder);
 
-        ReturnType GetAt(const int index, Order **pOrder);
+        returnType GetAt(const int index, Order **pOrder);
 
-        ReturnType GetFirst(Order **pOrder);
+        returnType GetFirst(Order **pOrder);
 
-        ReturnType PopFirst();
+        returnType PopFirst();
 };
 
 #endif

@@ -4,14 +4,12 @@
 
 #include "event.h"
 
-using namespace std;
+#include "json.h"
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
 
-ReturnType CacheOrderBookL2::OrderAdded(const Order& order)
+returnType CacheOrderBookL2::OrderAdded(const Order& order)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if (ORDER_SIDE_BUY == order.order_side)
     {
@@ -37,9 +35,9 @@ ReturnType CacheOrderBookL2::OrderAdded(const Order& order)
     return ret;
 }
 
-ReturnType CacheOrderBookL2::OrderCanceled(const Order& order)
+returnType CacheOrderBookL2::OrderCanceled(const Order& order)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if (ORDER_TYPE_LIMIT == order.order_type)
     {
@@ -76,9 +74,9 @@ ReturnType CacheOrderBookL2::OrderCanceled(const Order& order)
     return ret;
 }
 
-ReturnType CacheOrderBookL2::OrderFilled(const string& price, const float quantity, const enum eOrderSide_t book_order_side)
+returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float quantity, const orderSide_t book_order_side)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
     bool flag = false;
 
     if (ORDER_SIDE_BUY == book_order_side)
@@ -135,10 +133,10 @@ ReturnType CacheOrderBookL2::OrderFilled(const string& price, const float quanti
     return ret;
 }
 
-ReturnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
+returnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
 {
-    map<string, float, greater<string> > temp_bid_book_l2;
-    map<string, float, less<string> > temp_ask_book_l2;
+    std::map<std::string, float, std::greater<std::string> > temp_bid_book_l2;
+    std::map<std::string, float, std::less<std::string> > temp_ask_book_l2;
 
     this->bid_book_l2_look.lock();
     this->ask_book_l2_look.lock();
@@ -166,7 +164,7 @@ ReturnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
 /**************************/
 void CacheOrderBookL2::init(EventBus& event_bus)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, bind(&CacheOrderBookL2::EventHandler, this, placeholders::_1));
+    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1));
 
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_ADDED);
     event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_CANCELED);
@@ -200,7 +198,7 @@ void CacheOrderBookL2::EventHandler_OrderFilled(Event& event)
 void CacheOrderBookL2::EventHandler_GetOrderBookL2(Event& event)
 {
     json l2_book;
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
 
     if(nullptr != event.GetResponceDataPtr())
     {

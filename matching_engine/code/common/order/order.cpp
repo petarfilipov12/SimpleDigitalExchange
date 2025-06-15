@@ -1,9 +1,5 @@
 #include "order.h"
 
-#include <iostream>
-
-using namespace std;
-
 Order::Order()
 {
     this->price = "0.0";
@@ -29,12 +25,12 @@ Order::Order(const int id)
 }
 
 Order::Order(
-    const string& price,
+    const std::string& price,
     const float quantity,
     const float filled,
     const int id,
-    const enum eOrderSide_t order_side,
-    const enum eOrderType_t order_type,
+    const orderSide_t order_side,
+    const orderType_t order_type,
     const bool status,
     const time_t order_added_timestamp
 )
@@ -99,8 +95,8 @@ Order Order::ConvertJsonToOrder(const json &j_data){
         (j_data)["quantity"],
         (j_data)["filled"],
         (j_data)["order_id"],
-        static_cast<enum eOrderSide_t>((j_data)["order_side"]),
-        static_cast<enum eOrderType_t>((j_data)["order_type"]),
+        static_cast<orderSide_t>((j_data)["order_side"]),
+        static_cast<orderType_t>((j_data)["order_type"]),
         (j_data)["status"],
         (j_data)["order_added_timestamp"]
     );

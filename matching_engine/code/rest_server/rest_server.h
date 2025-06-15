@@ -9,42 +9,39 @@
 
 #include "event_bus.h"
 
-using namespace httplib;
-using namespace std;
-
 class RestServer
 {
 private:
-    SSLServer *svr;
-    string host;
+    httplib::SSLServer *svr;
+    std::string host;
     unsigned int port;
 
     EventBus& event_bus;
 
 public:
-    RestServer(const string& cert_path, const string& key_path, EventBus& event_bus);
+    RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus);
 
-    RestServer(const string& cert_path, const string& key_path, const string& host, const unsigned int port, EventBus& event_bus);
+    RestServer(const std::string& cert_path, const std::string& key_path, const std::string& host, const unsigned int port, EventBus& event_bus);
 
     ~RestServer();
 
-    void Post(const string& url_path, const function<void(const Request&, Response&)> handler_func);
+    void Post(const std::string& url_path, const std::function<void(const httplib::Request&, httplib::Response&)> handler_func);
 
     void run();
 
     void init();
 
-    void Handler_AddOrder(const Request &req, Response &res);
+    void Handler_AddOrder(const httplib::Request &req, httplib::Response &res);
 
-    void Handler_CancelOrder(const Request &req, Response &res);
+    void Handler_CancelOrder(const httplib::Request &req, httplib::Response &res);
 
-    void Handler_GetOrder(const Request &req, Response &res);
+    void Handler_GetOrder(const httplib::Request &req, httplib::Response &res);
 
-    void Handler_GetOrderBook(const Request &req, Response &res);
+    void Handler_GetOrderBook(const httplib::Request &req, httplib::Response &res);
 
-    void Handler_GetCandles(const Request &req, Response &res);
+    void Handler_GetCandles(const httplib::Request &req, httplib::Response &res);
 
-    void Handler_GetTrades(const Request &req, Response &res);
+    void Handler_GetTrades(const httplib::Request &req, httplib::Response &res);
 };
 
 #endif

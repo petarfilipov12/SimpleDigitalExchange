@@ -6,10 +6,6 @@
 
 #include "event.h"
 
-#include <iostream>
-
-using namespace std;
-
 enum eReceiverId_t
 {
     RECEIVER_ID_ENGINE,
@@ -26,28 +22,28 @@ class EventReceiver
 {
 private:
     enum eReceiverId_t id;
-    unordered_set<enum eEventId_t> events;
-    function<void(Event)> callback;
+    std::unordered_set<eventId_t> events;
+    std::function<void(Event)> callback;
 public:
     EventReceiver();
 
-    EventReceiver(const enum eReceiverId_t id, const function<void(Event)> callback);
+    EventReceiver(const enum eReceiverId_t id, const std::function<void(Event)> callback);
 
     ~EventReceiver();
 
-    void AddEvent(const enum eEventId_t event_id);
+    void AddEvent(const eventId_t event_id);
 
-    void RemoveEvent(const enum eEventId_t event_id);
+    void RemoveEvent(const eventId_t event_id);
 
     bool HaveEvents() const;
 
-    bool ContainsEvent(const enum eEventId_t event_id) const;
+    bool ContainsEvent(const eventId_t event_id) const;
 
-    unordered_set<enum eEventId_t> GetEvents() const;
+    std::unordered_set<eventId_t> GetEvents() const;
 
     enum eReceiverId_t GetId() const;
 
-    function<void(Event)> GetCallback() const;
+    std::function<void(Event)> GetCallback() const;
 
     bool operator<(const EventReceiver &event_receiver2) const;
 };

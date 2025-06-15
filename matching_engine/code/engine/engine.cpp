@@ -32,10 +32,10 @@ bool Engine::ExistsOrderId(const int id) const
     return this->ExistsOrder(Order(id));
 }
 
-ReturnType Engine::AddOrder(Order order)
+returnType Engine::AddOrder(Order order)
 {
-    enum eEventId_t event_id = EVENT_ID_ADD_ORDER_FAILLED;
-    ReturnType ret = RET_NOT_OK;
+    eventId_t event_id = EVENT_ID_ADD_ORDER_FAILLED;
+    returnType ret = RET_NOT_OK;
 
     ret = this->taker_book.AddTakerOrder(order);
 
@@ -50,11 +50,11 @@ ReturnType Engine::AddOrder(Order order)
     return ret;
 }
 
-ReturnType Engine::CancelOrder(const Order& order)
+returnType Engine::CancelOrder(const Order& order)
 {
-    enum eEventId_t event_id = EVENT_ID_CANCEL_ORDER_FAILED;
+    eventId_t event_id = EVENT_ID_CANCEL_ORDER_FAILED;
     json j_data = order.ConvertOrderToJson();
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
     Order *pOrder;
     
     ret = this->taker_book.CancelTakerOrder(order, pOrder);
@@ -84,14 +84,14 @@ ReturnType Engine::CancelOrder(const Order& order)
     return ret;
 }
 
-ReturnType Engine::CancelOrderById(const int id)
+returnType Engine::CancelOrderById(const int id)
 {
     return this->CancelOrder(Order(id));
 }
 
-ReturnType Engine::AddToOrderBook(Order& pTakerOrder)
+returnType Engine::AddToOrderBook(Order& pTakerOrder)
 {
-    ReturnType ret = this->order_book.AddOrder(pTakerOrder);
+    returnType ret = this->order_book.AddOrder(pTakerOrder);
 
     if(RET_OK == ret)
     {
@@ -101,9 +101,9 @@ ReturnType Engine::AddToOrderBook(Order& pTakerOrder)
     return ret;
 }
 
-ReturnType Engine::MatchTakerOrder(Order& pTakerOrder)
+returnType Engine::MatchTakerOrder(Order& pTakerOrder)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
     Order *bookOrder;
     json j_data;
     float quantity;
@@ -203,7 +203,7 @@ ReturnType Engine::MatchTakerOrder(Order& pTakerOrder)
 void Engine::Cyclic()
 {
     Order *takerOrder;
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
     int i = 1;
 
     if (RET_OK != this->taker_book.GetFirst(&takerOrder))
@@ -248,10 +248,10 @@ void Engine::run()
 /**************************/
 void Engine::init()
 {
-    thread thread_engine([this]{this->run();});
+    std::thread thread_engine([this]{this->run();});
     thread_engine.detach();
 
-    this->event_bus.AddReceiver(RECEIVER_ID_ENGINE, bind(&Engine::EventHandler, this, placeholders::_1));
+    this->event_bus.AddReceiver(RECEIVER_ID_ENGINE, std::bind(&Engine::EventHandler, this, std::placeholders::_1));
 
     this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
     this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
@@ -262,7 +262,7 @@ void Engine::init()
 /******************************/
 void Engine::EventHandler_AddOrder(Event& event)
 {
-    ReturnType ret = RET_NOT_OK;
+    returnType ret = RET_NOT_OK;
     json j_data = event.GetJsonData();
 
     ret = this->AddOrder(Order::ConvertJsonToOrder(j_data));
@@ -277,7 +277,7 @@ void Engine::EventHandler_AddOrder(Event& event)
 
 void Engine::EventHandler_CancelOrder(Event& event)
 {
-    ReturnType ret;
+    returnType ret;
 
     ret = this->CancelOrderById(event.GetJsonData()["order_id"]);
 

@@ -1,8 +1,6 @@
 #include "candle.h"
 
-using namespace candle;
-
-Candle::Candle() 
+candle::Candle::Candle() 
 {
     this->high = "";
     this->open = "";
@@ -12,7 +10,7 @@ Candle::Candle()
     this->timestamp = 0;
 }
 
-Candle::Candle(const time_t timestamp) 
+candle::Candle::Candle(const time_t timestamp) 
 {
     this->high = "";
     this->open = "";
@@ -22,7 +20,7 @@ Candle::Candle(const time_t timestamp)
     this->timestamp = timestamp;
 }
 
-Candle::Candle(const string& price, const time_t timestamp)
+candle::Candle::Candle(const std::string& price, const time_t timestamp)
 {
     this->high = price;
     this->open = price;
@@ -32,7 +30,7 @@ Candle::Candle(const string& price, const time_t timestamp)
     this->timestamp = timestamp;
 }
 
-Candle::Candle(const string& high, const string& open, const string& close, const string& low, const time_t timestamp)
+candle::Candle::Candle(const std::string& high, const std::string& open, const std::string& close, const std::string& low, const time_t timestamp)
 {
     this->high = high;
     this->open = open;
@@ -42,14 +40,14 @@ Candle::Candle(const string& high, const string& open, const string& close, cons
     this->timestamp = timestamp;
 }
 
-Candle::~Candle() {}
+candle::Candle::~Candle() {}
 
-bool Candle::IsEmpty()const
+bool candle::Candle::IsEmpty()const
 {
     return this->open.empty();
 }
 
-json Candle::ConvertCandleToJson()const
+json candle::Candle::ConvertCandleToJson()const
 {
     json j_candle = {
         {"high", this->high},

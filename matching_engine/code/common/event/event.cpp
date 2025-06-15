@@ -6,7 +6,7 @@ Event::Event()
     this->responce_data = nullptr;
 }
 
-Event::Event(const enum eEventId_t event_id, const json json_data, const json *responce_data)
+Event::Event(const eventId_t event_id, const json json_data, const json *responce_data)
 {
     this->event_id = event_id;
     this->json_data = json_data;
@@ -20,7 +20,7 @@ Event::Event(const Event &event2)
     this->responce_data = event2.responce_data;
 }
 
-enum eEventId_t Event::GetEventId() const
+eventId_t Event::GetEventId() const
 {
     return this->event_id;
 }

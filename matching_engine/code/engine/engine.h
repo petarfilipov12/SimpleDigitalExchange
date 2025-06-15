@@ -1,15 +1,15 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "types.h"
+#include "return_type.h"
 #include "order_book.h"
 #include "taker_order_book.h"
 #include "order.h"
 #include "event.h"
 #include "event_bus.h"
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+#include "json.h"
+
 
 class Engine{
     private:
@@ -17,9 +17,9 @@ class Engine{
         TakerOrderBook taker_book;
         EventBus& event_bus;
 
-        ReturnType AddToOrderBook(Order& pTakerOrder);
+        returnType AddToOrderBook(Order& pTakerOrder);
         
-        ReturnType MatchTakerOrder(Order& pTakerOrder);
+        returnType MatchTakerOrder(Order& pTakerOrder);
         
         void Cyclic();
 
@@ -36,11 +36,11 @@ class Engine{
         
         bool ExistsOrderId(const int id) const;
         
-        ReturnType AddOrder(Order order);
+        returnType AddOrder(Order order);
         
-        ReturnType CancelOrder(const Order& order);
+        returnType CancelOrder(const Order& order);
         
-        ReturnType CancelOrderById(const int id);
+        returnType CancelOrderById(const int id);
         
         void run();
 

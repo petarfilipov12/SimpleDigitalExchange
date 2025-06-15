@@ -1,17 +1,17 @@
 #ifndef ORDER_BOOK_H
 #define ORDER_BOOK_H
 
-#include "types.h"
+#include "return_type.h"
 #include "book.h"
 #include "order.h"
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+#include "json.h"
+
 
 class OrderBook{
     private:
-        Book<greater<string> > bid_book;
-        Book<less<string> > ask_book;
+        Book<std::greater<std::string> > bid_book;
+        Book<std::less<std::string> > ask_book;
     public:
         OrderBook();
         
@@ -21,15 +21,15 @@ class OrderBook{
 
         bool ExistsOrderId(const int id) const;
 
-        ReturnType AddOrder(const Order& order);
+        returnType AddOrder(const Order& order);
 
-        ReturnType CancelOrder(const Order& order, Order *pOrder);
+        returnType CancelOrder(const Order& order, Order *pOrder);
 
-        ReturnType CancelOrderById(const int id, Order *pOrder);
+        returnType CancelOrderById(const int id, Order *pOrder);
 
-        ReturnType GetBidFirst(Order **pOrder);
+        returnType GetBidFirst(Order **pOrder);
 
-        ReturnType GetAskFirst(Order **pOrder);
+        returnType GetAskFirst(Order **pOrder);
 
 };
 

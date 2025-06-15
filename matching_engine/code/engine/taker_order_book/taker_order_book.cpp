@@ -20,9 +20,9 @@ bool TakerOrderBook::ExistsTakerOrderById(const int id) const
     return this->ExistsTakerOrder(Order(id));
 }
 
-ReturnType TakerOrderBook::AddTakerOrder(const Order& order)
+returnType TakerOrderBook::AddTakerOrder(const Order& order)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
+    returnType ret = RET_ORDER_NOT_EXISTS;
 
     this->taker_book_lock.lock();
     if (this->taker_orders.find(order) == this->taker_orders.end())
@@ -37,12 +37,12 @@ ReturnType TakerOrderBook::AddTakerOrder(const Order& order)
     return ret;
 }
 
-ReturnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
+returnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
 {
-    ReturnType ret = RET_ORDER_NOT_EXISTS;
+    returnType ret = RET_ORDER_NOT_EXISTS;
 
     this->taker_book_lock.lock();
-    unordered_set<Order, Order::HashFunc>::iterator pOrder = this->taker_orders.find(Order(id));
+    std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->taker_orders.find(Order(id));
 
     if (pOrder != this->taker_orders.end())
     {
@@ -50,7 +50,7 @@ ReturnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
         {
             *pOrder_o = *pOrder;
         }
-        list<Order>::iterator pListOrder = find(this->taker_orders_queue.begin(), this->taker_orders_queue.end(), *pOrder);
+        std::list<Order>::iterator pListOrder = find(this->taker_orders_queue.begin(), this->taker_orders_queue.end(), *pOrder);
 
         if (pListOrder != this->taker_orders_queue.end())
         {
@@ -66,15 +66,15 @@ ReturnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
     return ret;
 }
 
-ReturnType TakerOrderBook::CancelTakerOrder(const Order& order, Order *pOrder)
+returnType TakerOrderBook::CancelTakerOrder(const Order& order, Order *pOrder)
 {
     return this->CancelTakerOrderById(order.id, pOrder);
 }
 
-ReturnType TakerOrderBook::GetAt(const int index, Order **pOrder)
+returnType TakerOrderBook::GetAt(const int index, Order **pOrder)
 {
-    ReturnType ret = RET_BOOK_EMPTY;
-    list<Order>::iterator iter;
+    returnType ret = RET_BOOK_EMPTY;
+    std::list<Order>::iterator iter;
 
     this->taker_book_lock.lock();
     if (!this->taker_orders_queue.empty())
@@ -99,9 +99,9 @@ ReturnType TakerOrderBook::GetAt(const int index, Order **pOrder)
     return ret;
 }
 
-ReturnType TakerOrderBook::GetFirst(Order **pOrder)
+returnType TakerOrderBook::GetFirst(Order **pOrder)
 {
-    ReturnType ret = RET_BOOK_EMPTY;
+    returnType ret = RET_BOOK_EMPTY;
 
     this->taker_book_lock.lock();
     if (!this->taker_orders_queue.empty())
@@ -115,9 +115,9 @@ ReturnType TakerOrderBook::GetFirst(Order **pOrder)
     return ret;
 }
 
-ReturnType TakerOrderBook::PopFirst()
+returnType TakerOrderBook::PopFirst()
 {
-    ReturnType ret = RET_BOOK_EMPTY;
+    returnType ret = RET_BOOK_EMPTY;
 
     this->taker_book_lock.lock();
     if (!this->taker_orders_queue.empty())

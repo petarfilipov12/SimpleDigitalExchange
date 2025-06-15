@@ -1,22 +1,22 @@
 #ifndef TRADE_H
 #define TRADE_H
 
-#include "types.h"
+#include "return_type.h"
 
 #include <string>
 #include <ctime>
 
-using namespace std;
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
+
+#include "json.h"
+
 
 
 namespace trade
 {
     struct sTrade
     {
-        string price;
+        std::string price;
         float quantity;
         time_t timestamp;
     };

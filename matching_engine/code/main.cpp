@@ -1,5 +1,5 @@
 #include <iostream>
-#include <nlohmann/json.hpp>
+#include "json.h"
 
 #include "engine.h"
 #include "event_bus.h"
@@ -14,15 +14,14 @@
 #include "cache_candles.h"
 #include "cache_trades.h"
 
-using json = nlohmann::json;
-using namespace std;
+
 
 int main(void){
     srand(time(0));
 
-    // cout << "Init sleep for 1 min\n";
+    // std::cout << "Init sleep for 1 min\n";
     // sleep(60);
-    // cout << "Start\n";
+    // std::cout << "Start\n";
     
     EventBus event_bus;
     Engine engine(event_bus);

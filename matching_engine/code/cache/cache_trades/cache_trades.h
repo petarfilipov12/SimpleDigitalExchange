@@ -1,7 +1,7 @@
 #ifndef CACHE_TRADES_H
 #define CACHE_TRADES_H
 
-#include "types.h"
+#include "return_type.h"
 
 #include <vector>
 #include <string>
@@ -11,19 +11,15 @@
 #include "event.h"
 #include "event_bus.h"
 
-using namespace std;
+#include "json.h"
 
-#include<nlohmann/json.hpp>
-using json = nlohmann::json;
-
-using namespace trade;
 
 class CacheTrades
 {
     private:
-        vector<sTrade> trades;
+        std::vector<trade::sTrade> trades;
 
-        mutable mutex trades_lock;
+        mutable std::mutex trades_lock;
 
         void EventHandler_OrderFilled(Event& event);
 
@@ -33,9 +29,9 @@ class CacheTrades
         CacheTrades();
         ~CacheTrades();
 
-        ReturnType OrderFilled(const string& price, const float quantity);
+        returnType OrderFilled(const std::string& price, const float quantity);
 
-        ReturnType GetTrades(int limit, json& data)const;
+        returnType GetTrades(int limit, json& data)const;
 
         void EventHandler(Event event);
 

@@ -186,7 +186,7 @@ class ExchangeUI:
         timer_updater = TimerUpdater(func=self._UpdaterFunc)
 
         dpg.create_context()
-        dpg.create_viewport(title='Custom Title', width=900, height=700)
+        dpg.create_viewport(title='Digital Exchange', width=900, height=700)
 
         dpg.add_window(tag="PRIMARY_WINDOW")
         self._ShowMainWindow()

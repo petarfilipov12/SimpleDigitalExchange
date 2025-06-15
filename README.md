@@ -10,7 +10,7 @@ Written in C++.
 - __Event Bus:__ Manages asynchronous communication between components using an event-driven model.
 - __Event Logger:__ Logs all events transmitted through the event bus for debugging and auditing purposes.
 - __Caches:__
-  - __Orders:__ Stores active buy and sell orders.
+  - __Orders:__ Stores current and past orders.
   - __Order Book:__ Stores the current state of the order book (Layer 2).
   - __Candles:__ Stores historical data for price candles.
   - __Trades:__ Stores information on completed trades.
@@ -35,6 +35,6 @@ A lightweight frontend written in Python using the DearPyGui library. It wraps t
 [DearPyGui](https://github.com/hoffstadt/DearPyGui): A fast, simple-to-use GUI framework for Python.
 
 ### UI Showcase
-
+![ShowcaseUI](ShowcaseUI/UI.PNG)
 
 

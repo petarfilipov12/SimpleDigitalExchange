@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#define RECEIVER_ID_EVENT_LOGGER 0u
+
 EventLogger::EventLogger() {}
 EventLogger::~EventLogger() {}
 
@@ -33,7 +35,13 @@ void EventLogger::init(EventBus& event_bus)
 {
     int event_id;
 
-    event_bus.AddReceiver(RECEIVER_ID_EVENT_LOGGER, std::bind(&EventLogger::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        RECEIVER_ID_EVENT_LOGGER, 
+        std::bind(&EventLogger::EventHandler, this, std::placeholders::_1),
+        nullptr
+    );
+
+    event_bus.AddReceiver(event_receiver);
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {

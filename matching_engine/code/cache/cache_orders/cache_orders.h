@@ -16,7 +16,10 @@ class CacheOrders
     private:
         std::unordered_map<int, Order> orders;
 
+        std::string symbol;
+
         mutable std::mutex order_lock;
+
 
         returnType OrderChange(const int order_id, const float quantity);
 
@@ -29,7 +32,7 @@ class CacheOrders
         void EventHandler_GetOrder(Event& event);
     
     public:
-        CacheOrders();
+        CacheOrders(const std::string& symbol);
         ~CacheOrders();
 
         returnType OrderAdded(const Order& order);
@@ -40,9 +43,11 @@ class CacheOrders
 
         returnType GetOrder(const int order_id, Order& pOrder);
 
+        void init(EventBus& event_bus, receiverId_t receiver_id);
+
         void EventHandler(Event event);
 
-        void init(EventBus& event_bus);
+        returnType Filter(Event& event);
 };
 
 #endif

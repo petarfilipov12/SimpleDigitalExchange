@@ -5,7 +5,11 @@
 #include <ctime>
 #include <thread>
 
-CacheCandles::CacheCandles() {}
+CacheCandles::CacheCandles(const std::string& symbol)
+{
+    this->symbol = symbol;
+}
+
 CacheCandles::~CacheCandles() {}
 
 returnType CacheCandles::OrderFilled(const std::string& price_s)
@@ -162,15 +166,21 @@ void CacheCandles::run()
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void CacheCandles::init(EventBus& event_bus)
+void CacheCandles::init(EventBus& event_bus, receiverId_t receiver_id)
 {
     std::thread thread_cache_candles([this]{this->run();});
     thread_cache_candles.detach();
 
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_CANDLES, std::bind(&CacheCandles::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheCandles::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheCandles::Filter, this, std::placeholders::_1)
+    );
     
-    event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_ORDER_FILLED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_CANDLES, EVENT_ID_GET_CANDLES);
+    event_bus.AddReceiver(event_receiver);
+    
+    event_bus.Subscribe(receiver_id, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_GET_CANDLES);
 }
 
 /******************************/
@@ -212,4 +222,19 @@ void CacheCandles::EventHandler(Event event)
         default:
             break;
     }
+}
+
+/***********************/
+/*Filter Implementation*/
+/***********************/
+returnType CacheCandles::Filter(Event& event)
+{
+    returnType ret = RET_NOT_OK;
+
+    if(this->symbol == event.GetJsonData()["symbol"])
+    {
+        ret = RET_OK;
+    }
+
+    return ret;
 }

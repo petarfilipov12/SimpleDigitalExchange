@@ -21,6 +21,8 @@ class CacheOrderBookL2
         std::map<std::string, float, std::greater<std::string> > bid_book_l2;
         std::map<std::string, float, std::less<std::string> > ask_book_l2;
 
+        std::string symbol;
+
         mutable std::mutex bid_book_l2_look;
         mutable std::mutex ask_book_l2_look;
 
@@ -33,6 +35,9 @@ class CacheOrderBookL2
         void EventHandler_GetOrderBookL2(Event& event);
 
     public:
+        CacheOrderBookL2(const std::string& symbol);
+        ~CacheOrderBookL2();
+
         returnType OrderAdded(const Order& order);
 
         returnType OrderCanceled(const Order& order);
@@ -41,9 +46,11 @@ class CacheOrderBookL2
 
         returnType GetOrderBookL2(json& l2_book)const;
 
+        void init(EventBus& event_bus, receiverId_t receiver_id);
+
         void EventHandler(Event event);
 
-        void init(EventBus& event_bus);
+        returnType Filter(Event& event);
 };
 
 #endif

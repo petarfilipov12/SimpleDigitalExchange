@@ -2,7 +2,11 @@
 
 #include <ctime>
 
-CacheTrades::CacheTrades() {}
+CacheTrades::CacheTrades(const std::string& symbol)
+{
+    this->symbol = symbol;
+}
+
 CacheTrades::~CacheTrades() {}
 
 returnType CacheTrades::OrderFilled(const std::string& price, const float quantity)
@@ -44,12 +48,18 @@ returnType CacheTrades::GetTrades(int limit, json& data)const
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void CacheTrades::init(EventBus& event_bus)
+void CacheTrades::init(EventBus& event_bus, receiverId_t receiver_id)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_TRADES, std::bind(&CacheTrades::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheTrades::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheTrades::Filter, this, std::placeholders::_1)
+    );
+
+    event_bus.AddReceiver(event_receiver);
     
-    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_ORDER_FILLED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_TRADES, EVENT_ID_GET_TRADES);
+    event_bus.Subscribe(receiver_id, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_GET_TRADES);
 }
 
 /******************************/
@@ -91,4 +101,19 @@ void CacheTrades::EventHandler(Event event)
         default:
             break;
     }
+}
+
+/***********************/
+/*Filter Implementation*/
+/***********************/
+returnType CacheTrades::Filter(Event& event)
+{
+    returnType ret = RET_NOT_OK;
+
+    if(this->symbol == event.GetJsonData()["symbol"])
+    {
+        ret = RET_OK;
+    }
+
+    return ret;
 }

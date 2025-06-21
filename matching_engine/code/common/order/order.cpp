@@ -2,6 +2,7 @@
 
 Order::Order()
 {
+    this->symbol = "";
     this->price = "0.0";
     this->quantity = 0.0;
     this->filled = 0.0;
@@ -14,6 +15,7 @@ Order::Order()
 
 Order::Order(const int id)
 {
+    this->symbol = "";
     this->price = "0.0";
     this->quantity = 0.0;
     this->filled = 0.0;
@@ -25,6 +27,7 @@ Order::Order(const int id)
 }
 
 Order::Order(
+    const std::string& symbol,
     const std::string& price,
     const float quantity,
     const float filled,
@@ -35,6 +38,7 @@ Order::Order(
     const time_t order_added_timestamp
 )
 {
+    this->symbol = symbol;
     this->price = price;
     this->quantity = quantity;
     this->filled = filled;
@@ -54,6 +58,7 @@ json Order::ConvertOrderToJson()const
 {
     json j_data;
 
+    j_data["symbol"] = this->symbol;
     j_data["order_id"] = this->id;
     j_data["price"] = this->price;
     j_data["quantity"] = this->quantity;
@@ -72,6 +77,7 @@ json Order::ConvertOrderToJson()const
 
 Order &Order::operator=(const Order &order2)
 {
+    this->symbol = order2.symbol;
     this->price = order2.price;
     this->quantity = order2.quantity;
     this->filled = order2.filled;
@@ -91,13 +97,14 @@ bool Order::operator==(const Order &order2) const
 
 Order Order::ConvertJsonToOrder(const json &j_data){
     return Order(
-        (j_data)["price"],
-        (j_data)["quantity"],
-        (j_data)["filled"],
-        (j_data)["order_id"],
-        static_cast<orderSide_t>((j_data)["order_side"]),
-        static_cast<orderType_t>((j_data)["order_type"]),
-        (j_data)["status"],
-        (j_data)["order_added_timestamp"]
+        j_data["symbol"],
+        j_data["price"],
+        j_data["quantity"],
+        j_data["filled"],
+        j_data["order_id"],
+        static_cast<orderSide_t>(j_data["order_side"]),
+        static_cast<orderType_t>(j_data["order_type"]),
+        j_data["status"],
+        j_data["order_added_timestamp"]
     );
 }

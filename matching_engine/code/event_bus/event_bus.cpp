@@ -16,15 +16,15 @@ EventBus::~EventBus()
     // }
 }
 
-returnType EventBus::AddReceiver(const receiverId_t receiver_id, const std::function<void(Event)> handler_func)
+returnType EventBus::AddReceiver(EventReceiver& event_receiver)
 {
+    receiverId_t receiver_id = event_receiver.GetId();
     returnType ret = RET_RECEIVER_EXISTS;
 
     this->receivers_lock.lock();
     if (this->event_receivers.find(receiver_id) == this->event_receivers.end())
     {
-        EventReceiver receiver = EventReceiver(receiver_id, handler_func);
-        this->event_receivers[receiver_id] = receiver;
+        this->event_receivers[receiver_id] = event_receiver;
 
         ret = RET_OK;
     }

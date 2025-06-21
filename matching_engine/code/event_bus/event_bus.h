@@ -30,7 +30,7 @@ public:
 
     ~EventBus();
 
-    returnType AddReceiver(const receiverId_t receiver_id, const std::function<void(Event)> handler_func);
+    returnType AddReceiver(EventReceiver& event_receiver);
 
     returnType RemoveReceiver(const receiverId_t receiver_id);
 

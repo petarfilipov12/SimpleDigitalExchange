@@ -21,6 +21,9 @@ class CacheCandles
         candle::Candle current_candle;
         float current_high;
         float current_low;
+
+        std::string symbol;
+
         time_t current_timestamp;
 
         const time_t interval = 5*60;
@@ -37,7 +40,7 @@ class CacheCandles
         void EventHandler_GetCandles(Event& event);
     
     public:
-        CacheCandles();
+        CacheCandles(const std::string& symbol);
         ~CacheCandles();
 
         returnType OrderFilled(const std::string& price_s);
@@ -46,9 +49,11 @@ class CacheCandles
         
         void run();
 
+        void init(EventBus& event_bus, receiverId_t receiver_id);
+
         void EventHandler(Event event);
 
-        void init(EventBus& event_bus);
+        returnType Filter(Event& event);
 };
 
 #endif

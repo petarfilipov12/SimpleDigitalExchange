@@ -25,6 +25,7 @@ typedef enum eOrderType_t orderType_t;
 
 class Order{
     public:
+        std::string symbol;
         std::string price;
         float quantity;
         float filled;
@@ -39,6 +40,7 @@ class Order{
         Order(const int id);
 
         Order(
+            const std::string& symbol,
             const std::string& price,
             const float quantity,
             const float filled,

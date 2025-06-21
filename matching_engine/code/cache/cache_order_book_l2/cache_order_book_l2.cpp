@@ -7,6 +7,13 @@
 #include "json.h"
 
 
+CacheOrderBookL2::CacheOrderBookL2(const std::string& symbol)
+{
+    this->symbol = symbol;
+}
+
+CacheOrderBookL2::~CacheOrderBookL2() {}
+
 returnType CacheOrderBookL2::OrderAdded(const Order& order)
 {
     returnType ret = RET_NOT_OK;
@@ -162,14 +169,20 @@ returnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void CacheOrderBookL2::init(EventBus& event_bus)
+void CacheOrderBookL2::init(EventBus& event_bus, receiverId_t receiver_id)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDER_BOOK_L2, std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheOrderBookL2::Filter, this, std::placeholders::_1)
+    );
 
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_ADDED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_MAKER_ORDER_CANCELED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_ORDER_FILLED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDER_BOOK_L2, EVENT_ID_GET_ORDER_BOOK);
+    event_bus.AddReceiver(event_receiver);
+
+    event_bus.Subscribe(receiver_id, EVENT_ID_MAKER_ORDER_ADDED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_MAKER_ORDER_CANCELED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_GET_ORDER_BOOK);
 }
 
 /******************************/
@@ -232,4 +245,19 @@ void CacheOrderBookL2::EventHandler(Event event)
         default:
             break;
     }
+}
+
+/***********************/
+/*Filter Implementation*/
+/***********************/
+returnType CacheOrderBookL2::Filter(Event& event)
+{
+    returnType ret = RET_NOT_OK;
+
+    if(this->symbol == event.GetJsonData()["symbol"])
+    {
+        ret = RET_OK;
+    }
+
+    return ret;
 }

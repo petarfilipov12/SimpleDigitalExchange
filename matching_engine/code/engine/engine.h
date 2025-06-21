@@ -16,6 +16,7 @@ class Engine{
         OrderBook order_book;
         TakerOrderBook taker_book;
         EventBus& event_bus;
+        std::string symbol;
 
         returnType AddToOrderBook(Order& pTakerOrder);
         
@@ -28,7 +29,7 @@ class Engine{
         void EventHandler_CancelOrder(Event& event);
     
     public:
-        Engine(EventBus& event_busP);
+        Engine(EventBus& event_busP, const std::string& symbol);
         
         ~Engine();
         
@@ -44,9 +45,11 @@ class Engine{
         
         void run();
 
+        void init(receiverId_t receiver_id);
+
         void EventHandler(Event event);
 
-        void init();
+        returnType Filter(Event& event);
 };
 
 #endif

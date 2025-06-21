@@ -1,6 +1,10 @@
 #include "cache_orders.h"
 
-CacheOrders::CacheOrders() {}
+CacheOrders::CacheOrders(const std::string& symbol)
+{
+    this->symbol = symbol;
+}
+
 CacheOrders::~CacheOrders() {}
 
 returnType CacheOrders::OrderAdded(const Order& order)
@@ -82,15 +86,21 @@ returnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void CacheOrders::init(EventBus& event_bus)
+void CacheOrders::init(EventBus& event_bus, receiverId_t receiver_id)
 {
-    event_bus.AddReceiver(RECEIVER_ID_CACHE_ORDERS, std::bind(&CacheOrders::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheOrders::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheOrders::Filter, this, std::placeholders::_1)
+    );
+
+    event_bus.AddReceiver(event_receiver);
     
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_ADDED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_TAKER_ORDER_CANCELED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_MAKER_ORDER_CANCELED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_ORDER_FILLED);
-    event_bus.Subscribe(RECEIVER_ID_CACHE_ORDERS, EVENT_ID_GET_ORDER);
+    event_bus.Subscribe(receiver_id, EVENT_ID_TAKER_ORDER_ADDED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_TAKER_ORDER_CANCELED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_MAKER_ORDER_CANCELED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_ORDER_FILLED);
+    event_bus.Subscribe(receiver_id, EVENT_ID_GET_ORDER);
 }
 
 /******************************/
@@ -154,4 +164,19 @@ void CacheOrders::EventHandler(Event event)
             break;
     }
 
+}
+
+/***********************/
+/*Filter Implementation*/
+/***********************/
+returnType CacheOrders::Filter(Event& event)
+{
+    returnType ret = RET_NOT_OK;
+
+    if(this->symbol == event.GetJsonData()["symbol"])
+    {
+        ret = RET_OK;
+    }
+
+    return ret;
 }

@@ -6,19 +6,8 @@
 
 #include "event.h"
 
-enum eReceiverId_t
-{
-    RECEIVER_ID_ENGINE,
-    RECEIVER_ID_EVENT_LOGGER,
-    RECEIVER_ID_CACHE_ORDERS,
-    RECEIVER_ID_CACHE_ORDER_BOOK_L2,
-    RECEIVER_ID_CACHE_CANDLES,
-    RECEIVER_ID_CACHE_TRADES,
-
-    RECEIVER_ID_INVALID
-};
-
-typedef enum eReceiverId_t receiverId_t;
+typedef int receiverId_t;
+#define RECEIVER_ID_INVALID 0xffffu;
 
 class EventReceiver
 {

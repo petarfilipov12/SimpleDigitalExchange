@@ -2,9 +2,10 @@
 
 #include <thread>
 
-Engine::Engine(EventBus& event_busP): event_bus(event_busP)
+Engine::Engine(EventBus& event_busP, const std::string& symbol): event_bus(event_busP)
 {
     //this->event_bus = (EventBus *)event_bus;
+    this->symbol = symbol;
 }
 
 Engine::~Engine()
@@ -246,15 +247,21 @@ void Engine::run()
 /**************************/
 /*Init Func implementation*/
 /**************************/
-void Engine::init()
+void Engine::init(receiverId_t receiver_id)
 {
     std::thread thread_engine([this]{this->run();});
     thread_engine.detach();
 
-    this->event_bus.AddReceiver(RECEIVER_ID_ENGINE, std::bind(&Engine::EventHandler, this, std::placeholders::_1));
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&Engine::EventHandler, this, std::placeholders::_1),
+        std::bind(&Engine::Filter, this, std::placeholders::_1)
+    );
+    
+    this->event_bus.AddReceiver(event_receiver);
 
-    this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_ADD_ORDER);
-    this->event_bus.Subscribe(RECEIVER_ID_ENGINE, EVENT_ID_CANCEL_ORDER);
+    this->event_bus.Subscribe(receiver_id, EVENT_ID_ADD_ORDER);
+    this->event_bus.Subscribe(receiver_id, EVENT_ID_CANCEL_ORDER);
 }
 
 /******************************/
@@ -302,4 +309,19 @@ void Engine::EventHandler(Event event)
             break;
     }
 
+}
+
+/***********************/
+/*Filter Implementation*/
+/***********************/
+returnType Engine::Filter(Event& event)
+{
+    returnType ret = RET_NOT_OK;
+
+    if(this->symbol == event.GetJsonData()["symbol"])
+    {
+        ret = RET_OK;
+    }
+
+    return ret;
 }

@@ -5,9 +5,9 @@
 #include <ctime>
 #include <thread>
 
-CacheCandles::CacheCandles(const std::string& symbol)
+CacheCandles::CacheCandles(const std::string& symbol): Cache(symbol)
 {
-    this->symbol = symbol;
+
 }
 
 CacheCandles::~CacheCandles() {}
@@ -177,10 +177,7 @@ void CacheCandles::init(EventBus& event_bus, receiverId_t receiver_id)
         std::bind(&CacheCandles::Filter, this, std::placeholders::_1)
     );
     
-    event_bus.AddReceiver(event_receiver);
-    
-    event_bus.Subscribe(receiver_id, EVENT_ID_ORDER_FILLED);
-    event_bus.Subscribe(receiver_id, EVENT_ID_GET_CANDLES);
+    Cache::init(event_bus, event_receiver, {EVENT_ID_ORDER_FILLED, EVENT_ID_GET_CANDLES});
 }
 
 /******************************/
@@ -222,19 +219,4 @@ void CacheCandles::EventHandler(Event event)
         default:
             break;
     }
-}
-
-/***********************/
-/*Filter Implementation*/
-/***********************/
-returnType CacheCandles::Filter(Event& event)
-{
-    returnType ret = RET_NOT_OK;
-
-    if(this->symbol == event.GetJsonData()["symbol"])
-    {
-        ret = RET_OK;
-    }
-
-    return ret;
 }

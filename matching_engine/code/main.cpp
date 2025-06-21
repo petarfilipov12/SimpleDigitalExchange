@@ -20,6 +20,23 @@
 #define RECEIVER_ID_CACHE_CANDLES_SYMBOL_1 4u
 #define RECEIVER_ID_CACHE_TRADES_SYMBOL_1 5u
 
+#include <string>
+
+void InitSymbol(const std::string& symbol, EventBus& event_bus, int& last_event_receiver_id)
+{
+    Engine* engine = new Engine(event_bus, symbol);
+
+    CacheOrders* cache_orders = new CacheOrders(symbol);
+    CacheOrderBookL2* cache_order_book_l2 = new CacheOrderBookL2(symbol);
+    CacheCandles* cache_candles = new CacheCandles(symbol);
+    CacheTrades* cache_trades = new CacheTrades(symbol);
+
+    cache_orders->init(event_bus, ++last_event_receiver_id);
+    cache_order_book_l2->init(event_bus, ++last_event_receiver_id);
+    cache_candles->init(event_bus, ++last_event_receiver_id);
+    cache_trades->init(event_bus, ++last_event_receiver_id);
+    engine->init(++last_event_receiver_id);
+}
 
 int main(void){
     srand(time(0));
@@ -27,24 +44,18 @@ int main(void){
     // std::cout << "Init sleep for 1 min\n";
     // sleep(60);
     // std::cout << "Start\n";
+
+    int last_event_receiver_id = RECEIVER_ID_EVENT_LOGGER;
     
     EventBus event_bus;
-    Engine engine(event_bus, "SYMBOL_1");
     RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem", event_bus);
     EventLogger event_logger;
 
-    CacheOrders cache_orders("SYMBOL_1");
-    CacheOrderBookL2 cache_order_book_l2("SYMBOL_1");
-    CacheCandles cache_candles("SYMBOL_1");
-    CacheTrades cache_trades("SYMBOL_1");
-
     event_bus.init();
     event_logger.init(event_bus);
-    cache_orders.init(event_bus, RECEIVER_ID_CACHE_ORDERS_SYMBOL_1);
-    cache_order_book_l2.init(event_bus, RECEIVER_ID_CACHE_ORDER_BOOK_L2_SYMBOL_1);
-    cache_candles.init(event_bus, RECEIVER_ID_CACHE_CANDLES_SYMBOL_1);
-    cache_trades.init(event_bus, RECEIVER_ID_CACHE_TRADES_SYMBOL_1);
-    engine.init(RECEIVER_ID_ENGINE_SYMBOL_1);
+
+    InitSymbol("SYMBOL_1", event_bus, last_event_receiver_id);
+
     rest_server.init();
 
     while(true)

@@ -180,6 +180,7 @@ returnType Engine::MatchTakerOrder(Order& pTakerOrder)
                 quantity = bookOrder_quantity;
             }
 
+            j_data["symbol"] = this->symbol;
             j_data["taker_order"] = pTakerOrder.ConvertOrderToJson();
             j_data["book_order"] = bookOrder->ConvertOrderToJson();
             j_data["price"] = bookOrder->price;

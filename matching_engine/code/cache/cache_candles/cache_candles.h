@@ -2,6 +2,7 @@
 #define CACHE_CANDLES_H
 
 #include "return_type.h"
+#include "cache.h"
 
 #include <vector>
 #include <string>
@@ -14,15 +15,13 @@
 #include "json.h"
 
 
-class CacheCandles
+class CacheCandles: public Cache
 {
     private:
         std::vector<candle::Candle> candles;
         candle::Candle current_candle;
         float current_high;
         float current_low;
-
-        std::string symbol;
 
         time_t current_timestamp;
 
@@ -52,8 +51,6 @@ class CacheCandles
         void init(EventBus& event_bus, receiverId_t receiver_id);
 
         void EventHandler(Event event);
-
-        returnType Filter(Event& event);
 };
 
 #endif

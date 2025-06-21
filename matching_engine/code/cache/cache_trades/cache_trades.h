@@ -3,23 +3,18 @@
 
 #include "return_type.h"
 
-#include <vector>
-#include <string>
+#include "cache.h"
+
 #include <mutex>
 
 #include "trade.h"
-#include "event.h"
-#include "event_bus.h"
-
 #include "json.h"
 
 
-class CacheTrades
+class CacheTrades: public Cache
 {
     private:
         std::vector<trade::sTrade> trades;
-
-        std::string symbol;
 
         mutable std::mutex trades_lock;
 
@@ -39,8 +34,6 @@ class CacheTrades
         void init(EventBus& event_bus, receiverId_t receiver_id);
 
         void EventHandler(Event event);
-
-        returnType Filter(Event& event);
 };
 
 #endif

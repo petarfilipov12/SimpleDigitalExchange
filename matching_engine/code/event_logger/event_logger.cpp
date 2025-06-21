@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#define RECEIVER_ID_EVENT_LOGGER 0u
-
 EventLogger::EventLogger() {}
 EventLogger::~EventLogger() {}
 

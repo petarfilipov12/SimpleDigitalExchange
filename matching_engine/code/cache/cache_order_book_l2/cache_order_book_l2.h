@@ -2,26 +2,23 @@
 #define CACHE_ORDER_BOOK_L2_H
 
 #include "return_type.h"
+#include "cache.h"
+
 #include <map>
-#include <string>
 #include <mutex>
 
 #include "order.h"
 #include "event.h"
 #include "event_bus.h"
 
-
-
 #include "json.h"
 
 
-class CacheOrderBookL2
+class CacheOrderBookL2: public Cache
 {
     private:
         std::map<std::string, float, std::greater<std::string> > bid_book_l2;
         std::map<std::string, float, std::less<std::string> > ask_book_l2;
-
-        std::string symbol;
 
         mutable std::mutex bid_book_l2_look;
         mutable std::mutex ask_book_l2_look;
@@ -49,8 +46,6 @@ class CacheOrderBookL2
         void init(EventBus& event_bus, receiverId_t receiver_id);
 
         void EventHandler(Event event);
-
-        returnType Filter(Event& event);
 };
 
 #endif

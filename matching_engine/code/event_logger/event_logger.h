@@ -6,7 +6,7 @@
 #include "event.h"
 #include "event_bus.h"
 
-
+#define RECEIVER_ID_EVENT_LOGGER 0u
 
 class EventLogger
 {

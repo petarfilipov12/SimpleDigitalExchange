@@ -2,6 +2,8 @@
 #define CACHE_ORDERS_H
 
 #include "return_type.h"
+#include "cache.h"
+
 #include <unordered_map>
 #include <mutex>
 
@@ -11,12 +13,10 @@
 
 
 
-class CacheOrders
+class CacheOrders: public Cache
 {
     private:
         std::unordered_map<int, Order> orders;
-
-        std::string symbol;
 
         mutable std::mutex order_lock;
 
@@ -46,8 +46,6 @@ class CacheOrders
         void init(EventBus& event_bus, receiverId_t receiver_id);
 
         void EventHandler(Event event);
-
-        returnType Filter(Event& event);
 };
 
 #endif

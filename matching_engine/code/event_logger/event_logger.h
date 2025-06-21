@@ -29,6 +29,12 @@ class EventLogger
             {EVENT_ID_GET_ORDER_BOOK, "EVENT_ID_GET_ORDER_BOOK"},
         
             {EVENT_ID_GET_CANDLES, "EVENT_ID_GET_CANDLES"},
+
+            {EVENT_ID_GET_TRADES, "EVENT_ID_GET_TRADES"},
+
+            {EVENT_ID_ADD_SYMBOL, "EVENT_ID_ADD_SYMBOL"},
+
+            {EVENT_ID_GET_EXCHANGE_INFO, "EVENT_ID_GET_EXCHANGE_INFO"},
         
             {EVENT_ID_INVALID, "EVENT_ID_INVALID"}
         };

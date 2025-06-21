@@ -42,6 +42,8 @@ public:
     void Handler_GetCandles(const httplib::Request &req, httplib::Response &res);
 
     void Handler_GetTrades(const httplib::Request &req, httplib::Response &res);
+
+    void Handler_GetExchangeInfo(const httplib::Request &req, httplib::Response &res);
 };
 
 #endif

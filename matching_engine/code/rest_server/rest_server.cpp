@@ -49,6 +49,7 @@ void RestServer::init()
     this->Post("/get_order_book", std::bind(&RestServer::Handler_GetOrderBook, this, std::placeholders::_1, std::placeholders::_2));
     this->Post("/get_candles", std::bind(&RestServer::Handler_GetCandles, this, std::placeholders::_1, std::placeholders::_2));
     this->Post("/get_trades", std::bind(&RestServer::Handler_GetTrades, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_exchange_info", std::bind(&RestServer::Handler_GetExchangeInfo, this, std::placeholders::_1, std::placeholders::_2));
 
     std::thread thread_rest_server([this]{this->run();});
     thread_rest_server.detach();
@@ -159,6 +160,23 @@ void RestServer::Handler_GetTrades(const httplib::Request &req, httplib::Respons
     json j_data = json::parse(req.body);
 
     this->event_bus.Send(Event(EVENT_ID_GET_TRADES, j_data, &responce_data));
+
+    while(RET_INVALID == responce_data["error"])
+    {
+        usleep(10);
+    }
+
+    res.set_content(responce_data.dump(), "application/json");
+}
+
+void RestServer::Handler_GetExchangeInfo(const httplib::Request &req, httplib::Response &res)
+{
+    json responce_data = {
+        {"error", RET_INVALID},
+        {"data", {}}
+    };
+
+    this->event_bus.Send(Event(EVENT_ID_GET_EXCHANGE_INFO, {}, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {

@@ -86,15 +86,24 @@ def GetTrades(symbol, limit=10):
 
     return resp
 
+def GetExchangeInfo():
+    print("GET EXCHANGE INFO")
+    url = "https://127.0.0.1:8080/get_exchange_info"
+
+    path_to_pub_key = "../../../server_certs/cert2.pem"
+    resp = requests.post(url, json={}, verify=path_to_pub_key).json()
+
+    return resp
+
 def main():
     
     while(True):
-        res = GetTrades("SYMBOL_1")
+        res = GetExchangeInfo()
         print(res)
         print()
 
-        time.sleep(0.2)
-        #input("Press Enter")
+        #time.sleep(0.2)
+        input("Press Enter")
 
     
 

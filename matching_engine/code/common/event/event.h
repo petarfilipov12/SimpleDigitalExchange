@@ -28,6 +28,10 @@ enum eEventId_t
 
     EVENT_ID_GET_TRADES,
 
+    EVENT_ID_ADD_SYMBOL,
+
+    EVENT_ID_GET_EXCHANGE_INFO,
+
     EVENT_ID_INVALID
 };
 

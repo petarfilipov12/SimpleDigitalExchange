@@ -14,11 +14,7 @@
 #include "cache_candles.h"
 #include "cache_trades.h"
 
-#define RECEIVER_ID_ENGINE_SYMBOL_1 1u
-#define RECEIVER_ID_CACHE_ORDERS_SYMBOL_1 2u
-#define RECEIVER_ID_CACHE_ORDER_BOOK_L2_SYMBOL_1 3u
-#define RECEIVER_ID_CACHE_CANDLES_SYMBOL_1 4u
-#define RECEIVER_ID_CACHE_TRADES_SYMBOL_1 5u
+#include "exchange_info.h"
 
 #include <string>
 
@@ -30,6 +26,8 @@ void InitSymbol(const std::string& symbol, EventBus& event_bus, int& last_event_
     CacheOrderBookL2* cache_order_book_l2 = new CacheOrderBookL2(symbol);
     CacheCandles* cache_candles = new CacheCandles(symbol);
     CacheTrades* cache_trades = new CacheTrades(symbol);
+
+    event_bus.Send(Event(EVENT_ID_ADD_SYMBOL, {{"symbol", symbol}}, nullptr));
 
     cache_orders->init(event_bus, ++last_event_receiver_id);
     cache_order_book_l2->init(event_bus, ++last_event_receiver_id);
@@ -50,9 +48,11 @@ int main(void){
     EventBus event_bus;
     RestServer rest_server("../../server_certs/cert2.pem", "../../server_certs/key2.pem", event_bus);
     EventLogger event_logger;
+    ExchangeInfo exchange_info;
 
     event_bus.init();
     event_logger.init(event_bus);
+    exchange_info.init(event_bus, ++last_event_receiver_id);
 
     InitSymbol("SYMBOL_1", event_bus, last_event_receiver_id);
 

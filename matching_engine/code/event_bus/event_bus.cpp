@@ -16,7 +16,7 @@ EventBus::~EventBus()
     // }
 }
 
-returnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const std::function<void(Event)> handler_func)
+returnType EventBus::AddReceiver(const receiverId_t receiver_id, const std::function<void(Event)> handler_func)
 {
     returnType ret = RET_RECEIVER_EXISTS;
 
@@ -33,7 +33,7 @@ returnType EventBus::AddReceiver(const enum eReceiverId_t receiver_id, const std
     return ret;
 }
 
-returnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
+returnType EventBus::RemoveReceiver(const receiverId_t receiver_id)
 {
     returnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -60,7 +60,7 @@ returnType EventBus::RemoveReceiver(const enum eReceiverId_t receiver_id)
     return ret;
 }
 
-returnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const eventId_t event_id)
+returnType EventBus::Subscribe(const receiverId_t receiver_id, const eventId_t event_id)
 {
     returnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -84,7 +84,7 @@ returnType EventBus::Subscribe(const enum eReceiverId_t receiver_id, const event
     return ret;
 }
 
-returnType EventBus::Unsubscribe(const enum eReceiverId_t receiver_id, const eventId_t event_id)
+returnType EventBus::Unsubscribe(const receiverId_t receiver_id, const eventId_t event_id)
 {
     returnType ret = RET_RECEIVER_NOT_EXISTS;
 
@@ -125,6 +125,8 @@ void EventBus::Send(const Event& event)
 void EventBus::Cyclic(void)
 {
     Event event;
+    std::function<returnType(Event&)> filter;
+    bool flag = true;
 
     this->event_queue_lock.lock();
     if (!this->event_queue.empty())
@@ -141,8 +143,11 @@ void EventBus::Cyclic(void)
         {
             for (auto receiver_id : this->events_to_receivers_map[event.GetEventId()])
             {
-                std::thread t(this->event_receivers[receiver_id].GetCallback(), event);
-                t.detach();
+                if(RET_OK == this->event_receivers[receiver_id].Filter(event))
+                {
+                    std::thread t(this->event_receivers[receiver_id].GetCallback(), event);
+                    t.detach();
+                }
             }
         }
         this->receivers_lock.unlock();

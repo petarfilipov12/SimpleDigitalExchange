@@ -18,16 +18,25 @@ enum eReceiverId_t
     RECEIVER_ID_INVALID
 };
 
+typedef enum eReceiverId_t receiverId_t;
+
 class EventReceiver
 {
 private:
-    enum eReceiverId_t id;
+    receiverId_t id;
     std::unordered_set<eventId_t> events;
     std::function<void(Event)> callback;
+    std::function<returnType(Event&)> filter;
 public:
     EventReceiver();
 
-    EventReceiver(const enum eReceiverId_t id, const std::function<void(Event)> callback);
+    EventReceiver(const receiverId_t id, const std::function<void(Event)> callback);
+
+    EventReceiver(
+        const receiverId_t id, 
+        const std::function<void(Event)> callback, 
+        const std::function<returnType(Event&)> filter
+    );
 
     ~EventReceiver();
 
@@ -41,9 +50,11 @@ public:
 
     std::unordered_set<eventId_t> GetEvents() const;
 
-    enum eReceiverId_t GetId() const;
+    receiverId_t GetId() const;
 
     std::function<void(Event)> GetCallback() const;
+
+    returnType Filter(Event& event) const;
 
     bool operator<(const EventReceiver &event_receiver2) const;
 };

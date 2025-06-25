@@ -2,6 +2,7 @@ import requests
 import time
 import json
 import random
+import threading
 
 ORDER_SIDE_BUY = 0
 ORDER_SIDE_SELL = 1
@@ -43,10 +44,12 @@ def AddOrder(symbolP, priceP, qtyP, sideP, typeP):
 
     return resp
 
-def CancelOrder(order_idP):
+def CancelOrder(symbol, order_idP):
     print("CANCEL ORDER")
     url = "https://127.0.0.1:8080/cancel_order"
     data = {}
+
+    data["symbol"] = symbol
     data["order_id"] = order_idP
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
@@ -54,21 +57,22 @@ def CancelOrder(order_idP):
 
     return resp
 
-def GetOrderBook():
+def GetOrderBook(symbol):
     print("GET ORDER BOOK")
     url = "https://127.0.0.1:8080/get_order_book"
     data = {}
+
+    data["symbol"] = symbol
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
     resp = requests.post(url, json=data, verify=path_to_pub_key).json()
 
     return resp
 
-def RandomOrder():
+def RandomOrder(price_lim_min, price_lim_max):
     data = {}
 
-    data["symbol"] = "SYMBOL_1"
-    data["price"] = str(round(random.uniform(1, 2), 2))
+    data["price"] = str(round(random.uniform(price_lim_min, price_lim_max), 2))
     data["qty"] = round(random.uniform(0, 500), 2)
     data["side"] = random.choice([ORDER_SIDE_BUY, ORDER_SIDE_SELL])
     #order_type = random.choices([ORDER_TYPE_MARKET, ORDER_TYPE_LIMIT], weights = [30, 70])[0]
@@ -79,7 +83,7 @@ def RandomOrder():
 def InputOrder():
     data = {}
 
-    data["symbol"] = "SYMBOL_1"
+    data["symbol"] = input("symbol:")
     data["price"] = input("price:")
     data["qty"] = float(input("qty:"))
     data["side"] = int(input("side:"))
@@ -87,18 +91,43 @@ def InputOrder():
 
     return data
 
-def main():
-    
+def AddOrderLoop(symbol, price_lim_min, price_lim_max):
     while(True):
-        data = RandomOrder()
-        #data = InputOrder()
+        data = RandomOrder(price_lim_min, price_lim_max)
+        data["symbol"] = symbol
         
         order = AddOrder(data["symbol"], data["price"], data["qty"], data["side"], data["order_type"])
         print(order)
         print()
 
         time.sleep(0.2)
-        #input("Press Enter")
+
+def main():
+    symbols_data = {}
+    symbols_data["SYMBOL_1"] = {
+        "price_lim_min": 1,
+        "price_lim_max": 2
+    }
+    symbols_data["SYMBOL_2"] = {
+        "price_lim_min": 10,
+        "price_lim_max": 20
+    }
+
+    threads = []
+
+    for symbol, symbol_data in symbols_data.items():
+        args = [symbol]
+        args += symbol_data.values()
+        t = threading.Thread(target=AddOrderLoop, args=args)
+        t.daemon = True
+        t.start()
+
+        threads.append(t)
+    
+    for t in threads:
+        t.join()
+    
+    
 
     
 

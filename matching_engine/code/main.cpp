@@ -55,6 +55,7 @@ int main(void){
     exchange_info.init(event_bus, ++last_event_receiver_id);
 
     InitSymbol("SYMBOL_1", event_bus, last_event_receiver_id);
+    InitSymbol("SYMBOL_2", event_bus, last_event_receiver_id);
 
     rest_server.init();
 

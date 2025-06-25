@@ -2,13 +2,23 @@ from ExchangeAPIWrapper.ExchangeAPIWrapper_Constants import*
 from TimerUpdater.TimerUpdater import TimerUpdater
 import dearpygui.dearpygui as dpg
 
+from threading import Lock
+
 class ExchangeUI:
     api_client = None
+
+    timer_updater = None
+    mutex = None
+
     exchange_info = None
     current_symbol = None
 
+    buy_btn_theme = None
+    sell_btn_theme = None
+
     def __init__(self, api_client):
         self.api_client = api_client
+        self.mutex = Lock()
     
     def _GetExchangeInfo(self):
         data = None
@@ -102,9 +112,14 @@ class ExchangeUI:
                     dpg.add_text(trade["quantity"])
     
     def _UpdaterFunc(self):
-        self._UpdateCandles()
-        self._UpdateOrderBook()
-        self._UpdateTrades()
+        with self.mutex:
+            self._UpdateCandles()
+        
+        with self.mutex:
+            self._UpdateOrderBook()
+
+        with self.mutex:
+            self._UpdateTrades()
         
     
     def _ShowCandleChart(self, parent):
@@ -123,7 +138,7 @@ class ExchangeUI:
             highs = data["highs"]
             lows = data["lows"]
 
-        with dpg.plot(parent=parent, label="Candle Series", height=-1, width=-1):
+        with dpg.plot(parent=parent, label=self.current_symbol + " Candle Chart", height=-1, width=-1):
             dpg.add_plot_legend()
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", scale=dpg.mvPlotScale_Time)
             with dpg.plot_axis(dpg.mvYAxis, tag="CANDLES_Y_AXIS", label="USD", auto_fit=True):
@@ -132,7 +147,7 @@ class ExchangeUI:
             dpg.fit_axis_data(xaxis)
 
     def _ShowBookDepth(self, parent):        
-        with dpg.plot(parent=parent, label="Order Book Depth", height=-1, width=-1):
+        with dpg.plot(parent=parent, label=self.current_symbol + " Order Book Depth", height=-1, width=-1):
             dpg.add_plot_legend()
             dpg.add_plot_axis(dpg.mvXAxis, label="price", auto_fit=True)
             with dpg.plot_axis(dpg.mvYAxis, label="Amount", auto_fit=True):
@@ -170,6 +185,27 @@ class ExchangeUI:
         
         self.api_client.AddOrder(symbol=self.current_symbol, price=price, qty=amount, order_side=order_side, order_type=order_type)
 
+    def _SymbolCallback(self, sender, app_data, user_data):
+        if(self.current_symbol != user_data):
+            with self.mutex:
+                self.current_symbol = user_data
+                self._ShowMainWindow()
+
+    def _ShowSymbolList(self, parent):
+        symbol_list = list(self.exchange_info.keys())
+
+        table_tag = dpg.generate_uuid()
+
+        dpg.add_input_text(parent=parent, hint="filter", width=-1, callback=lambda s, a, u: dpg.set_value(table_tag, dpg.get_value(s)))
+
+        with dpg.table(parent=parent, header_row=False, tag=table_tag, width=-1):
+            dpg.add_table_column(width=-1)
+
+            for symbol in symbol_list:
+                with dpg.table_row(filter_key=symbol):
+                    selectable = dpg.add_selectable(label=symbol, callback=self._SymbolCallback, user_data=symbol)
+                    if(self.current_symbol == symbol):
+                        dpg.configure_item(selectable, default_value=True, enabled=False)
     
     def _ShowBuySell(self, parent):
         dpg.add_combo(tag="ADD_ORDER_TYPE", parent=parent, label="Order Type", items=["MARKET", "LIMIT"], default_value="LIMIT")
@@ -177,30 +213,29 @@ class ExchangeUI:
         dpg.add_input_float(tag="ADD_ORDER_PRICE", parent=parent, label="Price", default_value=1.5, step=0.1)
         dpg.add_input_float(tag="ADD_ORDER_AMOUNT", parent=parent, label="Amount", default_value=100.0, step=1.0)
 
+        buy_btn_theme = dpg.add_theme()
+        with dpg.theme_component(dpg.mvButton, parent=buy_btn_theme):
+            dpg.add_theme_color(dpg.mvThemeCol_Button, (20, 210, 20, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (20, 230, 20, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (20, 250, 20, 255))
+            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 10)
+
+        sell_btn_theme = dpg.add_theme()
+        with dpg.theme_component(dpg.mvButton, parent=sell_btn_theme):
+            dpg.add_theme_color(dpg.mvThemeCol_Button, (210, 20, 20, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonHovered, (230, 20, 20, 255))
+            dpg.add_theme_color(dpg.mvThemeCol_ButtonActive, (250, 20, 20, 255))
+            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 10)
+
         with dpg.group(parent=parent, horizontal=True):
-            dpg.add_button(tag="ADD_ORDER_BUY", label="BUY", callback=self._AddOrder_Callback)
-            dpg.add_button(tag="ADD_ORDER_SELL", label="SELL", callback=self._AddOrder_Callback)
+            buy_btn = dpg.add_button(tag="ADD_ORDER_BUY", label="BUY", callback=self._AddOrder_Callback, width=100, height=40)
+            dpg.bind_item_theme("ADD_ORDER_BUY", buy_btn_theme)
 
-    def _SymbolCallback(self, sender, app_data, user_data):
-        if(self.current_symbol != user_data):
-            self.current_symbol = user_data
-            self._ShowMainWindow()
-
-    def _ShowSymbolList(self, parent):
-        symbol_list = list(self.exchange_info.keys())
-
-        table_tag = dpg.generate_uuid()
-
-        dpg.add_input_text(parent=parent, callback=lambda s, a, u: dpg.set_value(table_tag, dpg.get_value(s)))
-
-        with dpg.table(parent=parent, header_row=False, tag=table_tag, width=-1):
-            dpg.add_table_column(width=-1)
-
-            for symbol in symbol_list:
-                with dpg.table_row(filter_key=symbol):
-                    dpg.add_selectable(label=symbol, callback=self._SymbolCallback, user_data=symbol)
+            sell_btn = dpg.add_button(tag="ADD_ORDER_SELL", label="SELL", callback=self._AddOrder_Callback, width=100, height=40)
+            dpg.bind_item_theme(sell_btn, sell_btn_theme)
 
     def _ShowMainWindow(self):
+        self.timer_updater.Pause()
         dpg.delete_item("PRIMARY_WINDOW", children_only=True)
 
         with dpg.child_window(parent="PRIMARY_WINDOW", resizable_x=False, resizable_y=True, height=600, width=-1) as child_w:
@@ -213,19 +248,22 @@ class ExchangeUI:
                             self._ShowBookDepth(parent=parrent)
 
                 with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=500, border=False) as parrent:
+                    dpg.add_separator(label=self.current_symbol + " Last Trades")
                     self._ShowTrades(parent=parrent)
 
                 with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as parrent:
+                    dpg.add_separator(label="Symbols")
                     self._ShowSymbolList(parent=parrent)
 
         self._ShowBuySell(parent="PRIMARY_WINDOW")
-    
+        self.timer_updater.Resume()
+
     def _Init(self):
         self.exchange_info = self._GetExchangeInfo()
         self.current_symbol = list(self.exchange_info.keys())[0]
     
     def _Run(self):
-        timer_updater = TimerUpdater(func=self._UpdaterFunc)
+        self.timer_updater = TimerUpdater(func=self._UpdaterFunc)
 
         dpg.create_context()
         dpg.create_viewport(title='Digital Exchange', width=900, height=700)
@@ -237,7 +275,8 @@ class ExchangeUI:
         dpg.show_viewport()
         dpg.set_primary_window("PRIMARY_WINDOW", True)
         
-        timer_updater.Run()
+        self.timer_updater.Run()
+
         dpg.start_dearpygui()
 
         dpg.destroy_context()

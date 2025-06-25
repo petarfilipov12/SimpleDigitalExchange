@@ -4,12 +4,23 @@ import dearpygui.dearpygui as dpg
 
 class ExchangeUI:
     api_client = None
+    exchange_info = None
+    current_symbol = None
 
     def __init__(self, api_client):
         self.api_client = api_client
     
+    def _GetExchangeInfo(self):
+        data = None
+
+        body_json = self.api_client.GetExchangeInfo()
+        if(body_json):
+            data = body_json["data"]
+        
+        return data
+    
     def _UpdateOrderBook(self):
-        body_json = self.api_client.GetOrderBook()
+        body_json = self.api_client.GetOrderBook(symbol=self.current_symbol)
         if(body_json):
             order_book = body_json["data"]
 
@@ -36,7 +47,7 @@ class ExchangeUI:
     def _GetCandles_DpgFriendly(self):
         data = None
 
-        body_json = self.api_client.GetCandles(limit=100)
+        body_json = self.api_client.GetCandles(symbol=self.current_symbol, limit=100)
         if(body_json and body_json["data"]):
             candles = body_json["data"]
 
@@ -72,7 +83,7 @@ class ExchangeUI:
     def _GetTrades(self):
         data = None
 
-        body_json = self.api_client.GetTrades(limit=20)
+        body_json = self.api_client.GetTrades(symbol=self.current_symbol, limit=20)
         if(body_json):
             data = body_json["data"]
         
@@ -135,7 +146,7 @@ class ExchangeUI:
             dpg.add_table_column(label="Quantity")
     
     def _AddOrder_Callback(self, sender, app_data, user_data):
-        print(sender, app_data, user_data)
+        #print(sender, app_data, user_data)
 
         price = dpg.get_value("ADD_ORDER_PRICE")
         price = "{:.2f}".format(price)
@@ -157,7 +168,7 @@ class ExchangeUI:
         else:
             raise Exception("Wrong Order Side: " + str(order_side))
         
-        self.api_client.AddOrder(price=price, qty=amount, order_side=order_side, order_type=order_type)
+        self.api_client.AddOrder(symbol=self.current_symbol, price=price, qty=amount, order_side=order_side, order_type=order_type)
 
     
     def _ShowBuySell(self, parent):
@@ -170,19 +181,44 @@ class ExchangeUI:
             dpg.add_button(tag="ADD_ORDER_BUY", label="BUY", callback=self._AddOrder_Callback)
             dpg.add_button(tag="ADD_ORDER_SELL", label="SELL", callback=self._AddOrder_Callback)
 
+    def _SymbolCallback(self, sender, app_data, user_data):
+        self.current_symbol = user_data
+        self._ShowMainWindow()
 
-    def _ShowMainWindow(self, ):
+    def _ShowSymbolList(self, parent):
+        symbol_list = list(self.exchange_info.keys())
+
+        table_tag = dpg.generate_uuid()
+
+        dpg.add_input_text(parent=parent, callback=lambda s, a, u: dpg.set_value(table_tag, dpg.get_value(s)))
+
+        with dpg.table(parent=parent, header_row=False, tag=table_tag, width=-1):
+            dpg.add_table_column(width=-1)
+
+            for symbol in symbol_list:
+                with dpg.table_row(filter_key=symbol):
+                    dpg.add_selectable(label=symbol, callback=self._SymbolCallback, user_data=symbol)
+
+    def _ShowMainWindow(self):
+        dpg.delete_item("PRIMARY_WINDOW", children_only=True)
+
         with dpg.child_window(parent="PRIMARY_WINDOW", resizable_x=False, resizable_y=True, height=600, width=-1) as child_w_0:
             with dpg.group(parent=child_w_0, horizontal=True) as group:
                 with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_1:
                     self._ShowCandleChart(parent=child_w_1)
                 with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_2:
                     self._ShowBookDepth(parent=child_w_2)
-                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_3:
+                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=500, border=False) as child_w_3:
                     self._ShowTrades(parent=child_w_3)
+                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_4:
+                    self._ShowSymbolList(parent=child_w_4)
         self._ShowBuySell(parent="PRIMARY_WINDOW")
     
-    def Run(self):
+    def _Init(self):
+        self.exchange_info = self._GetExchangeInfo()
+        self.current_symbol = list(self.exchange_info.keys())[0]
+    
+    def _Run(self):
         timer_updater = TimerUpdater(func=self._UpdaterFunc)
 
         dpg.create_context()
@@ -199,3 +235,7 @@ class ExchangeUI:
         dpg.start_dearpygui()
 
         dpg.destroy_context()
+    
+    def Start(self):
+        self._Init()
+        self._Run()

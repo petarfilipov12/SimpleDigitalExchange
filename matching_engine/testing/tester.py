@@ -53,10 +53,12 @@ def CancelOrder(order_idP):
 
     return resp
 
-def GetOrderBook():
+def GetOrderBook(symbol):
     print("GET ORDER BOOK")
     url = "https://127.0.0.1:8080/get_order_book"
-    data = {}
+    data = {
+        "symbol": symbol
+    }
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
     resp = requests.post(url, json=data, verify=path_to_pub_key).json()
@@ -98,7 +100,7 @@ def GetExchangeInfo():
 def main():
     
     while(True):
-        res = GetExchangeInfo()
+        res = GetOrderBook(symbol="SYMBOL_1")
         print(res)
         print()
 

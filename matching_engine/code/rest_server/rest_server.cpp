@@ -122,8 +122,9 @@ void RestServer::Handler_GetOrderBook(const httplib::Request &req, httplib::Resp
         {"error", RET_INVALID},
         {"data", {}}
     };
+    json j_data = json::parse(req.body);
 
-    this->event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, {}, &responce_data));
+    this->event_bus.Send(Event(EVENT_ID_GET_ORDER_BOOK, j_data, &responce_data));
 
     while(RET_INVALID == responce_data["error"])
     {

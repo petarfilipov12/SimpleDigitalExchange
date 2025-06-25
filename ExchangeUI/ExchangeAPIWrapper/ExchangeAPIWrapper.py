@@ -27,7 +27,7 @@ class ExchangeAPIWrapper:
 
         return resp.json()
     
-    def AddOrder(self, price, qty, order_side, order_type):
+    def AddOrder(self, symbol, price, qty, order_side, order_type):
         if( (order_side < 0) or (order_side >= ORDER_SIDE_INVALID)):
             raise Exception("Invalid Order Side: " + str(order_side))
         
@@ -35,6 +35,7 @@ class ExchangeAPIWrapper:
             raise Exception("Invalid Order Type: " + str(order_type))
 
         data = {}
+        data["symbol"] = symbol
         data["price"] = price
         data["quantity"] = qty
         data["order_side"] = order_side
@@ -42,29 +43,39 @@ class ExchangeAPIWrapper:
 
         return self._Request_POST("/add_order", json_data=data)
     
-    def CancelOrder(self, order_id):
+    def CancelOrder(self, symbol, order_id):
         data = {}
+        data["symbol"] = symbol
         data["order_id"] = order_id
 
         return self._Request_POST("/cancel_order", json_data=data)
     
-    def GetOrder(self, order_id):
+    def GetOrder(self, symbol, order_id):
         data = {}
+        data["symbol"] = symbol
         data["order_id"] = order_id
 
         return self._Request_POST("/get_order", json_data=data)
     
-    def GetOrderBook(self):
-        return self._Request_POST("/get_order_book")
-    
-    def GetCandles(self, limit=10):
+    def GetOrderBook(self, symbol):
         data = {}
+        data["symbol"] = symbol
+
+        return self._Request_POST("/get_order_book", json_data=data)
+    
+    def GetCandles(self, symbol, limit=10):
+        data = {}
+        data["symbol"] = symbol
         data["limit"] = limit
 
         return self._Request_POST("/get_candles", json_data=data)
     
-    def GetTrades(self, limit=10):
+    def GetTrades(self, symbol, limit=10):
         data = {}
+        data["symbol"] = symbol
         data["limit"] = limit
 
         return self._Request_POST("/get_trades", json_data=data)
+    
+    def GetExchangeInfo(self):
+        return self._Request_POST("/get_exchange_info")

@@ -182,8 +182,9 @@ class ExchangeUI:
             dpg.add_button(tag="ADD_ORDER_SELL", label="SELL", callback=self._AddOrder_Callback)
 
     def _SymbolCallback(self, sender, app_data, user_data):
-        self.current_symbol = user_data
-        self._ShowMainWindow()
+        if(self.current_symbol != user_data):
+            self.current_symbol = user_data
+            self._ShowMainWindow()
 
     def _ShowSymbolList(self, parent):
         symbol_list = list(self.exchange_info.keys())
@@ -202,16 +203,21 @@ class ExchangeUI:
     def _ShowMainWindow(self):
         dpg.delete_item("PRIMARY_WINDOW", children_only=True)
 
-        with dpg.child_window(parent="PRIMARY_WINDOW", resizable_x=False, resizable_y=True, height=600, width=-1) as child_w_0:
-            with dpg.group(parent=child_w_0, horizontal=True) as group:
-                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_1:
-                    self._ShowCandleChart(parent=child_w_1)
-                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False) as child_w_2:
-                    self._ShowBookDepth(parent=child_w_2)
-                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=500, border=False) as child_w_3:
-                    self._ShowTrades(parent=child_w_3)
-                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as child_w_4:
-                    self._ShowSymbolList(parent=child_w_4)
+        with dpg.child_window(parent="PRIMARY_WINDOW", resizable_x=False, resizable_y=True, height=600, width=-1) as child_w:
+            with dpg.group(parent=child_w, horizontal=True) as group:
+                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=700, border=False):
+                    with dpg.tab_bar():
+                        with dpg.tab(label="Candles") as parrent:
+                            self._ShowCandleChart(parent=parrent)
+                        with dpg.tab(label="OrderBook") as parrent:
+                            self._ShowBookDepth(parent=parrent)
+
+                with dpg.child_window(parent=group, resizable_x=True, resizable_y=False, width=500, border=False) as parrent:
+                    self._ShowTrades(parent=parrent)
+
+                with dpg.child_window(parent=group, resizable_x=False, resizable_y=False, width=-1, border=False) as parrent:
+                    self._ShowSymbolList(parent=parrent)
+
         self._ShowBuySell(parent="PRIMARY_WINDOW")
     
     def _Init(self):

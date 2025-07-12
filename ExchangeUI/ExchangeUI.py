@@ -2,6 +2,7 @@ from ExchangeAPIWrapper.ExchangeAPIWrapper_Constants import*
 from TimerUpdater.TimerUpdater import TimerUpdater
 import dearpygui.dearpygui as dpg
 
+from datetime import datetime
 from threading import Lock
 
 class ExchangeUI:
@@ -107,7 +108,8 @@ class ExchangeUI:
 
             for trade in data:
                 with dpg.table_row(parent="TARDES_TABLE"):
-                    dpg.add_text(trade["timestamp"])
+                    local_time = datetime.fromtimestamp(trade["timestamp"])
+                    dpg.add_text(local_time.strftime("%d-%b-%Y  %H:%M:%S"))
                     dpg.add_text(trade["price"])
                     dpg.add_text(trade["quantity"])
     

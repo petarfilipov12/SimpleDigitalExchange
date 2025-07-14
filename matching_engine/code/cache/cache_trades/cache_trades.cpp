@@ -64,7 +64,7 @@ void CacheTrades::init(EventBus& event_bus, receiverId_t receiver_id)
 /******************************/
 void CacheTrades::EventHandler_OrderFilled(Event& event)
 {
-    this->OrderFilled(event.GetJsonData()["price"], event.GetJsonData()["quantity"]);
+    this->OrderFilled(event.GetDataIn()["price"], event.GetDataIn()["quantity"]);
 }
 
 void CacheTrades::EventHandler_GetTrades(Event& event)
@@ -72,16 +72,16 @@ void CacheTrades::EventHandler_GetTrades(Event& event)
     json trades;
     returnType ret = RET_NOT_OK;
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
-        ret = this->GetTrades(event.GetJsonData()["limit"], trades);
+        ret = this->GetTrades(event.GetDataIn()["limit"], trades);
 
         if(RET_OK == ret)
         {
-            (*event.GetResponceDataPtr())["data"] = trades;
+            (*event.GetDataOut())["data"] = trades;
         }
 
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["error"] = ret;
     }
 }
 

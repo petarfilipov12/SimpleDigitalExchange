@@ -190,21 +190,21 @@ void CacheOrderBookL2::init(EventBus& event_bus, receiverId_t receiver_id)
 /******************************/
 void CacheOrderBookL2::EventHandler_OrderAdded(Event& event)
 {
-    json j_data = event.GetJsonData();
+    json j_data = event.GetDataIn();
     this->OrderAdded(Order::ConvertJsonToOrder(j_data));
 }
 
 void CacheOrderBookL2::EventHandler_OrderCanceled(Event& event)
 {
-    json j_data = event.GetJsonData();
+    json j_data = event.GetDataIn();
     this->OrderCanceled(Order::ConvertJsonToOrder(j_data));
 }
 
 void CacheOrderBookL2::EventHandler_OrderFilled(Event& event)
 {
     this->OrderFilled(
-        event.GetJsonData()["price"], event.GetJsonData()["quantity"],
-        event.GetJsonData()["book_order"]["order_side"]
+        event.GetDataIn()["price"], event.GetDataIn()["quantity"],
+        event.GetDataIn()["book_order"]["order_side"]
     );
 }
 
@@ -213,16 +213,16 @@ void CacheOrderBookL2::EventHandler_GetOrderBookL2(Event& event)
     json l2_book;
     returnType ret = RET_NOT_OK;
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
         ret = this->GetOrderBookL2(l2_book);
 
         if(RET_OK == ret)
         {
-            (*event.GetResponceDataPtr())["data"] = l2_book;
+            (*event.GetDataOut())["data"] = l2_book;
         }
 
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["error"] = ret;
     }
 }
 

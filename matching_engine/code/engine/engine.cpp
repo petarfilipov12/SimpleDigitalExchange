@@ -271,14 +271,14 @@ void Engine::init(receiverId_t receiver_id)
 void Engine::EventHandler_AddOrder(Event& event)
 {
     returnType ret = RET_NOT_OK;
-    json j_data = event.GetJsonData();
+    json j_data = event.GetDataIn();
 
     ret = this->AddOrder(Order::ConvertJsonToOrder(j_data));
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
-        (*event.GetResponceDataPtr())["data"] = j_data;
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["data"] = j_data;
+        (*event.GetDataOut())["error"] = ret;
     }
 
 }
@@ -287,12 +287,12 @@ void Engine::EventHandler_CancelOrder(Event& event)
 {
     returnType ret;
 
-    ret = this->CancelOrderById(event.GetJsonData()["order_id"]);
+    ret = this->CancelOrderById(event.GetDataIn()["order_id"]);
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
-        (*event.GetResponceDataPtr())["data"] = event.GetJsonData();
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["data"] = event.GetDataIn();
+        (*event.GetDataOut())["error"] = ret;
     }
 }
 
@@ -319,7 +319,7 @@ returnType Engine::Filter(Event& event)
 {
     returnType ret = RET_NOT_OK;
 
-    if(this->symbol == event.GetJsonData()["symbol"])
+    if(this->symbol == event.GetDataIn()["symbol"])
     {
         ret = RET_OK;
     }

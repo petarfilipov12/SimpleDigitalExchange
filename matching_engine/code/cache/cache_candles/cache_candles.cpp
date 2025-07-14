@@ -185,7 +185,7 @@ void CacheCandles::init(EventBus& event_bus, receiverId_t receiver_id)
 /******************************/
 void CacheCandles::EventHandler_OrderFilled(Event& event)
 {
-    this->OrderFilled(event.GetJsonData()["price"]);
+    this->OrderFilled(event.GetDataIn()["price"]);
 }
 
 void CacheCandles::EventHandler_GetCandles(Event& event)
@@ -193,16 +193,16 @@ void CacheCandles::EventHandler_GetCandles(Event& event)
     json candles;
     returnType ret = RET_NOT_OK;
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
-        ret = this->GetCandles(event.GetJsonData()["limit"], candles);
+        ret = this->GetCandles(event.GetDataIn()["limit"], candles);
 
         if(RET_OK == ret)
         {
-            (*event.GetResponceDataPtr())["data"] = candles;
+            (*event.GetDataOut())["data"] = candles;
         }
 
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["error"] = ret;
     }
 }
 

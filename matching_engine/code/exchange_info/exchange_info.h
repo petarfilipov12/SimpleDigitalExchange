@@ -31,7 +31,7 @@ class ExchangeInfo
 
         void EventHandler_AddSymbol(Event &event)
         {
-            this->AddSymbol({event.GetJsonData()["symbol"]});
+            this->AddSymbol({event.GetDataIn()["symbol"]});
         }
 
         void EventHandler_GetExchangeInfo(Event &event)
@@ -39,16 +39,16 @@ class ExchangeInfo
             json exchange_info;
             returnType ret = RET_NOT_OK;
 
-            if (nullptr != event.GetResponceDataPtr())
+            if (nullptr != event.GetDataOut())
             {
                 ret = this->GetExchangeInfo(exchange_info);
 
                 if (RET_OK == ret)
                 {
-                    (*event.GetResponceDataPtr())["data"] = exchange_info;
+                    (*event.GetDataOut())["data"] = exchange_info;
                 }
 
-                (*event.GetResponceDataPtr())["error"] = ret;
+                (*event.GetDataOut())["error"] = ret;
             }
         }
 

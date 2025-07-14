@@ -25,7 +25,7 @@ void EventLogger::EventHandler(Event event)
 
     if(RET_OK == this->ConvertEventIdToString(event.GetEventId(), event_id_s))
     {
-        std::cout << "event_logger: event_id=" << event_id_s << ", data=" << event.GetJsonData() << std::endl;
+        std::cout << "event_logger: event_id=" << event_id_s << ", data=" << event.GetDataIn() << std::endl;
     }
 }
 

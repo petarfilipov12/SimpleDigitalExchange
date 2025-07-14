@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "event_bus.h"
+#include "event.h"
 
 class RestServer
 {
@@ -17,6 +18,8 @@ private:
     unsigned int port;
 
     EventBus& event_bus;
+
+    inline void HandleRequest(eventId_t event_id, const json& j_data, httplib::Response &res);
 
 public:
     RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus);

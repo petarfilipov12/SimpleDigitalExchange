@@ -3,6 +3,8 @@
 
 #include "return_type.h"
 
+#include <memory>
+
 #include "json.h"
 
 
@@ -41,21 +43,21 @@ typedef enum eEventId_t eventId_t;
 class Event{
     private:
         eventId_t event_id;
-        json json_data;
-        json *responce_data;
+        json data_in;
+        std::shared_ptr<json> data_out;
 
     public:
         Event();
 
-        Event(const eventId_t event_id, const json json_data, const json *responce_data);
+        Event(const eventId_t event_id, const json& data_in, const std::shared_ptr<json>& data_out);
 
         Event(const Event& event2);
 
         eventId_t GetEventId() const;
 
-        json GetJsonData() const;
+        json GetDataIn() const;
 
-        json* GetResponceDataPtr() const;
+        std::shared_ptr<json> GetDataOut() const;
 };
 
 #endif

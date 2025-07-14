@@ -40,7 +40,7 @@ class Cache
         {
             returnType ret = RET_NOT_OK;
         
-            if(this->symbol == event.GetJsonData()["symbol"])
+            if(this->symbol == event.GetDataIn()["symbol"])
             {
                 ret = RET_OK;
             }

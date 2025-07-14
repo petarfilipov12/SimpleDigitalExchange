@@ -108,20 +108,20 @@ void CacheOrders::init(EventBus& event_bus, receiverId_t receiver_id)
 /******************************/
 void CacheOrders::EventHandler_OrderAdded(Event& event)
 {
-    this->OrderAdded(Order::ConvertJsonToOrder(event.GetJsonData()));
+    this->OrderAdded(Order::ConvertJsonToOrder(event.GetDataIn()));
 }
 
 void CacheOrders::EventHandler_OrderCanceled(Event& event)
 {
-    this->OrderCanceled(event.GetJsonData()["order_id"]);
+    this->OrderCanceled(event.GetDataIn()["order_id"]);
 }
 
 void CacheOrders::EventHandler_OrderFilled(Event& event)
 {
     this->OrderFilled(
-        event.GetJsonData()["taker_order"]["order_id"],
-        event.GetJsonData()["book_order"]["order_id"],
-        event.GetJsonData()["quantity"]
+        event.GetDataIn()["taker_order"]["order_id"],
+        event.GetDataIn()["book_order"]["order_id"],
+        event.GetDataIn()["quantity"]
     );
 }
 
@@ -130,16 +130,16 @@ void CacheOrders::EventHandler_GetOrder(Event& event)
     Order order;
     returnType ret = RET_NOT_OK;
 
-    if(nullptr != event.GetResponceDataPtr())
+    if(nullptr != event.GetDataOut())
     {
-        ret = this->GetOrder(event.GetJsonData()["order_id"], order);
+        ret = this->GetOrder(event.GetDataIn()["order_id"], order);
 
         if(RET_OK == ret)
         {
-            (*event.GetResponceDataPtr())["data"] = order.ConvertOrderToJson();
+            (*event.GetDataOut())["data"] = order.ConvertOrderToJson();
         }
 
-        (*event.GetResponceDataPtr())["error"] = ret;
+        (*event.GetDataOut())["error"] = ret;
     }
 }
 

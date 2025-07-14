@@ -3,21 +3,22 @@
 Event::Event()
 {
     this->event_id = EVENT_ID_INVALID;
-    this->responce_data = nullptr;
+    this->data_in = nullptr;
+    this->data_out = nullptr;
 }
 
-Event::Event(const eventId_t event_id, const json json_data, const json *responce_data)
+Event::Event(const eventId_t event_id, const json& data_in, const std::shared_ptr<json>& data_out)
 {
     this->event_id = event_id;
-    this->json_data = json_data;
-    this->responce_data = (json*)responce_data;
+    this->data_in = data_in;
+    this->data_out = data_out;
 }
 
 Event::Event(const Event &event2)
 {
     this->event_id = event2.event_id;
-    this->json_data = event2.json_data;
-    this->responce_data = event2.responce_data;
+    this->data_in = event2.data_in;
+    this->data_out = event2.data_out;
 }
 
 eventId_t Event::GetEventId() const
@@ -25,12 +26,12 @@ eventId_t Event::GetEventId() const
     return this->event_id;
 }
 
-json Event::GetJsonData() const
+json Event::GetDataIn() const
 {
-    return this->json_data;
+    return this->data_in;
 }
 
-json* Event::GetResponceDataPtr() const
+std::shared_ptr<json> Event::GetDataOut() const
 {
-    return this->responce_data;
+    return this->data_out;
 }

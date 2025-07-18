@@ -70,7 +70,7 @@ inline void RestServer::HandleRequest(eventId_t event_id, const json& j_data, ht
 
     while(RET_INVALID == (*responce_data)["error"])
     {
-        usleep(10);
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
 
     res.set_content(responce_data->dump(), "application/json");

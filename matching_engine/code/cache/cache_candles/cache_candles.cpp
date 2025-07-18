@@ -1,9 +1,9 @@
 #include "cache_candles.h"
 
 #include <algorithm>
-#include <unistd.h>
 #include <ctime>
 #include <thread>
+#include <chrono>
 
 CacheCandles::CacheCandles(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
 {
@@ -120,7 +120,7 @@ void CacheCandles::InitFunc()
 
     this->current_timestamp = this->current_timestamp + sec_till_next_interval;
 
-    sleep(sec_till_next_interval);
+    std::this_thread::sleep_for(std::chrono::seconds(sec_till_next_interval));
     this->Cyclic();
 }
 
@@ -165,7 +165,7 @@ void CacheCandles::run()
 
     while (true)
     {
-        sleep(this->interval);
+        std::this_thread::sleep_for(std::chrono::seconds(this->interval));
         this->Cyclic();
     }
 }

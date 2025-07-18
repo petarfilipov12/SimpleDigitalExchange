@@ -19,6 +19,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <chrono>
 
 struct SymbolSpecificModules
 {
@@ -50,7 +51,7 @@ int main(void){
     srand(time(0));
 
     // std::cout << "Init sleep for 1 min\n";
-    // sleep(60);
+    // std::this_thread::sleep_for(std::chrono::seconds(60));
     // std::cout << "Start\n";
 
     int last_event_receiver_id = RECEIVER_ID_EVENT_LOGGER;
@@ -66,7 +67,7 @@ int main(void){
 
     while(true)
     {
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     return 0;

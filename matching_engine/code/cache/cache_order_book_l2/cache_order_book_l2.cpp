@@ -1,6 +1,7 @@
 #include "cache_order_book_l2.h"
 
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 
 #include "event.h"
 
@@ -112,7 +113,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
 
             if(false == flag)
             {
-                usleep(10);
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
     }
@@ -135,7 +136,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
 
             if(false == flag)
             {
-                usleep(10);
+                std::this_thread::sleep_for(std::chrono::microseconds(10));
             }
         }
     }

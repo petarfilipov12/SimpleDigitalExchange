@@ -8,11 +8,9 @@ TakerOrderBook::~TakerOrderBook() {}
 
 bool TakerOrderBook::ExistsTakerOrder(const Order& order) const
 {
-    this->taker_book_lock.lock();
-    bool ret = this->taker_orders.find(order) != this->taker_orders.end();
-    this->taker_book_lock.unlock();
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
 
-    return ret;
+    return this->taker_orders.find(order) != this->taker_orders.end();
 }
 
 bool TakerOrderBook::ExistsTakerOrderById(const int id) const
@@ -24,7 +22,7 @@ returnType TakerOrderBook::AddTakerOrder(const Order& order)
 {
     returnType ret = RET_ORDER_NOT_EXISTS;
 
-    this->taker_book_lock.lock();
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
     if (this->taker_orders.find(order) == this->taker_orders.end())
     {
         this->taker_orders_queue.push_back(order);
@@ -32,7 +30,6 @@ returnType TakerOrderBook::AddTakerOrder(const Order& order)
 
         ret = RET_OK;
     }
-    this->taker_book_lock.unlock();
 
     return ret;
 }
@@ -41,9 +38,9 @@ returnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
 {
     returnType ret = RET_ORDER_NOT_EXISTS;
 
-    this->taker_book_lock.lock();
-    std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->taker_orders.find(Order(id));
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
 
+    std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->taker_orders.find(Order(id));
     if (pOrder != this->taker_orders.end())
     {
         if(pOrder_o != nullptr)
@@ -61,7 +58,6 @@ returnType TakerOrderBook::CancelTakerOrderById(const int id, Order *pOrder_o)
 
         ret = RET_OK;
     }
-    this->taker_book_lock.unlock();
 
     return ret;
 }
@@ -76,7 +72,7 @@ returnType TakerOrderBook::GetAt(const int index, Order **pOrder)
     returnType ret = RET_BOOK_EMPTY;
     std::list<Order>::iterator iter;
 
-    this->taker_book_lock.lock();
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
     if (!this->taker_orders_queue.empty())
     {
         if(index < this->taker_orders_queue.size())
@@ -94,7 +90,6 @@ returnType TakerOrderBook::GetAt(const int index, Order **pOrder)
             ret = RET_INVALID;
         }
     }
-    this->taker_book_lock.unlock();
 
     return ret;
 }
@@ -103,14 +98,13 @@ returnType TakerOrderBook::GetFirst(Order **pOrder)
 {
     returnType ret = RET_BOOK_EMPTY;
 
-    this->taker_book_lock.lock();
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
     if (!this->taker_orders_queue.empty())
     {
         *pOrder = &(this->taker_orders_queue.front());
 
         ret = RET_OK;
     }
-    this->taker_book_lock.unlock();
 
     return ret;
 }
@@ -119,7 +113,7 @@ returnType TakerOrderBook::PopFirst()
 {
     returnType ret = RET_BOOK_EMPTY;
 
-    this->taker_book_lock.lock();
+    std::lock_guard<std::mutex> taker_book_lock(this->taker_book_mtx);
     if (!this->taker_orders_queue.empty())
     {
         this->taker_orders.erase(this->taker_orders_queue.front());
@@ -127,7 +121,6 @@ returnType TakerOrderBook::PopFirst()
 
         ret = RET_OK;
     }
-    this->taker_book_lock.unlock();
 
     return ret;
 }

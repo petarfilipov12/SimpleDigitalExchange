@@ -17,9 +17,8 @@ CacheTrades::~CacheTrades() {}
 
 returnType CacheTrades::OrderFilled(const std::string& price, const float quantity)
 {
-    this->trades_lock.lock();
+    std::lock_guard<std::mutex> trades_lock(this->trades_mtx);
     this->trades.push_back((struct trade::sTrade){price, quantity, time(nullptr)});
-    this->trades_lock.unlock();
     
     return RET_OK;
 }
@@ -29,9 +28,9 @@ returnType CacheTrades::GetTrades(int limit, json& data)const
     std::vector<trade::sTrade> temp;
     std::vector<trade::sTrade>::size_type trades_size;
 
-    this->trades_lock.lock();
+    std::unique_lock<std::mutex> trades_lock(this->trades_mtx);
     trades_size = this->trades.size();
-    this->trades_lock.unlock();
+    trades_lock.unlock();
 
     if(trades_size > 0)
     {
@@ -40,9 +39,9 @@ returnType CacheTrades::GetTrades(int limit, json& data)const
             limit = trades_size;
         }
 
-        this->trades_lock.lock();
+        trades_lock.lock();
         temp = std::vector<trade::sTrade>((this->trades.end() - limit), this->trades.end());
-        this->trades_lock.unlock();
+        trades_lock.unlock();
 
         reverse(temp.begin(), temp.end());
 

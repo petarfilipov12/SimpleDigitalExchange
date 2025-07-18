@@ -25,7 +25,7 @@ returnType CacheCandles::OrderFilled(const std::string& price_s)
 {
     const float price_f = stof(price_s);
 
-    this->current_candle_lock.lock();
+    std::lock_guard<std::mutex> current_candle_lock(this->current_candle_mtx);
     if (this->current_candle.IsEmpty())
     {
         this->current_candle.high = price_s;
@@ -53,7 +53,6 @@ returnType CacheCandles::OrderFilled(const std::string& price_s)
             this->current_low = price_f;
         }
     }
-    this->current_candle_lock.unlock();
 
     return RET_OK;
 }
@@ -64,13 +63,13 @@ returnType CacheCandles::GetCandles(int limit, json& data)const
     std::vector<candle::Candle>::size_type candles_size;
     candle::Candle temp_candle;
 
-    this->candles_lock.lock();
+    std::unique_lock<std::mutex> candles_lock(this->candles_mtx);
     candles_size = this->candles.size();
-    this->candles_lock.unlock();
+    candles_lock.unlock();
 
-    this->current_candle_lock.lock();
+    std::unique_lock<std::mutex> current_candle_lock(this->current_candle_mtx);
     temp_candle = this->current_candle;
-    this->current_candle_lock.unlock();
+    current_candle_lock.unlock();
 
     if ((candles_size > 0) || (!temp_candle.IsEmpty()))
     {
@@ -81,9 +80,9 @@ returnType CacheCandles::GetCandles(int limit, json& data)const
                 limit = candles_size;
             }
 
-            this->candles_lock.lock();
+            candles_lock.lock();
             temp = std::vector<candle::Candle>((this->candles.end() - limit), this->candles.end());
-            this->candles_lock.unlock();
+            candles_lock.unlock();
         }
         
         if (temp_candle.IsEmpty())
@@ -130,33 +129,31 @@ void CacheCandles::Cyclic()
     candle::Candle candle;
     time_t next_timestamp = this->current_timestamp + this->interval;
 
-    this->current_candle_lock.lock();
+    std::unique_lock<std::mutex> current_candle_lock(this->current_candle_mtx);
     if (this->current_candle.IsEmpty())
     {
         this->current_candle = candle::Candle(next_timestamp);
-        this->current_candle_lock.unlock();
+        current_candle_lock.unlock();
 
-        this->candles_lock.lock();
+        std::lock_guard<std::mutex> candles_lock(this->candles_mtx);
         if(!this->candles.empty())
         {
             this->candles.push_back(candle::Candle(this->candles.back().close, this->current_timestamp));
         }
-        this->candles_lock.unlock();
     }
     else
     {
         candle = this->current_candle;
         this->current_candle = candle::Candle(next_timestamp);
-        this->current_candle_lock.unlock();
+        current_candle_lock.unlock();
 
         if(candle.timestamp != this->current_timestamp)
         {
             candle.timestamp = this->current_timestamp;
         }
         
-        this->candles_lock.lock();
+        std::lock_guard<std::mutex> candles_lock(this->candles_mtx);
         this->candles.push_back(candle);
-        this->candles_lock.unlock();
     }
 
     this->current_timestamp = next_timestamp;

@@ -17,7 +17,7 @@ template <typename Comparator> class Book{
         std::map<std::string, std::list<Order>, Comparator > book;
         std::unordered_set<Order, Order::HashFunc> orders;
 
-        mutable std::mutex book_lock;
+        mutable std::mutex book_mtx;
     
     public:
         Book(){}
@@ -28,11 +28,9 @@ template <typename Comparator> class Book{
         }
 
         bool ExistsOrder(const Order& order) const{
-            this->book_lock.lock();
-            bool ret = this->orders.find(order) != this->orders.end();
-            this->book_lock.unlock();
+            std::lock_guard<std::mutex> book_lock(this->book_mtx);
 
-            return ret;
+            return this->orders.find(order) != this->orders.end();;
         }
 
         bool ExistsOrderId(const int id) const{
@@ -42,14 +40,13 @@ template <typename Comparator> class Book{
         returnType AddOrder(const Order& order){
             returnType ret = RET_ORDER_EXISTS;
 
-            this->book_lock.lock();
+            std::lock_guard<std::mutex> book_lock(this->book_mtx);
             if(this->orders.find(order) == this->orders.end()){
                 this->book[order.price].push_back(order);
                 this->orders.insert(order);
 
                 ret = RET_OK;
             }
-            this->book_lock.unlock();
 
             return ret;
         }
@@ -57,9 +54,9 @@ template <typename Comparator> class Book{
         returnType CancelOrderById(const int id, Order *pOrder_o){
             returnType ret = RET_ORDER_NOT_EXISTS;
 
-            this->book_lock.lock();
-            std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(Order(id));
+            std::lock_guard<std::mutex> book_lock(this->book_mtx);
 
+            std::unordered_set<Order, Order::HashFunc>::iterator pOrder = this->orders.find(Order(id));
             if(pOrder != this->orders.end()){
                 if(pOrder_o != nullptr)
                 {
@@ -80,7 +77,6 @@ template <typename Comparator> class Book{
 
                 ret = RET_OK;
             }
-            this->book_lock.unlock();
 
             return ret;
         }
@@ -92,14 +88,13 @@ template <typename Comparator> class Book{
         returnType GetFirst(Order **pOrder){
             returnType ret = RET_BOOK_EMPTY;
 
-            this->book_lock.lock();
+            std::lock_guard<std::mutex> book_lock(this->book_mtx);
             if(!this->book.empty())
             {
                 *pOrder = &(this->book.begin()->second.front());
 
                 ret = RET_OK;
             }
-            this->book_lock.unlock();
 
             return ret;
         }

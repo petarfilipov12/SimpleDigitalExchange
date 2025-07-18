@@ -20,8 +20,8 @@ private:
     std::map<eventId_t, std::unordered_set<receiverId_t> > events_to_receivers_map;
     std::queue<Event> event_queue;
 
-    mutable std::mutex receivers_lock;
-    mutable std::mutex event_queue_lock;
+    mutable std::mutex receivers_mtx;
+    mutable std::mutex event_queue_mtx;
 
     void Cyclic(void);
     void run();

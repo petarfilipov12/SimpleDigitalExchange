@@ -23,14 +23,12 @@ returnType CacheOrders::OrderAdded(const Order& order)
 {
     returnType ret = RET_ORDER_EXISTS;
 
-    this->order_lock.lock();
+    std::lock_guard<std::mutex> order_lock(this->order_mtx);
     if (this->orders.find(order.id) == this->orders.end())
     {
         this->orders[order.id] = order;
-
         ret = RET_OK;
     }
-    this->order_lock.unlock();
 
     return ret;
 }
@@ -39,14 +37,12 @@ returnType CacheOrders::OrderCanceled(const int order_id)
 {
     returnType ret = RET_ORDER_NOT_EXISTS;
 
-    this->order_lock.lock();
+    std::lock_guard<std::mutex> order_lock(this->order_mtx);
     if (this->orders.find(order_id) != this->orders.end())
     {
         this->orders[order_id].status = false;
-
         ret = RET_OK;
     }
-    this->order_lock.unlock();
 
     return ret;
 }
@@ -56,7 +52,7 @@ returnType CacheOrders::OrderChange(const int order_id, const float quantity)
     returnType ret = RET_ORDER_NOT_EXISTS;
     std::unordered_map<int, Order>::iterator order_itter;
 
-    this->order_lock.lock();
+    std::lock_guard<std::mutex> order_lock(this->order_mtx);
     order_itter = this->orders.find(order_id);
     if (order_itter != this->orders.end())
     {
@@ -65,7 +61,6 @@ returnType CacheOrders::OrderChange(const int order_id, const float quantity)
 
         ret = RET_OK;
     }
-    this->order_lock.unlock();
 
     return ret;
 }
@@ -83,7 +78,7 @@ returnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
     returnType ret = RET_ORDER_NOT_EXISTS;
     std::unordered_map<int, Order>::iterator order_itter;
 
-    this->order_lock.lock();
+    std::lock_guard<std::mutex> order_lock(this->order_mtx);
     order_itter = this->orders.find(order_id);
     if (order_itter != this->orders.end())
     {
@@ -91,7 +86,6 @@ returnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
 
         ret = RET_OK;
     }
-    this->order_lock.unlock();
 
     return ret;
 }

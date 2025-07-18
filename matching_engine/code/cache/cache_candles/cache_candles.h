@@ -27,8 +27,8 @@ class CacheCandles: public Cache
 
         const time_t interval = 5*60;
 
-        mutable std::mutex candles_lock;
-        mutable std::mutex current_candle_lock;
+        mutable std::mutex candles_mtx;
+        mutable std::mutex current_candle_mtx;
 
         returnType OrderFilled(const std::string& price_s);
 

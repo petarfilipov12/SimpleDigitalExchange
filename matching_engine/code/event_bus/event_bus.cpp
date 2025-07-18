@@ -16,14 +16,13 @@ returnType EventBus::AddReceiver(EventReceiver& event_receiver)
     receiverId_t receiver_id = event_receiver.GetId();
     returnType ret = RET_RECEIVER_EXISTS;
 
-    this->receivers_lock.lock();
+    std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
     if (this->event_receivers.find(receiver_id) == this->event_receivers.end())
     {
         this->event_receivers[receiver_id] = event_receiver;
 
         ret = RET_OK;
     }
-    this->receivers_lock.unlock();
 
     return ret;
 }
@@ -32,7 +31,7 @@ returnType EventBus::RemoveReceiver(const receiverId_t receiver_id)
 {
     returnType ret = RET_RECEIVER_NOT_EXISTS;
 
-    this->receivers_lock.lock();
+    std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
     if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
     {
         for (auto event_id : this->event_receivers[receiver_id].GetEvents())
@@ -50,7 +49,6 @@ returnType EventBus::RemoveReceiver(const receiverId_t receiver_id)
 
         ret = RET_OK;
     }
-    this->receivers_lock.unlock();
 
     return ret;
 }
@@ -61,7 +59,7 @@ returnType EventBus::Subscribe(const receiverId_t receiver_id, const eventId_t e
 
     if(event_id < EVENT_ID_INVALID)
     {
-        this->receivers_lock.lock();
+        std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
         if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
             this->event_receivers[receiver_id].AddEvent(event_id);
@@ -69,7 +67,6 @@ returnType EventBus::Subscribe(const receiverId_t receiver_id, const eventId_t e
 
             ret = RET_OK;
         }
-        this->receivers_lock.unlock();
     }
     else
     {
@@ -85,7 +82,7 @@ returnType EventBus::Unsubscribe(const receiverId_t receiver_id, const eventId_t
 
     if(event_id < EVENT_ID_INVALID)
     {
-        this->receivers_lock.lock();
+        std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
         if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
             this->event_receivers[receiver_id].RemoveEvent(event_id);
@@ -100,7 +97,6 @@ returnType EventBus::Unsubscribe(const receiverId_t receiver_id, const eventId_t
 
             ret = RET_OK;
         }
-        this->receivers_lock.unlock();
     }
     else
     {
@@ -112,9 +108,8 @@ returnType EventBus::Unsubscribe(const receiverId_t receiver_id, const eventId_t
 
 void EventBus::Send(const Event& event)
 {
-    this->event_queue_lock.lock();
+    std::lock_guard<std::mutex> event_queue_lock(this->event_queue_mtx);
     this->event_queue.push(event);
-    this->event_queue_lock.unlock();
 }
 
 void EventBus::Cyclic(void)
@@ -123,17 +118,17 @@ void EventBus::Cyclic(void)
     std::function<returnType(Event&)> filter;
     bool flag = true;
 
-    this->event_queue_lock.lock();
+    std::unique_lock<std::mutex> event_queue_lock(this->event_queue_mtx);
     if (!this->event_queue.empty())
     {
         event = this->event_queue.front();
         this->event_queue.pop();
     }
-    this->event_queue_lock.unlock();
+    event_queue_lock.unlock();
 
     if (EVENT_ID_INVALID != event.GetEventId())
     {
-        this->receivers_lock.lock();
+        std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
         if (this->events_to_receivers_map.find(event.GetEventId()) != this->events_to_receivers_map.end())
         {
             for (auto receiver_id : this->events_to_receivers_map[event.GetEventId()])
@@ -145,7 +140,6 @@ void EventBus::Cyclic(void)
                 }
             }
         }
-        this->receivers_lock.unlock();
     }
 }
 

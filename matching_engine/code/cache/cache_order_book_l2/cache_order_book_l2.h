@@ -20,8 +20,8 @@ class CacheOrderBookL2: public Cache
         std::map<std::string, float, std::greater<std::string> > bid_book_l2;
         std::map<std::string, float, std::less<std::string> > ask_book_l2;
 
-        mutable std::mutex bid_book_l2_look;
-        mutable std::mutex ask_book_l2_look;
+        mutable std::mutex bid_book_l2_mtx;
+        mutable std::mutex ask_book_l2_mtx;
 
         returnType OrderAdded(const Order& order);
 

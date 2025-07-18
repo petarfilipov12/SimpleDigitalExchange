@@ -13,7 +13,7 @@ class TakerOrderBook{
         std::list<Order> taker_orders_queue;
         std::unordered_set<Order, Order::HashFunc> taker_orders;
 
-        mutable std::mutex taker_book_lock;
+        mutable std::mutex taker_book_mtx;
     
     public:
         TakerOrderBook();

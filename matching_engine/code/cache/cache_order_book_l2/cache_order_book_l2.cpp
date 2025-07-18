@@ -31,19 +31,17 @@ returnType CacheOrderBookL2::OrderAdded(const Order& order)
 
     if (ORDER_SIDE_BUY == order.order_side)
     {
-        this->bid_book_l2_look.lock();
-        this->bid_book_l2[order.price] += (order.quantity - order.filled);
-        this->bid_book_l2_look.unlock();
-
         ret = RET_OK;
+
+        std::lock_guard<std::mutex> bid_book_l2_lock(this->bid_book_l2_mtx);
+        this->bid_book_l2[order.price] += (order.quantity - order.filled);
     }
     else if (ORDER_SIDE_SELL == order.order_side)
     {
-        this->ask_book_l2_look.lock();
-        this->ask_book_l2[order.price] += (order.quantity - order.filled);
-        this->ask_book_l2_look.unlock();
-
         ret = RET_OK;
+
+        std::lock_guard<std::mutex> ask_book_l2_lock(this->ask_book_l2_mtx);
+        this->ask_book_l2[order.price] += (order.quantity - order.filled);
     }
     else
     {
@@ -61,27 +59,25 @@ returnType CacheOrderBookL2::OrderCanceled(const Order& order)
     {
         if (ORDER_SIDE_BUY == order.order_side)
         {
-            this->bid_book_l2_look.lock();
+            ret = RET_OK;
+
+            std::lock_guard<std::mutex> bid_book_l2_lock(this->bid_book_l2_mtx);
             this->bid_book_l2[order.price] -= (order.quantity - order.filled);
             if (this->bid_book_l2[order.price] <= 0.0)
             {
                 this->bid_book_l2.erase(order.price);
             }
-            this->bid_book_l2_look.unlock();
-
-            ret = RET_OK;
         }
         else if (ORDER_SIDE_SELL == order.order_side)
         {
-            this->ask_book_l2_look.lock();
+            ret = RET_OK;
+
+            std::lock_guard<std::mutex> ask_book_l2_lock(this->ask_book_l2_mtx);
             this->ask_book_l2[order.price] -= (order.quantity - order.filled);
             if (this->ask_book_l2[order.price] <= 0.0)
             {
                 this->ask_book_l2.erase(order.price);
             }
-            this->ask_book_l2_look.unlock();
-
-            ret = RET_OK;
         }
         else
         {
@@ -101,7 +97,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
     {
         while(false == flag)
         {
-            this->bid_book_l2_look.lock();
+            std::unique_lock<std::mutex> bid_book_l2_lock(this->bid_book_l2_mtx);
             if(this->bid_book_l2[price] >= (quantity - 0.1))
             {
                 this->bid_book_l2[price] -= quantity;
@@ -112,7 +108,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
 
                 flag = true;
             }
-            this->bid_book_l2_look.unlock();
+            bid_book_l2_lock.unlock();
 
             if(false == flag)
             {
@@ -124,7 +120,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
     {
         while(false == flag)
         {
-            this->ask_book_l2_look.lock();
+            std::unique_lock<std::mutex> ask_book_l2_lock(this->ask_book_l2_mtx);
             if(this->ask_book_l2[price] >= (quantity - 0.1))
             {
                 this->ask_book_l2[price] -= quantity;
@@ -135,7 +131,7 @@ returnType CacheOrderBookL2::OrderFilled(const std::string& price, const float q
 
                 flag = true;
             }
-            this->ask_book_l2_look.unlock();
+            ask_book_l2_lock.unlock();
 
             if(false == flag)
             {
@@ -156,12 +152,12 @@ returnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
     std::map<std::string, float, std::greater<std::string> > temp_bid_book_l2;
     std::map<std::string, float, std::less<std::string> > temp_ask_book_l2;
 
-    this->bid_book_l2_look.lock();
-    this->ask_book_l2_look.lock();
+    std::unique_lock<std::mutex> bid_book_l2_lock(this->bid_book_l2_mtx);
+    std::unique_lock<std::mutex> ask_book_l2_lock(this->ask_book_l2_mtx);
     temp_bid_book_l2 = this->bid_book_l2;
     temp_ask_book_l2 = this->ask_book_l2;
-    this->bid_book_l2_look.unlock();
-    this->ask_book_l2_look.unlock();
+    bid_book_l2_lock.unlock();
+    ask_book_l2_lock.unlock();
 
     l2_book["bid"] = {};
     if (!this->bid_book_l2.empty())

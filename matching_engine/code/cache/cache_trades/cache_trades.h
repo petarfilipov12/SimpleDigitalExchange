@@ -16,7 +16,7 @@ class CacheTrades: public Cache
     private:
         std::vector<trade::sTrade> trades;
 
-        mutable std::mutex trades_lock;
+        mutable std::mutex trades_mtx;
 
 
         returnType OrderFilled(const std::string& price, const float quantity);

@@ -18,7 +18,7 @@ class CacheOrders: public Cache
     private:
         std::unordered_map<int, Order> orders;
 
-        mutable std::mutex order_lock;
+        mutable std::mutex order_mtx;
 
         returnType OrderChange(const int order_id, const float quantity);
 

@@ -62,6 +62,7 @@ class Order{
         Order& operator=(const Order& order2);
 
         bool operator==(const Order& order2) const;
+        bool operator!=(const Order& order2) const;
 
         class HashFunc{
             public:

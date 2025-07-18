@@ -2,6 +2,9 @@
 #define ENGINE_H
 
 #include "return_type.h"
+
+#include <shared_mutex>
+
 #include "order_book.h"
 #include "taker_order_book.h"
 #include "order.h"
@@ -17,6 +20,12 @@ class Engine{
         TakerOrderBook taker_book;
         EventBus& event_bus;
         std::string symbol;
+
+        Order *taker_order_ptr;
+        Order *book_order_ptr;
+
+        std::shared_mutex taker_order_ptr_mtx;
+        std::shared_mutex book_order_ptr_mtx;
 
         returnType AddToOrderBook(Order& pTakerOrder);
         

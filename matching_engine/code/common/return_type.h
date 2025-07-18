@@ -16,6 +16,10 @@ enum eReturnType_t
     RET_RECEIVER_NOT_EXISTS,
     RET_EVENT_ID_INVALID,
 
+    //Engine
+    RET_TAKER_ORDER_FILLED,
+    RET_TAKER_ORDER_ADDED_TO_BOOK,
+
     RET_INVALID
 };
 

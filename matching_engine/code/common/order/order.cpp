@@ -95,6 +95,11 @@ bool Order::operator==(const Order &order2) const
     return this->id == order2.id;
 }
 
+bool Order::operator!=(const Order &order2) const
+{
+    return this->id != order2.id;
+}
+
 Order Order::ConvertJsonToOrder(const json &j_data){
     return Order(
         j_data["symbol"],

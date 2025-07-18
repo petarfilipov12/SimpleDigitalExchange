@@ -13,7 +13,7 @@ enum eOrderSide_t
     ORDER_SIDE_SELL,
     ORDER_SIDE_INVALID
 };
-typedef enum eOrderSide_t orderSide_t;
+using orderSide_t = enum eOrderSide_t;
 
 enum eOrderType_t
 {
@@ -21,7 +21,7 @@ enum eOrderType_t
     ORDER_TYPE_LIMIT,
     ORDER_TYPE_INVALID
 };
-typedef enum eOrderType_t orderType_t;
+using orderType_t = enum eOrderType_t;
 
 class Order{
     public:

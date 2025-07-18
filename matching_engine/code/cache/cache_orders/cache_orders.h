@@ -20,20 +20,7 @@ class CacheOrders: public Cache
 
         mutable std::mutex order_lock;
 
-
         returnType OrderChange(const int order_id, const float quantity);
-
-        void EventHandler_OrderAdded(Event& event);
-
-        void EventHandler_OrderCanceled(Event& event);
-
-        void EventHandler_OrderFilled(Event& event);
-
-        void EventHandler_GetOrder(Event& event);
-    
-    public:
-        CacheOrders(const std::string& symbol);
-        ~CacheOrders();
 
         returnType OrderAdded(const Order& order);
 
@@ -43,9 +30,19 @@ class CacheOrders: public Cache
 
         returnType GetOrder(const int order_id, Order& pOrder);
 
-        void init(EventBus& event_bus, receiverId_t receiver_id);
+        void EventHandler_OrderAdded(Event& event);
+
+        void EventHandler_OrderCanceled(Event& event);
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetOrder(Event& event);
 
         void EventHandler(Event event);
+    
+    public:
+        CacheOrders(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id);
+        ~CacheOrders();
 };
 
 #endif

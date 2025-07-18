@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++11 -g -O3
+CFLAGS = -std=c++17 -g #-O3
 CFLAGS_END = -lssl -lcrypto
 
 PROGRAM_NAME = MatchingEngine_exec

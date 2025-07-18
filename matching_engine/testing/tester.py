@@ -93,14 +93,15 @@ def GetExchangeInfo():
     url = "https://127.0.0.1:8080/get_exchange_info"
 
     path_to_pub_key = "../../../server_certs/cert2.pem"
-    resp = requests.post(url, json={}, verify=path_to_pub_key).json()
+    resp = requests.post(url, json={}, verify=path_to_pub_key)
+    print(resp.status_code)
 
-    return resp
+    return resp.json()
 
 def main():
     
     while(True):
-        res = GetOrderBook(symbol="SYMBOL_1")
+        res = GetExchangeInfo()
         print(res)
         print()
 

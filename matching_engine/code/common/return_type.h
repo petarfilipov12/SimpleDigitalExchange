@@ -19,6 +19,6 @@ enum eReturnType_t
     RET_INVALID
 };
 
-typedef enum eReturnType_t returnType;
+using returnType = enum eReturnType_t;
 
 #endif

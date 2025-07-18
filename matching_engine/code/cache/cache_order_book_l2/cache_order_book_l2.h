@@ -23,18 +23,6 @@ class CacheOrderBookL2: public Cache
         mutable std::mutex bid_book_l2_look;
         mutable std::mutex ask_book_l2_look;
 
-        void EventHandler_OrderAdded(Event& event);
-
-        void EventHandler_OrderCanceled(Event& event);
-
-        void EventHandler_OrderFilled(Event& event);
-
-        void EventHandler_GetOrderBookL2(Event& event);
-
-    public:
-        CacheOrderBookL2(const std::string& symbol);
-        ~CacheOrderBookL2();
-
         returnType OrderAdded(const Order& order);
 
         returnType OrderCanceled(const Order& order);
@@ -43,9 +31,19 @@ class CacheOrderBookL2: public Cache
 
         returnType GetOrderBookL2(json& l2_book)const;
 
-        void init(EventBus& event_bus, receiverId_t receiver_id);
+        void EventHandler_OrderAdded(Event& event);
+
+        void EventHandler_OrderCanceled(Event& event);
+
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetOrderBookL2(Event& event);
 
         void EventHandler(Event event);
+
+    public:
+        CacheOrderBookL2(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id);
+        ~CacheOrderBookL2();
 };
 
 #endif

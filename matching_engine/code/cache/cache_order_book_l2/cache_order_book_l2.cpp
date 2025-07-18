@@ -7,9 +7,20 @@
 #include "json.h"
 
 
-CacheOrderBookL2::CacheOrderBookL2(const std::string& symbol): Cache(symbol)
+CacheOrderBookL2::CacheOrderBookL2(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
 {
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheOrderBookL2::Filter, this, std::placeholders::_1)
+    );
 
+    Cache::init(event_bus, event_receiver, {
+        EVENT_ID_MAKER_ORDER_ADDED,
+        EVENT_ID_MAKER_ORDER_CANCELED,
+        EVENT_ID_ORDER_FILLED,
+        EVENT_ID_GET_ORDER_BOOK
+    });
 }
 
 CacheOrderBookL2::~CacheOrderBookL2() {}
@@ -166,24 +177,6 @@ returnType CacheOrderBookL2::GetOrderBookL2(json& l2_book)const
 
     return RET_OK;
 }
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void CacheOrderBookL2::init(EventBus& event_bus, receiverId_t receiver_id)
-{
-    EventReceiver event_receiver = EventReceiver(
-        receiver_id, 
-        std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1),
-        std::bind(&CacheOrderBookL2::Filter, this, std::placeholders::_1)
-    );
-
-    Cache::init(event_bus, event_receiver, {
-        EVENT_ID_MAKER_ORDER_ADDED,
-        EVENT_ID_MAKER_ORDER_CANCELED,
-        EVENT_ID_ORDER_FILLED,
-        EVENT_ID_GET_ORDER_BOOK
-    });
-}
 
 /******************************/
 /*Event_Handler Implementation*/
@@ -219,7 +212,7 @@ void CacheOrderBookL2::EventHandler_GetOrderBookL2(Event& event)
 
         if(RET_OK == ret)
         {
-            (*event.GetDataOut())["data"] = l2_book;
+            (*event.GetDataOut())["data"] = l2_book; //std::move
         }
 
         (*event.GetDataOut())["error"] = ret;

@@ -30,27 +30,25 @@ class CacheCandles: public Cache
         mutable std::mutex candles_lock;
         mutable std::mutex current_candle_lock;
 
+        returnType OrderFilled(const std::string& price_s);
+
+        returnType GetCandles(int limit, json& data)const;
+
         void InitFunc();
 
         void Cyclic();
 
+        void run();
+
         void EventHandler_OrderFilled(Event& event);
 
         void EventHandler_GetCandles(Event& event);
-    
-    public:
-        CacheCandles(const std::string& symbol);
-        ~CacheCandles();
-
-        returnType OrderFilled(const std::string& price_s);
-
-        returnType GetCandles(int limit, json& data)const;
-        
-        void run();
-
-        void init(EventBus& event_bus, receiverId_t receiver_id);
 
         void EventHandler(Event event);
+    
+    public:
+        CacheCandles(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id);
+        ~CacheCandles();
 };
 
 #endif

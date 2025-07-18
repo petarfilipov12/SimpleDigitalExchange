@@ -24,6 +24,7 @@ private:
     mutable std::mutex event_queue_lock;
 
     void Cyclic(void);
+    void run();
 
 public:
     EventBus();
@@ -39,10 +40,6 @@ public:
     returnType Unsubscribe(const receiverId_t receiver_id, const eventId_t event_id);
 
     void Send(const Event& event);
-
-    void run();
-
-    void init();
 };
 
 #endif

@@ -1,8 +1,20 @@
 #include "cache_orders.h"
 
-CacheOrders::CacheOrders(const std::string& symbol): Cache(symbol)
+CacheOrders::CacheOrders(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
 {
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheOrders::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheOrders::Filter, this, std::placeholders::_1)
+    );
 
+    Cache::init(event_bus, event_receiver, {
+        EVENT_ID_TAKER_ORDER_ADDED,
+        EVENT_ID_TAKER_ORDER_CANCELED,
+        EVENT_ID_MAKER_ORDER_CANCELED,
+        EVENT_ID_ORDER_FILLED,
+        EVENT_ID_GET_ORDER
+    });
 }
 
 CacheOrders::~CacheOrders() {}
@@ -82,25 +94,6 @@ returnType CacheOrders::GetOrder(const int order_id, Order& pOrder)
     this->order_lock.unlock();
 
     return ret;
-}
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void CacheOrders::init(EventBus& event_bus, receiverId_t receiver_id)
-{
-    EventReceiver event_receiver = EventReceiver(
-        receiver_id, 
-        std::bind(&CacheOrders::EventHandler, this, std::placeholders::_1),
-        std::bind(&CacheOrders::Filter, this, std::placeholders::_1)
-    );
-
-    Cache::init(event_bus, event_receiver, {
-        EVENT_ID_TAKER_ORDER_ADDED,
-        EVENT_ID_TAKER_ORDER_CANCELED,
-        EVENT_ID_MAKER_ORDER_CANCELED,
-        EVENT_ID_ORDER_FILLED,
-        EVENT_ID_GET_ORDER
-    });
 }
 
 /******************************/

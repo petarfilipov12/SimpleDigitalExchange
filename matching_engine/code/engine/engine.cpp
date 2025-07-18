@@ -2,19 +2,24 @@
 
 #include <thread>
 
-Engine::Engine(EventBus& event_busP, const std::string& symbol): event_bus(event_busP)
+Engine::Engine(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): event_bus(event_bus), symbol(symbol)
 {
-    //this->event_bus = (EventBus *)event_bus;
-    this->symbol = symbol;
+    std::thread thread_engine([this]{this->run();});
+    thread_engine.detach();
+
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&Engine::EventHandler, this, std::placeholders::_1),
+        std::bind(&Engine::Filter, this, std::placeholders::_1)
+    );
+    
+    this->event_bus.AddReceiver(event_receiver);
+
+    this->event_bus.Subscribe(receiver_id, EVENT_ID_ADD_ORDER);
+    this->event_bus.Subscribe(receiver_id, EVENT_ID_CANCEL_ORDER);
 }
 
-Engine::~Engine()
-{
-    // this->taker_orders_queue.clear();
-    // this->taker_orders.clear();
-
-    // this->order_book.~OrderBook();
-}
+Engine::~Engine() {}
 
 bool Engine::ExistsOrder(const Order& order) const
 {
@@ -244,25 +249,6 @@ void Engine::run()
     {
         this->Cyclic();
     }
-}
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void Engine::init(receiverId_t receiver_id)
-{
-    std::thread thread_engine([this]{this->run();});
-    thread_engine.detach();
-
-    EventReceiver event_receiver = EventReceiver(
-        receiver_id, 
-        std::bind(&Engine::EventHandler, this, std::placeholders::_1),
-        std::bind(&Engine::Filter, this, std::placeholders::_1)
-    );
-    
-    this->event_bus.AddReceiver(event_receiver);
-
-    this->event_bus.Subscribe(receiver_id, EVENT_ID_ADD_ORDER);
-    this->event_bus.Subscribe(receiver_id, EVENT_ID_CANCEL_ORDER);
 }
 
 /******************************/

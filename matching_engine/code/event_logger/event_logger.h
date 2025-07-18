@@ -39,15 +39,14 @@ class EventLogger
             {EVENT_ID_INVALID, "EVENT_ID_INVALID"}
         };
 
+        void EventHandler(Event event);
+
     public:
-        EventLogger();
+        EventLogger(EventBus& event_bus);
         ~EventLogger();
 
         returnType ConvertEventIdToString(eventId_t event_id, std::string& event_id_s);
 
-        void EventHandler(Event event);
-
-        void init(EventBus& event_bus);
 };
 
 #endif

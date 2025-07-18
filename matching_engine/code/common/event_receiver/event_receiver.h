@@ -6,7 +6,7 @@
 
 #include "event.h"
 
-typedef int receiverId_t;
+using receiverId_t = int;
 #define RECEIVER_ID_INVALID 0xffffu;
 
 class EventReceiver

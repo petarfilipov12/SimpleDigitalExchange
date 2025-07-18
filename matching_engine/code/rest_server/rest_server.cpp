@@ -6,7 +6,16 @@
 
 #include "json.h"
 
-
+void RestServer::InitServices()
+{
+    this->Post("/add_order", std::bind(&RestServer::Handler_AddOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/cancel_order", std::bind(&RestServer::Handler_CancelOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_order", std::bind(&RestServer::Handler_GetOrder, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_order_book", std::bind(&RestServer::Handler_GetOrderBook, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_candles", std::bind(&RestServer::Handler_GetCandles, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_trades", std::bind(&RestServer::Handler_GetTrades, this, std::placeholders::_1, std::placeholders::_2));
+    this->Post("/get_exchange_info", std::bind(&RestServer::Handler_GetExchangeInfo, this, std::placeholders::_1, std::placeholders::_2));
+}
 
 RestServer::RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus): event_bus(event_bus)
 {
@@ -14,6 +23,10 @@ RestServer::RestServer(const std::string& cert_path, const std::string& key_path
 
     this->host = "0.0.0.0";
     this->port = 8080;
+
+    this->InitServices();
+
+    this->run();
 }
 
 RestServer::RestServer(const std::string& cert_path, const std::string& key_path, const std::string& host, const unsigned int port, EventBus& event_bus): event_bus(event_bus)
@@ -22,6 +35,10 @@ RestServer::RestServer(const std::string& cert_path, const std::string& key_path
 
     this->host = host;
     this->port = port;
+
+    this->InitServices();
+
+    this->run();
 }
 
 RestServer::~RestServer()
@@ -36,22 +53,7 @@ void RestServer::Post(const std::string& url_path, const std::function<void(cons
 
 void RestServer::run()
 {
-    this->svr->listen(this->host, this->port);
-}
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void RestServer::init()
-{
-    this->Post("/add_order", std::bind(&RestServer::Handler_AddOrder, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/cancel_order", std::bind(&RestServer::Handler_CancelOrder, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/get_order", std::bind(&RestServer::Handler_GetOrder, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/get_order_book", std::bind(&RestServer::Handler_GetOrderBook, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/get_candles", std::bind(&RestServer::Handler_GetCandles, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/get_trades", std::bind(&RestServer::Handler_GetTrades, this, std::placeholders::_1, std::placeholders::_2));
-    this->Post("/get_exchange_info", std::bind(&RestServer::Handler_GetExchangeInfo, this, std::placeholders::_1, std::placeholders::_2));
-
-    std::thread thread_rest_server([this]{this->run();});
+    std::thread thread_rest_server([this]{this->svr->listen(this->host, this->port);});
     thread_rest_server.detach();
 }
 
@@ -60,19 +62,19 @@ void RestServer::init()
 /************************/
 inline void RestServer::HandleRequest(eventId_t event_id, const json& j_data, httplib::Response &res)
 {
-    std::shared_ptr<json> responce_data(new json);
-    responce_data->at("error") = RET_INVALID;
-    responce_data->at("data") = {};
+    std::shared_ptr<json> responce_data = std::make_shared<json>();
+    (*responce_data)["error"] = RET_INVALID;
+    (*responce_data)["data"] = {};
 
     this->event_bus.Send(Event(event_id, j_data, responce_data));
 
-    while(RET_INVALID == responce_data->at("error"))
+    while(RET_INVALID == (*responce_data)["error"])
     {
         usleep(10);
     }
 
     res.set_content(responce_data->dump(), "application/json");
-}
+ }
 
 void RestServer::Handler_AddOrder(const httplib::Request &req, httplib::Response &res)
 {
@@ -112,16 +114,5 @@ void RestServer::Handler_GetTrades(const httplib::Request &req, httplib::Respons
 
 void RestServer::Handler_GetExchangeInfo(const httplib::Request &req, httplib::Response &res)
 {
-    std::shared_ptr<json> responce_data(new json);
-    // responce_data->at("error") = RET_INVALID;
-    // responce_data->at("data") = {};
-
-    this->event_bus.Send(Event(EVENT_ID_GET_EXCHANGE_INFO, json::parse(req.body), responce_data));
-
-    while(RET_INVALID == responce_data->at("error"))
-    {
-        usleep(10);
-    }
-
-    res.set_content(responce_data->dump(), "application/json");
+    this->HandleRequest(EVENT_ID_GET_EXCHANGE_INFO, {}, res);
 }

@@ -3,18 +3,13 @@
 
 
 
-EventBus::EventBus() {}
-
-EventBus::~EventBus()
+EventBus::EventBus()
 {
-    // this->event_receivers.clear();
-    // this->events_to_receivers_map.clear();
-
-    // while (!this->event_queue.empty())
-    // {
-    //     this->event_queue.pop();
-    // }
+    std::thread thread_event_bus([this]{this->run();});
+    thread_event_bus.detach();
 }
+
+EventBus::~EventBus() {}
 
 returnType EventBus::AddReceiver(EventReceiver& event_receiver)
 {
@@ -160,13 +155,4 @@ void EventBus::run(void)
     {
         this->Cyclic();
     }
-}
-
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void EventBus::init()
-{
-    std::thread thread_event_bus([this]{this->run();});
-    thread_event_bus.detach();
 }

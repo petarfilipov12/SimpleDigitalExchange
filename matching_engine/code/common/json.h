@@ -2,6 +2,6 @@
 #define JSON_H
 
 #include <nlohmann/json.hpp>
-typedef nlohmann::json json;
+using json = nlohmann::json;
 
 #endif

@@ -19,20 +19,11 @@ private:
 
     EventBus& event_bus;
 
-    inline void HandleRequest(eventId_t event_id, const json& j_data, httplib::Response &res);
-
-public:
-    RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus);
-
-    RestServer(const std::string& cert_path, const std::string& key_path, const std::string& host, const unsigned int port, EventBus& event_bus);
-
-    ~RestServer();
+    void HandleRequest(eventId_t event_id, const json& j_data, httplib::Response &res);
 
     void Post(const std::string& url_path, const std::function<void(const httplib::Request&, httplib::Response&)> handler_func);
 
-    void run();
-
-    void init();
+    void InitServices();
 
     void Handler_AddOrder(const httplib::Request &req, httplib::Response &res);
 
@@ -47,6 +38,15 @@ public:
     void Handler_GetTrades(const httplib::Request &req, httplib::Response &res);
 
     void Handler_GetExchangeInfo(const httplib::Request &req, httplib::Response &res);
+
+    void run();
+
+public:
+    RestServer(const std::string& cert_path, const std::string& key_path, EventBus& event_bus);
+
+    RestServer(const std::string& cert_path, const std::string& key_path, const std::string& host, const unsigned int port, EventBus& event_bus);
+
+    ~RestServer();
 };
 
 #endif

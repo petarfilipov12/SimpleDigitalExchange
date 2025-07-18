@@ -5,9 +5,18 @@
 #include <ctime>
 #include <thread>
 
-CacheCandles::CacheCandles(const std::string& symbol): Cache(symbol)
+CacheCandles::CacheCandles(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
 {
+    std::thread thread_cache_candles([this]{this->run();});
+    thread_cache_candles.detach();
 
+    EventReceiver event_receiver = EventReceiver(
+        receiver_id, 
+        std::bind(&CacheCandles::EventHandler, this, std::placeholders::_1),
+        std::bind(&CacheCandles::Filter, this, std::placeholders::_1)
+    );
+    
+    Cache::init(event_bus, event_receiver, {EVENT_ID_ORDER_FILLED, EVENT_ID_GET_CANDLES});
 }
 
 CacheCandles::~CacheCandles() {}
@@ -162,22 +171,6 @@ void CacheCandles::run()
         sleep(this->interval);
         this->Cyclic();
     }
-}
-/**************************/
-/*Init Func implementation*/
-/**************************/
-void CacheCandles::init(EventBus& event_bus, receiverId_t receiver_id)
-{
-    std::thread thread_cache_candles([this]{this->run();});
-    thread_cache_candles.detach();
-
-    EventReceiver event_receiver = EventReceiver(
-        receiver_id, 
-        std::bind(&CacheCandles::EventHandler, this, std::placeholders::_1),
-        std::bind(&CacheCandles::Filter, this, std::placeholders::_1)
-    );
-    
-    Cache::init(event_bus, event_receiver, {EVENT_ID_ORDER_FILLED, EVENT_ID_GET_CANDLES});
 }
 
 /******************************/

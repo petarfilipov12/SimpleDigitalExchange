@@ -21,18 +21,7 @@ class Engine{
         returnType AddToOrderBook(Order& pTakerOrder);
         
         returnType MatchTakerOrder(Order& pTakerOrder);
-        
-        void Cyclic();
 
-        void EventHandler_AddOrder(Event& event);
-
-        void EventHandler_CancelOrder(Event& event);
-    
-    public:
-        Engine(EventBus& event_busP, const std::string& symbol);
-        
-        ~Engine();
-        
         bool ExistsOrder(const Order& order) const;
         
         bool ExistsOrderId(const int id) const;
@@ -43,13 +32,22 @@ class Engine{
         
         returnType CancelOrderById(const int id);
         
+        void Cyclic();
+
         void run();
 
-        void init(receiverId_t receiver_id);
+        void EventHandler_AddOrder(Event& event);
+
+        void EventHandler_CancelOrder(Event& event);
 
         void EventHandler(Event event);
 
         returnType Filter(Event& event);
+    
+    public:
+        Engine(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id);
+        
+        ~Engine();
 };
 
 #endif

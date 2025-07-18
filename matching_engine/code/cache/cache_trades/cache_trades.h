@@ -19,21 +19,19 @@ class CacheTrades: public Cache
         mutable std::mutex trades_lock;
 
 
-        void EventHandler_OrderFilled(Event& event);
-
-        void EventHandler_GetTrades(Event& event);
-    
-    public:
-        CacheTrades(const std::string& symbol);
-        ~CacheTrades();
-
         returnType OrderFilled(const std::string& price, const float quantity);
 
         returnType GetTrades(int limit, json& data)const;
 
-        void init(EventBus& event_bus, receiverId_t receiver_id);
+        void EventHandler_OrderFilled(Event& event);
+
+        void EventHandler_GetTrades(Event& event);
 
         void EventHandler(Event event);
+    
+    public:
+        CacheTrades(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id);
+        ~CacheTrades();
 };
 
 #endif

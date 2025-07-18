@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/matching_engine/code/**",
-                "${workspaceFolder}/matching_engine/code/common"
+                "${workspaceFolder}/matching_engine/code/common/event/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

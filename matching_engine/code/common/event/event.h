@@ -37,7 +37,7 @@ enum eEventId_t
     EVENT_ID_INVALID
 };
 
-typedef enum eEventId_t eventId_t;
+using eventId_t = enum eEventId_t;
 
 
 class Event{

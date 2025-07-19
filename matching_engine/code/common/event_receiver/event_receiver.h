@@ -3,6 +3,7 @@
 
 #include <unordered_set>
 #include <functional>
+#include <string>
 
 #include "event.h"
 
@@ -13,18 +14,18 @@ class EventReceiver
 {
 private:
     receiverId_t id;
+    std::string name;
     std::unordered_set<eventId_t> events;
     std::function<void(Event)> callback;
     std::function<returnType(Event&)> filter;
 public:
     EventReceiver();
 
-    EventReceiver(const receiverId_t id, const std::function<void(Event)> callback);
-
     EventReceiver(
         const receiverId_t id, 
         const std::function<void(Event)> callback, 
-        const std::function<returnType(Event&)> filter
+        const std::function<returnType(Event&)> filter = nullptr,
+        const std::string& name = ""
     );
 
     ~EventReceiver();
@@ -44,6 +45,8 @@ public:
     std::function<void(Event)> GetCallback() const;
 
     returnType Filter(Event& event) const;
+
+    std::string GetName() const;
 
     bool operator<(const EventReceiver &event_receiver2) const;
 };

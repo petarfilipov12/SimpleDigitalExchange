@@ -7,24 +7,20 @@ EventReceiver::EventReceiver()
     this->id = RECEIVER_ID_INVALID;
     this->callback = nullptr;
     this->filter = nullptr;
+    this->name = "";
 };
-
-EventReceiver::EventReceiver(const receiverId_t id, const std::function<void(Event)> callback)
-{
-    this->id = id;
-    this->callback = callback;
-    this->filter = nullptr;
-}
 
 EventReceiver::EventReceiver(
     const receiverId_t id, 
     const std::function<void(Event)> callback, 
-    const std::function<returnType(Event&)> filter
+    const std::function<returnType(Event&)> filter,
+    const std::string& name
 )
 {
     this->id = id;
     this->callback = callback;
     this->filter = filter;
+    this->name = name;
 }
 
 EventReceiver::~EventReceiver()
@@ -77,6 +73,11 @@ returnType EventReceiver::Filter(Event& event) const
     }
 
     return ret;
+}
+
+std::string EventReceiver::GetName() const
+{
+    return this->name;
 }
 
 bool EventReceiver::operator<(const EventReceiver &event_receiver2) const

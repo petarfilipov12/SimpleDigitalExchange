@@ -11,6 +11,7 @@
 class EventLogger
 {
     private:
+        EventReceiver event_receiver;
         std::unordered_map<eventId_t, std::string> eventIdToStringMap = {
             {EVENT_ID_ADD_ORDER, "EVENT_ID_ADD_ORDER"},
             {EVENT_ID_CANCEL_ORDER, "EVENT_ID_CANCEL_ORDER"},

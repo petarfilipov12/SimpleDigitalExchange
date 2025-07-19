@@ -8,45 +8,24 @@
 
 #include "event.h"
 #include "event_bus.h"
+#include "event_receiver.h"
 
 class Cache
 {
     protected:
         std::string symbol;
+        EventReceiver event_receiver;
+
+        Cache(const std::string& symbol, const EventReceiver& event_receiver);
+
+        ~Cache();
+
+        void init(EventBus& event_bus, const std::vector<eventId_t>& events_to_subscribe);
     
     public:
-        Cache(const std::string& symbol)
-        {
-            this->symbol = symbol;
-        }
-
-        ~Cache() {}
-
-        virtual void init(EventBus& event_bus, EventReceiver& event_receiver, const std::vector<eventId_t>& events_to_subscribe)
-        {
-            receiverId_t receiver_id = event_receiver.GetId();
-        
-            event_bus.AddReceiver(event_receiver);
-            
-            for(int i = 0; i < events_to_subscribe.size(); i++)
-            {
-                event_bus.Subscribe(receiver_id, events_to_subscribe.at(i));
-            }
-        }
-
         virtual void EventHandler(Event event) = 0;
 
-        returnType Filter(Event& event)
-        {
-            returnType ret = RET_NOT_OK;
-        
-            if(this->symbol == event.GetDataIn()["symbol"])
-            {
-                ret = RET_OK;
-            }
-        
-            return ret;
-        }
+        virtual returnType Filter(Event& event);
 };
 
 #endif

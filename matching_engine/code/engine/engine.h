@@ -16,11 +16,11 @@
 
 class Engine{
     private:
+        std::string symbol;
         OrderBook order_book;
         TakerOrderBook taker_book;
         EventBus& event_bus;
-        std::string symbol;
-
+        EventReceiver event_receiver;
         Order *taker_order_ptr;
         Order *book_order_ptr;
 

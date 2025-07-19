@@ -6,13 +6,13 @@ EventLogger::EventLogger(EventBus& event_bus)
 {
     int event_id;
 
-    EventReceiver event_receiver = EventReceiver(
+    this->event_receiver = EventReceiver(
         RECEIVER_ID_EVENT_LOGGER, 
         std::bind(&EventLogger::EventHandler, this, std::placeholders::_1),
         nullptr
     );
 
-    event_bus.AddReceiver(event_receiver);
+    event_bus.AddReceiver(&this->event_receiver);
 
     for(event_id = 0; event_id < EVENT_ID_INVALID; event_id++)
     {

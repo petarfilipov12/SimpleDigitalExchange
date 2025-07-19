@@ -11,12 +11,10 @@
 #include "event.h"
 #include "event_receiver.h"
 
-
-
 class EventBus
 {
 private:
-    std::map<receiverId_t, EventReceiver> event_receivers;
+    std::map<receiverId_t, EventReceiver*> event_receivers;
     std::map<eventId_t, std::unordered_set<receiverId_t> > events_to_receivers_map;
     std::queue<Event> event_queue;
 
@@ -31,7 +29,7 @@ public:
 
     ~EventBus();
 
-    returnType AddReceiver(EventReceiver& event_receiver);
+    returnType AddReceiver(EventReceiver* event_receiver);
 
     returnType RemoveReceiver(const receiverId_t receiver_id);
 

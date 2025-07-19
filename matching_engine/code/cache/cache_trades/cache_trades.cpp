@@ -2,15 +2,17 @@
 
 #include <ctime>
 
-CacheTrades::CacheTrades(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
-{
-    EventReceiver event_receiver = EventReceiver(
+CacheTrades::CacheTrades(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id):
+Cache(
+    symbol,
+    EventReceiver(
         receiver_id, 
         std::bind(&CacheTrades::EventHandler, this, std::placeholders::_1),
         std::bind(&CacheTrades::Filter, this, std::placeholders::_1)
-    );
-
-    Cache::init(event_bus, event_receiver, {EVENT_ID_ORDER_FILLED, EVENT_ID_GET_TRADES});
+    )
+)
+{
+    Cache::init(event_bus, {EVENT_ID_ORDER_FILLED, EVENT_ID_GET_TRADES});
 }
 
 CacheTrades::~CacheTrades() {}

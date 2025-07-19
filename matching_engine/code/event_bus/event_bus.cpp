@@ -11,9 +11,9 @@ EventBus::EventBus()
 
 EventBus::~EventBus() {}
 
-returnType EventBus::AddReceiver(EventReceiver& event_receiver)
+returnType EventBus::AddReceiver(EventReceiver* event_receiver)
 {
-    receiverId_t receiver_id = event_receiver.GetId();
+    receiverId_t receiver_id = event_receiver->GetId();
     returnType ret = RET_RECEIVER_EXISTS;
 
     std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
@@ -34,7 +34,7 @@ returnType EventBus::RemoveReceiver(const receiverId_t receiver_id)
     std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
     if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
     {
-        for (auto event_id : this->event_receivers[receiver_id].GetEvents())
+        for (auto event_id : this->event_receivers[receiver_id]->GetEvents())
         {
             if (this->events_to_receivers_map[event_id].erase(receiver_id))
             {
@@ -62,7 +62,7 @@ returnType EventBus::Subscribe(const receiverId_t receiver_id, const eventId_t e
         std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
         if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
-            this->event_receivers[receiver_id].AddEvent(event_id);
+            this->event_receivers[receiver_id]->AddEvent(event_id);
             this->events_to_receivers_map[event_id].insert(receiver_id);
 
             ret = RET_OK;
@@ -85,7 +85,7 @@ returnType EventBus::Unsubscribe(const receiverId_t receiver_id, const eventId_t
         std::lock_guard<std::mutex> receivers_lock(this->receivers_mtx);
         if (this->event_receivers.find(receiver_id) != this->event_receivers.end())
         {
-            this->event_receivers[receiver_id].RemoveEvent(event_id);
+            this->event_receivers[receiver_id]->RemoveEvent(event_id);
 
             if (this->events_to_receivers_map[event_id].erase(receiver_id))
             {
@@ -133,9 +133,9 @@ void EventBus::Cyclic(void)
         {
             for (auto receiver_id : this->events_to_receivers_map[event.GetEventId()])
             {
-                if(RET_OK == this->event_receivers[receiver_id].Filter(event))
+                if(RET_OK == this->event_receivers[receiver_id]->Filter(event))
                 {
-                    std::thread t(this->event_receivers[receiver_id].GetCallback(), event);
+                    std::thread t(this->event_receivers[receiver_id]->GetCallback(), event);
                     t.detach();
                 }
             }

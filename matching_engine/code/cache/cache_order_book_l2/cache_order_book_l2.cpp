@@ -8,15 +8,17 @@
 #include "json.h"
 
 
-CacheOrderBookL2::CacheOrderBookL2(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id): Cache(symbol)
-{
-    EventReceiver event_receiver = EventReceiver(
+CacheOrderBookL2::CacheOrderBookL2(const std::string& symbol, EventBus& event_bus, receiverId_t receiver_id):
+Cache(
+    symbol,
+    EventReceiver(
         receiver_id, 
         std::bind(&CacheOrderBookL2::EventHandler, this, std::placeholders::_1),
         std::bind(&CacheOrderBookL2::Filter, this, std::placeholders::_1)
-    );
-
-    Cache::init(event_bus, event_receiver, {
+    )
+)
+{
+    Cache::init(event_bus, {
         EVENT_ID_MAKER_ORDER_ADDED,
         EVENT_ID_MAKER_ORDER_CANCELED,
         EVENT_ID_ORDER_FILLED,

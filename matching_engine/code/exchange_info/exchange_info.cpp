@@ -25,12 +25,12 @@ void ExchangeInfo::EventHandler_GetExchangeInfo(Event &event)
 
 ExchangeInfo::ExchangeInfo(EventBus& event_bus, receiverId_t receiver_id)
 {
-    EventReceiver event_receiver = EventReceiver(
+    this->event_receiver = EventReceiver(
         receiver_id,
         std::bind(&ExchangeInfo::EventHandler, this, std::placeholders::_1),
         nullptr);
 
-    event_bus.AddReceiver(event_receiver);
+    event_bus.AddReceiver(&this->event_receiver);
 
     event_bus.Subscribe(receiver_id, EVENT_ID_ADD_SYMBOL);
     event_bus.Subscribe(receiver_id, EVENT_ID_GET_EXCHANGE_INFO);

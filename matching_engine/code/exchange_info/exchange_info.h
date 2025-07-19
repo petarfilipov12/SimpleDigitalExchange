@@ -15,6 +15,7 @@
 class ExchangeInfo
 {   
     private:
+        EventReceiver event_receiver;
         std::map<std::string, symbol_data::SymbolData> symbols_data;
 
         returnType AddSymbol(const symbol_data::SymbolData& symbol_data);

@@ -11,12 +11,12 @@ Engine::Engine(const std::string &symbol, EventBus &event_bus, receiverId_t rece
                               { this->run(); });
     thread_engine.detach();
 
-    EventReceiver event_receiver = EventReceiver(
+    this->event_receiver = EventReceiver(
         receiver_id,
         std::bind(&Engine::EventHandler, this, std::placeholders::_1),
         std::bind(&Engine::Filter, this, std::placeholders::_1));
 
-    this->event_bus.AddReceiver(event_receiver);
+    this->event_bus.AddReceiver(&this->event_receiver);
 
     this->event_bus.Subscribe(receiver_id, EVENT_ID_ADD_ORDER);
     this->event_bus.Subscribe(receiver_id, EVENT_ID_CANCEL_ORDER);

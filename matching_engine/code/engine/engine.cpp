@@ -23,7 +23,7 @@ Engine::~Engine() {}
 
 bool Engine::ExistsOrder(const Order &order) const
 {
-    bool ret = this->taker_book.ExistsTakerOrder(order);
+    bool ret = this->taker_book.ExistsOrder(order);
 
     if (!ret)
     {
@@ -43,7 +43,7 @@ returnType Engine::AddOrder(Order order)
     eventId_t event_id = EVENT_ID_ADD_ORDER_FAILLED;
     returnType ret = RET_NOT_OK;
 
-    ret = this->taker_book.AddTakerOrder(order);
+    ret = this->taker_book.AddOrder(order);
 
     if (RET_OK == ret)
     {
@@ -63,7 +63,7 @@ returnType Engine::CancelOrder(const Order &order)
     returnType ret = RET_NOT_OK;
     Order *pOrder;
     
-    ret = this->taker_book.CancelTakerOrder(order, pOrder);
+    ret = this->taker_book.CancelOrder(order, pOrder);
 
     if(RET_OK == ret)
     {
@@ -245,7 +245,7 @@ void Engine::Cyclic()
     }
 
     ret = this->MatchTakerOrder(*takerOrder);
-    this->taker_book.ReleaseTakerOrder(*takerOrder);
+    this->taker_book.ReleaseOrder(*takerOrder);
 
     if ( (RET_TAKER_ORDER_ADDED_TO_BOOK == ret) || (RET_TAKER_ORDER_FILLED == ret) )
     {
@@ -261,11 +261,11 @@ void Engine::Cyclic()
             }
 
             takerOrder_id = takerOrder->id;
-            this->taker_book.ReleaseTakerOrder(*takerOrder);
+            this->taker_book.ReleaseOrder(*takerOrder);
 
             if( (RET_TAKER_ORDER_ADDED_TO_BOOK == ret) || (RET_TAKER_ORDER_FILLED == ret) )
             {
-                this->taker_book.CancelTakerOrderById(takerOrder_id, nullptr);
+                this->taker_book.CancelOrderById(takerOrder_id, nullptr);
             }
         }
     }

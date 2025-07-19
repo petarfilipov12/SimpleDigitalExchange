@@ -60,7 +60,7 @@ json candle::Candle::ConvertCandleToJson()const
     return j_candle;
 }
 
-void candle::to_json(json &j, const Candle c)
+void candle::to_json(json &j, const Candle& c)
 {
     j = c.ConvertCandleToJson();
 }

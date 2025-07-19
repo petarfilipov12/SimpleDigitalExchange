@@ -9,6 +9,7 @@ enum eReturnType_t
     //Book
     RET_ORDER_EXISTS,
     RET_ORDER_NOT_EXISTS,
+    RET_ORDER_IN_USE,
     RET_BOOK_EMPTY,
 
     //Event Bus

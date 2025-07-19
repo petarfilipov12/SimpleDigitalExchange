@@ -21,7 +21,7 @@ namespace trade
         time_t timestamp;
     };
     
-    void to_json(json& j, const struct sTrade t);
+    void to_json(json& j, const struct sTrade& t);
 }
 
 #endif

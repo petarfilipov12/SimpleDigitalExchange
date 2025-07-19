@@ -2,7 +2,7 @@
 #define TAKER_ORDER_BOOK_H
 
 #include <list>
-#include <unordered_set>
+#include <unordered_map>
 #include <mutex>
 
 #include "return_type.h"
@@ -11,9 +11,10 @@
 class TakerOrderBook{
     private:
         std::list<Order> taker_orders_queue;
-        std::unordered_set<Order, Order::HashFunc> taker_orders;
+        std::unordered_map<Order, bool, Order::HashFunc> taker_orders;
 
-        mutable std::mutex taker_book_mtx;
+        mutable std::mutex taker_orders_queue_mtx;
+        mutable std::mutex taker_orders_mtx;
     
     public:
         TakerOrderBook();
@@ -34,6 +35,8 @@ class TakerOrderBook{
         returnType GetFirst(Order **pOrder);
 
         returnType PopFirst();
+
+        returnType ReleaseTakerOrder(Order& order);
 };
 
 #endif

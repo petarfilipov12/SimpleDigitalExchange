@@ -83,7 +83,17 @@ returnType OrderBook::GetBidFirst(Order **pOrder)
     return this->bid_book.GetFirst(pOrder);
 }
 
+returnType OrderBook::ReleaseBidOrder(Order& order)
+{
+    return this->bid_book.ReleaseOrder(order);
+}
+
 returnType OrderBook::GetAskFirst(Order **pOrder)
 {
     return this->ask_book.GetFirst(pOrder);
+}
+
+returnType OrderBook::ReleaseAskOrder(Order& order)
+{
+    return this->ask_book.ReleaseOrder(order);
 }

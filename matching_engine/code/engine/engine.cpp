@@ -4,9 +4,6 @@
 
 Engine::Engine(const std::string &symbol, EventBus &event_bus, receiverId_t receiver_id) : event_bus(event_bus), symbol(symbol)
 {
-    this->taker_order_ptr = nullptr;
-    this->book_order_ptr = nullptr;
-
     std::thread thread_engine([this]
                               { this->run(); });
     thread_engine.detach();
@@ -65,44 +62,29 @@ returnType Engine::CancelOrder(const Order &order)
     json j_data = order.ConvertOrderToJson();
     returnType ret = RET_NOT_OK;
     Order *pOrder;
-    bool flag = false;
+    
+    ret = this->taker_book.CancelTakerOrder(order, pOrder);
 
-    //Canceling book order is more likely, so check this first
-    std::shared_lock<std::shared_mutex> book_order_ptr_lock(this->book_order_ptr_mtx);
-    if ((this->book_order_ptr != nullptr) && (order == *(this->book_order_ptr)))
+    if(RET_OK == ret)
     {
-        book_order_ptr_lock.unlock();
-        flag = true;
+        event_id = EVENT_ID_TAKER_ORDER_CANCELED;
+        j_data = pOrder->ConvertOrderToJson();
     }
-    else
+    else if(RET_ORDER_NOT_EXISTS == ret)
     {
         ret = this->order_book.CancelOrder(order, pOrder);
-        book_order_ptr_lock.unlock();
 
-        if (RET_OK == ret)
+        if(RET_OK == ret)
         {
             event_id = EVENT_ID_MAKER_ORDER_CANCELED;
             j_data = pOrder->ConvertOrderToJson();
-            flag = true;
         }
     }
-
-    if ((!flag) && (RET_ORDER_NOT_EXISTS == ret))
+    else
     {
-        std::shared_lock<std::shared_mutex> taker_order_ptr_lock(this->taker_order_ptr_mtx);
-        if ((this->taker_order_ptr == nullptr) || (order != *(this->taker_order_ptr)))
-        {
-            ret = this->taker_book.CancelTakerOrder(order, pOrder);
-            taker_order_ptr_lock.unlock();
-
-            if (RET_OK == ret)
-            {
-                event_id = EVENT_ID_MAKER_ORDER_CANCELED;
-                j_data = pOrder->ConvertOrderToJson();
-            }
-        }
+        //Nothing to do
     }
-
+        
     this->event_bus.Send(Event(event_id, j_data, nullptr));
 
     return ret;
@@ -128,11 +110,14 @@ returnType Engine::AddToOrderBook(Order &pTakerOrder)
 returnType Engine::MatchTakerOrder(Order &pTakerOrder)
 {
     returnType ret = RET_NOT_OK;
+    Order *bookOrder;
+    std::function<returnType(Order&)> release_func;
     json j_data;
     float quantity;
     float bookOrder_quantity;
 
-    std::unique_lock<std::shared_mutex> book_order_ptr_lock(this->book_order_ptr_mtx, std::defer_lock);
+    bool diff;
+    int book_order_id;
 
     if ((ORDER_TYPE_MARKET != pTakerOrder.order_type) && (ORDER_TYPE_LIMIT != pTakerOrder.order_type))
     {
@@ -146,13 +131,9 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
 
     if (pTakerOrder.order_side == ORDER_SIDE_BUY)
     {
-        book_order_ptr_lock.lock();
-        ret = this->order_book.GetAskFirst(&(this->book_order_ptr));
+        ret = this->order_book.GetAskFirst(&bookOrder);
         if (RET_BOOK_EMPTY == ret)
         {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
-
             if (ORDER_TYPE_LIMIT == pTakerOrder.order_type)
             {
                 this->AddToOrderBook(pTakerOrder);
@@ -165,29 +146,23 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
         }
         else if (RET_OK != ret)
         {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
-
             return RET_NOT_OK;
         }
 
-        if ((ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) < stof(this->book_order_ptr->price)))
-        {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
+        release_func = [this](Order& order) -> returnType{return this->order_book.ReleaseAskOrder(order);};
 
+        if ((ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) < stof(bookOrder->price)))
+        {
             this->AddToOrderBook(pTakerOrder);
+            release_func(*bookOrder);
             return RET_TAKER_ORDER_ADDED_TO_BOOK;
         }
     }
     else if (pTakerOrder.order_side == ORDER_SIDE_SELL)
     {
-        book_order_ptr_lock.lock();
-        ret = this->order_book.GetBidFirst(&(this->book_order_ptr));
+        ret = this->order_book.GetBidFirst(&(bookOrder));
         if (RET_BOOK_EMPTY == ret)
         {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
 
             if (ORDER_TYPE_LIMIT == pTakerOrder.order_type)
             {
@@ -201,18 +176,15 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
         }
         else if (RET_OK != ret)
         {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
-
             return RET_NOT_OK;
         }
 
-        if ((ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) > stof(this->book_order_ptr->price)))
-        {
-            this->book_order_ptr = nullptr;
-            book_order_ptr_lock.unlock();
+        release_func = [this](Order& order) -> returnType{return this->order_book.ReleaseBidOrder(order);};
 
+        if ((ORDER_TYPE_LIMIT == pTakerOrder.order_type) && (stof(pTakerOrder.price) > stof(bookOrder->price)))
+        {
             this->AddToOrderBook(pTakerOrder);
+            release_func(*bookOrder);
             return RET_TAKER_ORDER_ADDED_TO_BOOK;
         }
     }
@@ -223,7 +195,7 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
 
     quantity = (pTakerOrder.quantity - pTakerOrder.filled);
 
-    bookOrder_quantity = (this->book_order_ptr->quantity - this->book_order_ptr->filled);
+    bookOrder_quantity = (bookOrder->quantity - bookOrder->filled);
     if (bookOrder_quantity < quantity)
     {
         quantity = bookOrder_quantity;
@@ -231,17 +203,21 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
 
     j_data["symbol"] = this->symbol;
     j_data["taker_order"] = pTakerOrder.ConvertOrderToJson();
-    j_data["book_order"] = this->book_order_ptr->ConvertOrderToJson();
-    j_data["price"] = this->book_order_ptr->price;
+    j_data["book_order"] = bookOrder->ConvertOrderToJson();
+    j_data["price"] = bookOrder->price;
     j_data["quantity"] = quantity;
 
-    this->book_order_ptr->filled += quantity;
-    if (this->book_order_ptr->filled >= this->book_order_ptr->quantity)
+    bookOrder->filled += quantity;
+
+    diff = bookOrder->filled >= bookOrder->quantity;
+    book_order_id = bookOrder->id;
+
+    release_func(*bookOrder);
+
+    if (diff)
     {
-        this->order_book.CancelOrderById(this->book_order_ptr->id, nullptr);
+        this->order_book.CancelOrderById(book_order_id, nullptr);
     }
-    this->book_order_ptr = nullptr;
-    book_order_ptr_lock.unlock();
 
     this->event_bus.Send(Event(EVENT_ID_ORDER_FILLED, j_data, nullptr));
 
@@ -258,19 +234,18 @@ returnType Engine::MatchTakerOrder(Order &pTakerOrder)
 
 void Engine::Cyclic()
 {
+    Order *takerOrder;
+    int takerOrder_id;
     returnType ret = RET_NOT_OK;
     int i = 1;
 
-    std::unique_lock<std::shared_mutex> taker_order_ptr_lock(this->taker_order_ptr_mtx);
-    if (RET_OK != this->taker_book.GetFirst(&(this->taker_order_ptr)))
+    if (RET_OK != this->taker_book.GetFirst(&takerOrder))
     {
-        this->taker_order_ptr = nullptr;
         return;
     }
 
-    ret = this->MatchTakerOrder(*(this->taker_order_ptr));
-    this->taker_order_ptr = nullptr;
-    taker_order_ptr_lock.unlock();
+    ret = this->MatchTakerOrder(*takerOrder);
+    this->taker_book.ReleaseTakerOrder(*takerOrder);
 
     if ( (RET_TAKER_ORDER_ADDED_TO_BOOK == ret) || (RET_TAKER_ORDER_FILLED == ret) )
     {
@@ -278,23 +253,21 @@ void Engine::Cyclic()
     }
     else if (RET_BOOK_EMPTY == ret)
     {
-        taker_order_ptr_lock.lock();
         for (i = 1; RET_BOOK_EMPTY == ret; i++)
         {
-            if (RET_OK != this->taker_book.GetAt(i, &(this->taker_order_ptr)))
+            if (RET_OK != this->taker_book.GetAt(i, &takerOrder))
             {
-                this->taker_order_ptr = nullptr;
                 return;
             }
 
+            takerOrder_id = takerOrder->id;
+            this->taker_book.ReleaseTakerOrder(*takerOrder);
+
             if( (RET_TAKER_ORDER_ADDED_TO_BOOK == ret) || (RET_TAKER_ORDER_FILLED == ret) )
             {
-                this->taker_book.CancelTakerOrderById(this->taker_order_ptr->id, nullptr);
+                this->taker_book.CancelTakerOrderById(takerOrder_id, nullptr);
             }
         }
-
-        this->taker_order_ptr = nullptr;
-        taker_order_ptr_lock.unlock();
     }
 }
 

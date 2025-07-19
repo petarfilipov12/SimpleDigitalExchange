@@ -6,11 +6,7 @@
 #include <string>
 #include <ctime>
 
-
-
 #include "json.h"
-
-
 
 namespace candle
 {
@@ -39,7 +35,7 @@ namespace candle
             json ConvertCandleToJson()const;
     };
 
-    void to_json(json &j, const Candle c);
+    void to_json(json &j, const Candle& c);
 }
 
 #endif

@@ -29,7 +29,11 @@ class OrderBook{
 
         returnType GetBidFirst(Order **pOrder);
 
+        returnType ReleaseBidOrder(Order& order);
+
         returnType GetAskFirst(Order **pOrder);
+
+        returnType ReleaseAskOrder(Order& order);
 
 };
 

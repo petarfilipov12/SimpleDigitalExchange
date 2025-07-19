@@ -11,7 +11,7 @@ namespace symbol_data
         std::string symbol;
     };
 
-    void to_json(json& j, const struct SymbolData s_data);
+    void to_json(json& j, const struct SymbolData& s_data);
 }
 
 #endif
